@@ -1,0 +1,70 @@
+@import '~@lumino/default-theme/style/index.css';
+
+body {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#menuBar {
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  background-color: rgb(53, 28, 117);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+}
+
+.enthought-title {
+  margin-left: 10px;
+  color: var(--neutral-layer-1);
+}
+
+.logout-button {
+  height: 80%;
+}
+
+.app-greeting {
+  background-color: var(--neutral-layer-1);
+}
+
+.greeting-text {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.app-logs {
+  width: 100%;
+  height: 100%;
+  background-color: var(--neutral-layer-1);
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+.plot-container {
+  background-color: var(--neutral-layer-1);
+}
+
+#main {
+  flex: 1 1 auto;
+}
+
+#palette {
+  min-width: 300px;
+  border-right: 1px solid #dddddd;
+}
+
+#dock {
+  padding: 4px;
+}
