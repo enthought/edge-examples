@@ -60,7 +60,7 @@ def create_app():
         return "healthy"
 
     @app.route("/")
-    @authenticated
+    #@authenticated
     def serve():
         return render_template("index.html")
 

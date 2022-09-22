@@ -12,7 +12,7 @@ USER app_admin
 RUN edm install authlib flask gunicorn requests -y
 
 WORKDIR /home/app_admin
-COPY --chown=app_admin external-app-example external-app-example/
+COPY --chown=app_admin externally-hosted external-app-example/
 
 RUN chmod 777 external-app-example/startup-script.sh
 
