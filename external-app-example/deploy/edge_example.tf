@@ -153,7 +153,7 @@ resource "kubernetes_manifest" "virtualservice_edge-example-app" {
         "istio-ingress/platform-devops-enthought-com"
       ]
       hosts = [
-        "*"
+        "external-example.platform-devops.enthought.com"
       ]
       http = [
         {
