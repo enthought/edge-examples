@@ -1,25 +1,31 @@
 # Native App Example
 
 This folder contains a Flask + React application that showcases how to
-create an Edge native application, the native app is packaged as a docker image that will be consumed by the JupyterHub spawner system.
+create an Edge native application. The native app is packaged as a docker image that will be consumed by the JupyterHub spawner system.
+
+## Requirements
+
+To build and run the example application you will need:
+- [Docker](https://docke.com)
+- [Node JS}(https://nodejs.org)
+- [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
 ## Set up the development environment
 
-To build and run the example application you will need EDM, Docker, and `npm`
-installed and available in your PATH.
-
-You will also need to install dependencies into an EDM environment:
-
-- Create a development environment:
+First, you will need to create an EDM environment named `dev_env` and install some dependencies.
 
 ```commandline
-    edm install -e dev_env --version 3.8 -y click requests opencv_python "flask>2"
-    edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy"
+edm install -e dev_env --version 3.8 -y click requests opencv_python "flask>2" && \
+edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
+    dockerspawner \
+    "configurable-http-proxy" \
+    Flask-Session
 ```   
-- Activate the `dev_env` environment:
+
+Once you have created the `dev_env` environment, you may activate it with:
 
 ```commandline
-    edm shell -e dev_env
+edm shell -e dev_env
 ```   
 
 ## Running the Application
@@ -32,12 +38,13 @@ run:
     python -m ci build
 ```
 
-Once built, start the JupyterHub session containing the application with:
+Once built, you can run the image from within a local JupyterHub session. You may start the JupyterHub session containing the application with:
 
 ```commandline
     python -m ci start
 ```
-the password of the `JupyterHub` session is defined in the `ci/jupyterhub_config.py` file.
+
+For your local JupyterHub session, your username is `dummy` and the password is `password`.
 
 To start the application in file watching mode:
 - Start the application and watch the backend changes:

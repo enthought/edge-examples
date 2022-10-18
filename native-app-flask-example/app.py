@@ -13,7 +13,15 @@ from functools import wraps
 from uuid import uuid4
 
 import requests
-from flask import Flask, make_response, redirect, render_template, request, session
+from flask import (
+    Flask,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session
+)
+from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
 
@@ -48,7 +56,11 @@ def track_activity(f):
                         "Authorization": f"token {API_TOKEN}",
                         "Content-Type": "application/json",
                     },
-                    json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
+                    json={
+                        "servers": {
+                            SERVER_NAME: {"last_activity": last_activity}
+                        }
+                    },
                 )
             except Exception:
                 pass
@@ -75,14 +87,17 @@ def authenticated(f):
         else:
             # redirect to login url on failed auth
             state = AUTH.generate_state(next_url=request.path)
-            response = make_response(redirect(AUTH.login_url + "&state=%s" % state))
+            response = make_response(
+                redirect(AUTH.login_url + "&state=%s" % state)
+            )
             response.set_cookie(AUTH.state_cookie_name, state)
             return response
 
     return decorated
 
 
-def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
+def task(id: str, result_dict: dict,
+         encoded_string: str, params: dict) -> None:
     result = detect_face(encoded_string, params)
     result_dict[id] = result
 
@@ -100,14 +115,16 @@ def create_app():
         static_folder="frontend/dist",
         static_url_path=PREFIX + "static",
     )
-    app.secret_key = "super secret key"
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SECRET_KEY'] = "super secret key"
+    sess = Session()
+    sess.init_app(app)
 
     @app.route(PREFIX)
     @track_activity
     @authenticated
     def serve(**kwargs):
         """The main handle to serve the index page."""
-
         hub_user = kwargs.get("hub_user", {"name": "No user"})
         return render_template(
             "index.html", **{"user": hub_user["name"], "url_prefix": PREFIX}

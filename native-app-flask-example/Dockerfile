@@ -11,7 +11,7 @@ USER app_admin
 
 RUN edm install --version 3.8 click opencv_python "flask>2" gunicorn requests -y
 
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy"
+RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session
 
 WORKDIR /home/app_admin
 COPY --chown=app_admin native-app-flask-example native-app-flask-example/
