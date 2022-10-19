@@ -7,7 +7,7 @@ create an Edge native application. The native app is packaged as a docker image 
 
 To build and run the example application you will need:
 - [Docker](https://docke.com)
-- [Node JS}(https://nodejs.org)
+- [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
 ## Set up the development environment
