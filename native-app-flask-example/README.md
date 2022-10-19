@@ -91,35 +91,17 @@ Flask should bind to the hostname and port specified in this variable.
     StandaloneApplication(application, options).run()
 ```
 
-### Reporting server activities back to `JupyterHub`: 
+### Reporting server activities back to Edge: 
 
 Edge will shut your application down after a while if it is considered inactive.
 To avoid this, you will need to report activity back to the server when the user
-interacts with your app.
+interacts with your app. 
 
-To report activities, users can send a POST request to the URL defined by the 
-`JUPYTERHUB_ACTIVITY_URL` environment variable. The authentication with `JupyterHub`
-is done with the token `JUPYTERHUB_API_TOKEN`. For example  
-
-```python
-# native-app-flask-example/app.py
-    ...
-    ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
-    API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
-    SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
-    if ACTIVITY_URL:
-        try:
-            requests.post(
-                ACTIVITY_URL,
-                headers={
-                    "Authorization": f"token {API_TOKEN}",
-                    "Content-Type": "application/json",
-                },
-                json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
-            )
-        except Exception:
-            pass
-```
+To report activities, users can send a POST to the URL provided in the
+`JUPYTERHUB_ACTIVITY_URL` environment variable, using the token provided
+in `JUPYTERHUB_API_TOKEN`. In this native app example, the 
+[`trackactivity` decorator](./src/app.py#L61) is used to perform this POST
+whenever any Flask endpoint is accessed.
 
 ## The authentication flow using JupyterHub as an OAuth provider
 
