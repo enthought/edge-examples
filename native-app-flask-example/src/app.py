@@ -7,8 +7,10 @@
 # Distribution is prohibited.
 
 import datetime
+import logging
 import multiprocessing as mp
 import os
+import sys
 from functools import wraps
 from uuid import uuid4
 
@@ -27,10 +29,22 @@ from jupyterhub.utils import isoformat
 
 from .opencv_model.model import detect_face
 
-# Flag to deactivate the `authenticated` and `track_activity` decorator.
-# It is used to develop the app outside of JupyterHub environment.
-DEV_MODE = int(os.environ.get("DEV_MODE", 0))
+# When running flask in debug mode outside of a JupyterHub environment,
+# deactivate the `authenticated` and `track_activity` decorator.
+FLASK_DEBUG = int(os.environ.get("FLASK_DEBUG", 0))
 
+LOG = logging.getLogger(__name__)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(formatter)
+handler.setLevel(logging.DEBUG)
+LOG.addHandler(handler)
+if FLASK_DEBUG:
+    LOG.setLevel(logging.DEBUG)
+
+# When run from Edge, these environment variables will be provided
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
@@ -39,13 +53,17 @@ SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60)
 
+LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
+LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
+LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
+
 
 def track_activity(f):
     """Decorator for reporting server activities with the Hub"""
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if DEV_MODE == 1:
+        if FLASK_DEBUG == 1:
             return f(*args, **kwargs)
         last_activity = isoformat(datetime.datetime.now())
         if ACTIVITY_URL:
@@ -74,7 +92,7 @@ def authenticated(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if DEV_MODE == 1:
+        if FLASK_DEBUG == 1:
             return f(*args, **kwargs)
         token = session.get("token")
         if token:
@@ -98,15 +116,19 @@ def authenticated(f):
 
 def task(id: str, result_dict: dict,
          encoded_string: str, params: dict) -> None:
+    """Run face detection and store the result"""
     result = detect_face(encoded_string, params)
     result_dict[id] = result
 
 
 def create_app():
-
+    """Creates the Flask app with routes for serving the React application
+    and API routes for running jobs
+    """
     mp.set_start_method("spawn")  # Starts a fresh process instead of forking.
     manager = mp.Manager()
 
+    # Use a multiprocessing shared dictionary for aggregating job results
     RESULTS = manager.dict()
 
     app = Flask(
@@ -134,7 +156,9 @@ def create_app():
     @track_activity
     @authenticated
     def job(**kwargs):
+        """A job endpoint for receiving images and returning job results"""
         if request.method == "GET":
+            # Return finished task results and remove them from shared results
             ret = {}
             for taskId, value in RESULTS.items():
                 if value:
@@ -143,6 +167,7 @@ def create_app():
             return ret
 
         if request.method == "POST":
+            # Spawn a face detection task and an id
             body = request.json
             id = str(uuid4())
             RESULTS[id] = None

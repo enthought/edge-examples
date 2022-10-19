@@ -85,8 +85,9 @@ def watch_backend():
     """Start the application and watch backend changes"""
 
     print(f"\nStart {NATIVE_EXAMPLE_CONTAINER} in files watching mode\n")
-    cmd = ["flask", "--app", "app.py", "--debug", "run"]
+    cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
+    env["FLASK_DEBUG"] = "1"
     env["DEV_MODE"] = "1"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
