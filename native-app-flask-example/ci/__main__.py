@@ -8,12 +8,14 @@
 
 import os
 import subprocess
+from pathlib import Path
 
 import click
 
 NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
 NATIVE_EXAMPLE_CONTAINER = "edge-native-app-flask"
-MODULE_DIR = os.path.dirname(__file__)
+MODULE_DIR = os.path.dirname(Path(__file__).parent)
+SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
 @click.group()
@@ -28,7 +30,7 @@ def build(tag):
     """Build the native example app"""
     click.echo("Building the Native Example App...")
 
-    cwd = os.path.join(MODULE_DIR, "..", "frontend")
+    cwd = os.path.join(SRC_DIR, "frontend")
     subprocess.run(
         ["npm", "install"],
         check=True,
@@ -48,7 +50,7 @@ def build(tag):
         f"{NATIVE_EXAMPLE_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
-        "..",
+        MODULE_DIR,
     ]
     subprocess.run(cmd, check=True)
     click.echo("Done")
@@ -86,14 +88,14 @@ def watch_backend():
     cmd = ["flask", "--app", "app.py", "--debug", "run"]
     env = os.environ.copy()
     env["DEV_MODE"] = "1"
-    subprocess.run(cmd, check=True, env=env)
+    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 
 @watch_cmd.command(name="frontend")
 def watch_frontend():
     """Start the application and watch frontend changes"""
 
-    cwd = os.path.join(MODULE_DIR, "..", "frontend")
+    cwd = os.path.join(SRC_DIR, "frontend")
     subprocess.run(
         ["npm", "install"],
         check=True,

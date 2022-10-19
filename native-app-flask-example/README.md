@@ -1,7 +1,7 @@
 # Native App Example
 
 This folder contains a Flask + React application that showcases how to
-create an Edge native application. The native app is packaged as a docker image that will be consumed by the JupyterHub spawner system.
+create an Edge native application. The native app is packaged as a docker image that will be consumed by the Edge's JupyterHub spawner system.
 
 ## Requirements
 
@@ -38,7 +38,7 @@ run:
     python -m ci build
 ```
 
-Once built, you can run the image from within a local JupyterHub session. You may start the JupyterHub session containing the application with:
+Once built, you can run the image from a local JupyterHub session by running:
 
 ```commandline
     python -m ci start
@@ -46,26 +46,32 @@ Once built, you can run the image from within a local JupyterHub session. You ma
 
 For your local JupyterHub session, your username is `dummy` and the password is `password`.
 
-To start the application in file watching mode:
-- Start the application and watch the backend changes:
+## Local Development
+
+For development purposes, you may run this application outside of a JupyterHub using file
+watch modes for automatic reloading. To start the application and watch backend changes:
 
 ```commandline
     python -m ci watch backend
 ```
-- Watch the frontend changes:
+To watch the frontend changes:
 
 ```commandline
     python -m ci watch frontend
 ```
 
 
-## Requirements for a JupyterHub compatible application
+## Requirements for a Edge native application
+
+Edge's JupyterHub spawner will launch a native application's container and provide
+environment variables for routing and authentication.
 
 ### Using port and URL prefix provided by `JupyterHub`: 
 
-Once the docker image is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
+Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
 will be available. Users need to set the listening port and URL prefix of the
-application with values extracted from this variable. For example:
+application with values extracted from this variable. A `wsgi` based application such as
+Flask should bind to the hostname and port specified in this variable.
 
 ```python
 # native-app-flask-example/wsgi.py
@@ -90,6 +96,7 @@ application with values extracted from this variable. For example:
 Edge will shut your application down after a while if it is considered inactive.
 To avoid this, you will need to report activity back to the server when the user
 interacts with your app.
+
 To report activities, users can send a POST request to the URL defined by the 
 `JUPYTERHUB_ACTIVITY_URL` environment variable. The authentication with `JupyterHub`
 is done with the token `JUPYTERHUB_API_TOKEN`. For example  
