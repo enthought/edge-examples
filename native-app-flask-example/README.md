@@ -70,26 +70,8 @@ environment variables for routing and authentication.
 
 Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
 will be available. Users need to set the listening port and URL prefix of the
-application with values extracted from this variable. A `wsgi` based application such as
-Flask should bind to the hostname and port specified in this variable.
-
-```python
-# native-app-flask-example/wsgi.py
-    ...
-    service_url = os.environ.get('JUPYTERHUB_SERVICE_URL', None)
-    port = 8888
-    host = '0.0.0.0'
-    if service_url:
-        url = urlparse(service_url)
-        port = url.port
-        host = url.hostname
-    options = {
-        'bind': f'{host}:{port}',
-        'workers': 1,
-    }
-    application = create_app()
-    StandaloneApplication(application, options).run()
-```
+application with values extracted from this variable. In this native app example,
+the binding information is provided to the [`wsgi` application](./src/wsgi.py#L43).
 
 ### Reporting server activities back to Edge: 
 
@@ -103,61 +85,30 @@ in `JUPYTERHUB_API_TOKEN`. In this native app example, the
 [`trackactivity` decorator](./src/app.py#L61) is used to perform this POST
 whenever any Flask endpoint is accessed.
 
-## The authentication flow using JupyterHub as an OAuth provider
+## Using Edge as an OAuth provider
 
-Since the `jupyterHub` only proxies connections to the single-user server,
-it's the job of the server (`Flask` in this case) to provide the user authentication
-service. To simplify the process, `JupyterHub` can act as an OAuth provider for the
-single-user server.
-The authentication flow generally goes like this:
+Edge proxies connections to the single-user server, therefore
+it's the job of the native app (`Flask` in this case) to provide user authentication.
+To simplify the process, Edge can act as an OAuth provider for the
+single-user server. The authentication flow generally goes like this:
 
-* Create the `JupyterHub` authenticator (`jupyterhub.services.auth.HubOAuth`)
+* Create a [JupyterHub `HubOAuth` authenticator](./src/app.py#L54)
 with the `JUPYTERHUB_API_TOKEN` environment variable. This object provides methods
-to generate user's tokens, identify the user from tokens...
+to generate user tokens and identify Edge users accessing the native app via the
+generated tokens.
 
-    ```python
-    ...
-    API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
-    AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60)
-    ```
-* A non-authenticated user makes a request to access your application, the server
-redirects the user to the "authorize" endpoint on `JupyterHub` with extra information:
-    - the *state* of the request, given the redirect target.
-    - the cookie name for storing OAuth state.
+* When a non-authenticated user makes a request to access your application, the server
+[redirects the user](./src/app.py#L106) to the Edge login page with extra information:
+    - the [`state`](./src/app.py#L107) of the request, including the redirect
+      target to your application
+    - the [cookie name](./src/app.py#L109) for storing OAuth state.
 
-    ```python
-        ...
-        else:
-            # redirect to login url on failed auth
-            state = AUTH.generate_state(next_url=request.path)
-            response = make_response(redirect(AUTH.login_url + "&state=%s" % state))
-            response.set_cookie(AUTH.state_cookie_name, state)
-            return response
-    ```
-* After the user is authenticated with `JupyterHub`, the browser is redirected to the
-OAuth callback handle of the `Flask` server with the OAuth code. Your application needs
-to have this handle implemented to generate the user's token from this code.
+* After the user is authenticated with Edge, the browser is redirected to your application's
+[OAuth callback handler](./src/app.py#L182). Your application needs to [generate an Edge
+token](./src/app.py#L196) from the OAuth flow's code and store it in a user session.
 
-```python
-    @app.route(PREFIX + "oauth_callback")
-    def oauth_callback():
-        code = request.args.get("code", None)
-        if code is None:
-            return "Forbidden", 403
+* Finally authenticated user is [redirected](./src/app.py#L199) back to the original URL.
 
-        arg_state = request.args.get("state", None)
-        cookie_state = request.cookies.get(AUTH.state_cookie_name)
-        if arg_state is None or arg_state != cookie_state:
-            return "Forbidden", 403
-
-        session["token"] = AUTH.token_for_code(code)
-
-        next_url = AUTH.get_next_url(cookie_state) or PREFIX
-        response = make_response(redirect(next_url))
-        return response
-```
-
-* Finally, the authenticated user is redirected back to the original URL. 
-
-
-
+Any further requests to your native application can be using the `HubOAuth` and
+the token stored in the user's session. In this native app example, this is done using
+an [`authenticated` route decorator](./src/app#L90).
