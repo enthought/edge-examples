@@ -8,13 +8,12 @@
 
 import os
 import subprocess
-from pathlib import Path
 
 import click
 
 NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
 NATIVE_EXAMPLE_CONTAINER = "edge-native-app-flask"
-MODULE_DIR = os.path.dirname(Path(__file__).parent)
+MODULE_DIR = os.path.join(os.path.dirname(__file__), '..')
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 

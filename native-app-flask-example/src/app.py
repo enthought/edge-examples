@@ -180,7 +180,7 @@ def create_app():
 
     @app.route(PREFIX + "oauth_callback")
     def oauth_callback():
-        """The OAuth callback handle, this handle is required for the
+        """The OAuth callback handler, this handler is required for the
         authentication process with Hub.
         """
 
