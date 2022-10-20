@@ -15,6 +15,9 @@ from flask_session import Session
 from .api.auth import auth, authenticated
 from .api.users import users
 
+
+FLASK_DEBUG = os.environ["FLASK_DEBUG"]
+
 SESSION_SECRET_KEY_FILE = os.environ["SESSION_SECRET_KEY_FILE"]
 with open(SESSION_SECRET_KEY_FILE, "r") as fp:
     SESSION_SECRET_KEY = fp.read().strip()

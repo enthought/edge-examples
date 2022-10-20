@@ -40,7 +40,7 @@ def build(tag):
         f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
-        
+        "." 
     ]
     subprocess.run(cmd, cwd=MODULE_DIR, check=True)
     click.echo("Done")
