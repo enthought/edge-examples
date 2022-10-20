@@ -7,6 +7,7 @@
 # Distribution is prohibited.
 
 import logging
+import sys
 from functools import wraps
 
 from authlib.integrations.base_client.errors import OAuthError
@@ -15,6 +16,7 @@ from flask import current_app as app
 from flask import redirect, render_template, request, session, url_for
 
 LOG = logging.getLogger(__name__)
+
 
 auth = Blueprint("auth", __name__)
 

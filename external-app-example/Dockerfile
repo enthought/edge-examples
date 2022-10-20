@@ -10,6 +10,7 @@ RUN adduser app_admin
 USER app_admin
 
 RUN edm install authlib flask gunicorn requests -y
+RUN edm run -- python -m pip install Flask-Session
 
 WORKDIR /home/app_admin
 COPY --chown=app_admin external-app-example external-app-example/

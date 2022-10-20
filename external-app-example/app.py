@@ -10,6 +10,7 @@ import os
 
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, render_template
+from flask_session import Session
 
 from .api.auth import auth, authenticated
 from .api.users import users
@@ -43,15 +44,17 @@ OAUTH.register(
 
 
 def create_app():
-
     app = Flask(
         __name__,
         static_url_path="",
         template_folder="frontend/templates",
         static_folder="frontend/dist",
     )
-    app.secret_key = SESSION_SECRET_KEY
     app.session_cookie_name = "edge-external-app"
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SECRET_KEY'] = SESSION_SECRET_KEY
+    sess = Session()
+    sess.init_app(app)
     OAUTH.init_app(app)
     app.OAUTH = OAUTH.create_client("edge")
 
