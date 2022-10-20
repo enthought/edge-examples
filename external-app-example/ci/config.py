@@ -13,9 +13,6 @@ import socket
 
 EXTERNAL_EXAMPLE_IMAGE = "quay.io/enthought/edge-external-app-demo"
 
-PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
-
-
 def discover_ip():
     """Find the IP address we are connected to. More or less does the
     same thing as get_external_ip() but not using the SDK."""

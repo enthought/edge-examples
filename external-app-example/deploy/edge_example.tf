@@ -57,11 +57,11 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           image_pull_policy = "Always"
 
           env {
-            name  = "SESSION_SECRET_KEY"
+            name  = "SESSION_SECRET_KEY_FILE"
             value = "/secrets/secret_key"
           }
           env {
-            name  = "OAUTH_CLIENT_SECRET"
+            name  = "OAUTH_CLIENT_SECRET_FILE"
             value = "/secrets/client_secret"
           }
           env {

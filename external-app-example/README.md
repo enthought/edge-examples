@@ -3,6 +3,172 @@
 This folder contains a Flask + React application that showcases how to
 integrate an external web app with Edge, by using JupyterHub as the OAuth2 provider.
 
+## Pre-Requisites
+
+To integrate your external web app with Edge, you need to know the hostname of where
+your app will be hosted. For this demonstration, we will integrate the application deployed
+to [`https://edge-external-app-demo.platform-devops.enthought.com`](https://edge-external-app-demo.platform-devops.enthought.com)
+
+
+## Application Requirements
+
+Edge handles OAuth for your external web application. The requirements for the authenticating
+this Flask application are handled in [`api/auth.py`](./api/auth.py). These include
+
+## Registering Your Application
+
+As an Edge organization developer, you must register your application. From the Analysis
+app on Edge, start an Edge notebook and use the code below. Be sure to substitute the
+`external_hostname` with your application's hostname.
+
+```python
+from edge.apps.application import Application, AppResource
+from edge.apps.app_version import AppKindEnum, AppVersion
+
+external_hostname = "https://edge-external-app-demo.platform-devops.enthought.com"
+
+ICON = (
+  "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/w"
+  "D/AP+gvaeTAAABfklEQVRoge2ZTU7DMBBGHz9bECpLWAI36ZIdEvQa5Rpw"
+  "CFQhtaq66o5wErgCWSR7KAvbUrGaFI8Tu5XmSZbjuFK/mS/jNjYoiqLsMp"
+  "fAHKiBVeJWAwvgOkZ8mUG430rgQhLAfAfEuzZrEnnQEkANnAQG3RcVcLZp"
+  "oi2AlTe+7UzO/1h6441aDxMI6ZUcASz5m11/HMTeO3Cc8Lv8LDeNg2pNHQ"
+  "jAZdbPtCjzDnUgAK2BTWgN5CalAw4/01H/sfbeAQ0gN5IaOAJGwNBeF8AE"
+  "+LHzna4y25AEMALu18Z3GPGTThQFIglgaPsx8NmhFhGSGhjYPrt4iPsdeM"
+  "G8NxfAFPj25sVvWSHErEID4Bx4sM3xEaUokBgHxpgEPGHq4tXef/Q+16sT"
+  "EgdK269vc/hbMMmQOFBgHpln714WJAFMbe+W0zdatv76RnfmctPmQAWcph"
+  "KyhcbN3TYH3vvRIkK0SNwAX+Q/GyiBK0kAYE5GZhgLUwuvMIcsYvGKoij9"
+  "8ws479akcYBsnQAAAABJRU5ErkJggg=="
+)
+
+
+app = Application(
+            app_id='edge-external-app-demo',
+            visible_versions=[],
+            visible_auto_add=True,
+            max_resources=AppResource(cpu=1, gpu=0, memory=1000000),
+            max_global_resources=AppResource(cpu=10, gpu=1, memory=20000000),
+        )
+
+
+version1 = AppVersion(
+            app_id=app.app_id,
+            version="1.0.0",
+            title="Edge External App Demo, v1.0.0",
+            description="Demonstration of an external application",
+            icon=ICON,
+            kind=AppKindEnum.External,
+            link=external_hostname,
+            profiles={
+                "small": AppResource(cpu=1, gpu=0, memory=1000000, shutdown=7200),
+                "less-small": AppResource(cpu=2, gpu=0, memory=2000000, shutdown=14400),
+            },
+            default_profile="small",
+            volume_mount_point="/data",
+            suggested_volume_size=1,
+        )
+
+
+
+edge.applications.add_application(app)
+edge.applications.add_app_version(version1)
+
+result = edge.applications.register_oauth_client(app.app_id, f"{external_hostname}/authorize")
+result
+```
+
+The result will be something like this:
+
+```python
+{'client_id': 'service-edge-app-default-edge-external-app-demo',
+ 'client_secret': 'RANDOM_CLIENT_SECRET',
+ 'redirect_uri': 'https://edge-external-app-demo.platform-devops.enthought.com/authorize'}
+ ```
+
+
+
+ ## Local Development of this Example
+
+To perform local development on this application without Edge integration, you will need:
+- [Docker](https://docker.com)
+- [Node JS](https://nodejs.org)
+- [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+
+First, you will need to create an EDM environment named `dev_env` and install some dependencies.
+
+```commandline
+edm install -e dev_env --version 3.8 -y install authlib "flask>2" gunicorn requests && \
+edm run -e dev_env -- python -m pip install Flask-Session
+```   
+
+Once you have created the `dev_env` environment, you may activate it with:
+
+```commandline
+edm shell -e dev_env
+```
+
+
+## Registering Your Application
+
+
+
+```
+from edge.apps.application import Application, AppResource
+from edge.apps.app_version import AppKindEnum, AppVersion
+
+external_hostname = "https://edge-external-app-demo.platform-devops.enthought.com"
+
+ICON = (
+  "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/w"
+  "D/AP+gvaeTAAABfklEQVRoge2ZTU7DMBBGHz9bECpLWAI36ZIdEvQa5Rpw"
+  "CFQhtaq66o5wErgCWSR7KAvbUrGaFI8Tu5XmSZbjuFK/mS/jNjYoiqLsMp"
+  "fAHKiBVeJWAwvgOkZ8mUG430rgQhLAfAfEuzZrEnnQEkANnAQG3RcVcLZp"
+  "oi2AlTe+7UzO/1h6441aDxMI6ZUcASz5m11/HMTeO3Cc8Lv8LDeNg2pNHQ"
+  "jAZdbPtCjzDnUgAK2BTWgN5CalAw4/01H/sfbeAQ0gN5IaOAJGwNBeF8AE"
+  "+LHzna4y25AEMALu18Z3GPGTThQFIglgaPsx8NmhFhGSGhjYPrt4iPsdeM"
+  "G8NxfAFPj25sVvWSHErEID4Bx4sM3xEaUokBgHxpgEPGHq4tXef/Q+16sT"
+  "EgdK269vc/hbMMmQOFBgHpln714WJAFMbe+W0zdatv76RnfmctPmQAWcph"
+  "KyhcbN3TYH3vvRIkK0SNwAX+Q/GyiBK0kAYE5GZhgLUwuvMIcsYvGKoij9"
+  "8ws479akcYBsnQAAAABJRU5ErkJggg=="
+)
+
+
+app = Application(
+            app_id='edge-external-app-demo',
+            visible_versions=[],
+            visible_auto_add=True,
+            max_resources=AppResource(cpu=1, gpu=0, memory=1000000),
+            max_global_resources=AppResource(cpu=10, gpu=1, memory=20000000),
+        )
+
+
+version1 = AppVersion(
+            app_id=app.app_id,
+            version="1.0.0",
+            title="Edge External App Demo, v1.0.0",
+            description="Demonstration of an external application",
+            icon=ICON,
+            kind=AppKindEnum.External,
+            link=external_hostname,
+            profiles={
+                "small": AppResource(cpu=1, gpu=0, memory=1000000, shutdown=7200),
+                "less-small": AppResource(cpu=2, gpu=0, memory=2000000, shutdown=14400),
+            },
+            default_profile="small",
+            volume_mount_point="/data",
+            suggested_volume_size=1,
+        )
+
+
+
+edge.applications.add_application(app)
+edge.applications.add_app_version(version1)
+
+
+result = edge.applications.register_oauth_client(app.app_id, f"{external_hostname}/authorize")
+result
+```
+
 ## Understanding the OAuth 2.0 flow
     
 A single OAuth2 flow generally goes like this:

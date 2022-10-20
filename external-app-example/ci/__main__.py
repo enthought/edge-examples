@@ -11,7 +11,11 @@ import subprocess
 
 import click
 
-from .config import discover_ip, EXTERNAL_EXAMPLE_IMAGE, PROJECT_DIR
+from .config import discover_ip, EXTERNAL_EXAMPLE_IMAGE
+
+
+MODULE_DIR = os.path.join(os.path.dirname(__file__), '..')
+SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
 @click.group()
@@ -26,9 +30,9 @@ def build(tag):
     """Build external example app"""
     click.echo("Building the External Example App...")
     cmd = ["npm", "install"]
-    subprocess.run(cmd, check=True, cwd=os.path.join(PROJECT_DIR, "frontend"))
+    subprocess.run(cmd, check=True, cwd=os.path.join(SRC_DIR, "frontend"))
     cmd = ["npm", "run", "build"]
-    subprocess.run(cmd, check=True, cwd=os.path.join(PROJECT_DIR, "frontend"))
+    subprocess.run(cmd, check=True, cwd=os.path.join(SRC_DIR, "frontend"))
     cmd = [
         "docker",
         "build",
@@ -36,9 +40,9 @@ def build(tag):
         f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
-        "..",
+        
     ]
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, cwd=MODULE_DIR, check=True)
     click.echo("Done")
 
 
@@ -69,17 +73,42 @@ def stop():
     click.echo("Example app stopped")
 
 
+@cli.group(name="watch")
+def watch_cmd():
+    pass
+
+
+@watch_cmd.command(name="backend")
+def watch_backend():
+    """Start the application and watch backend changes"""
+
+    print(f"\nStart {EXTERNAL_EXAMPLE_IMAGE} in files watching mode\n")
+    cmd = ["flask", "--app", "app.py", "run", "-p 8020" ]
+    host = discover_ip()
+    env = os.environ.copy()
+    env.update({
+        "SESSION_SECRET_KEY_FILE": f"{MODULE_DIR}/test_secrets/secret_key",
+        "OAUTH_CLIENT_SECRET_FILE": f"{MODULE_DIR}/test_secrets/client_secret",
+        "OAUTH_CLIENT_ID": "service-edge-app-default-edge-external-app-demo",
+        "EDGE_BASE_URL": f"http://{host}:8000",
+        "OAUTH_REDIRECT_URI": "http://localhost:8020/authorize",
+        "FLASK_DEBUG": "1",
+    })
+    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+
+
 def start_external_example(tag):
     """Start the external example app."""
-    cmd = ["docker", "run"]
+    cmd = ["docker", "run", f"--volume={MODULE_DIR}/test_secrets:/test_secrets"]
     host = discover_ip()
     env = {
-        "SESSION_SECRET_KEY": "external-app-example/test_secrets/secret_key",
-        "OAUTH_CLIENT_SECRET": "external-app-example/test_secrets/client_secret",
+        "SESSION_SECRET_KEY_FILE": "/test_secrets/secret_key",
+        "OAUTH_CLIENT_SECRET_FILE": "/test_secrets/client_secret",
         "OAUTH_CLIENT_ID": "service-edge-app-default-external-demo",
         "EDGE_BASE_URL": f"http://{host}:8000",
         "OAUTH_REDIRECT_URI": "http://localhost:8020/authorize",
     }
+    
     for key, val in env.items():
         cmd.extend(["--env", f"{key}={val}"])
     cmd.extend(
@@ -89,11 +118,11 @@ def start_external_example(tag):
             "--name",
             "edge-external-demo-app",
             "-d",
-            f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}",
+            f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}"
         ]
     )
     # subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, cwd=MODULE_DIR, check=True)
 
 
 def stop_external_example():

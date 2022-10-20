@@ -15,11 +15,11 @@ from flask_session import Session
 from .api.auth import auth, authenticated
 from .api.users import users
 
-SESSION_SECRET_KEY_FILE = os.environ["SESSION_SECRET_KEY"]
+SESSION_SECRET_KEY_FILE = os.environ["SESSION_SECRET_KEY_FILE"]
 with open(SESSION_SECRET_KEY_FILE, "r") as fp:
     SESSION_SECRET_KEY = fp.read().strip()
 
-CLIENT_SECRET_FILE = os.environ["OAUTH_CLIENT_SECRET"]
+CLIENT_SECRET_FILE = os.environ["OAUTH_CLIENT_SECRET_FILE"]
 with open(CLIENT_SECRET_FILE, "r") as fp:
     CLIENT_SECRET = fp.read().strip()
 
