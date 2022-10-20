@@ -15,7 +15,7 @@ from flask import Blueprint
 from flask import current_app as app
 from flask import redirect, render_template, request, session, url_for
 
-FLASK_DEBUG = os.environ["FLASK_DEBUG"]
+FLASK_DEBUG = int(os.environ.get("FLASK_DEBUG", 0))
 LOG = logging.getLogger(__name__)
 
 

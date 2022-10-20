@@ -9,7 +9,7 @@ RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.1
 RUN adduser app_admin
 USER app_admin
 
-RUN edm install authlib "flask>2" gunicorn requests -y
+RUN edm install --version 3.8 authlib "flask>2" gunicorn requests -y
 RUN edm run -- python -m pip install Flask-Session
 
 WORKDIR /home/app_admin
