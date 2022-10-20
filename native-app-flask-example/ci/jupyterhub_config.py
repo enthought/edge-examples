@@ -29,7 +29,7 @@ def discover_ip():
 c = get_config()  # noqa
 temp = tempfile.gettempdir()
 
-# dummy for testing. Don't use this in production!
+# dummy authenticator for testing. Don't use this in production!
 c.JupyterHub.authenticator_class = "dummy"
 c.DummyAuthenticator.password = "password"
 

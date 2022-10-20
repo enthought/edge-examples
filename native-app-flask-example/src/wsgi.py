@@ -17,6 +17,11 @@ from .app import create_app
 
 
 class StandaloneApplication(gunicorn.app.base.BaseApplication):
+    """
+    A gunicorn custom application
+
+    https://docs.gunicorn.org/en/stable/custom.html
+    """
     def __init__(self, app, options=None):
         self.options = options or {}
         self.application = app
@@ -36,11 +41,15 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
 
 if __name__ == "__main__":
-
+    """Application main, which looks for JUPYTERHUB_SERVICE_URL provided
+    by Edge and binds Flask to the provided endpoint
+    """
     service_url = os.environ.get("JUPYTERHUB_SERVICE_URL", None)
+    # The default binding is any interface, on port 8888
     port = 8888
     host = "0.0.0.0"
     if service_url:
+        # Get the hostname and port where the container is being served
         url = urlparse(service_url)
         port = url.port
         host = url.hostname
