@@ -15,10 +15,6 @@ The requirements are:
 - A client ID from Edge (see above)
 - A `quay.io` username and password with access to the `quay.io/enthough/edge-external-app-demo` repo
 
-If it's your first time deploying the application, make sure you follow the
-steps below as they describe how to install and configure `kubectl` and
-the `terraform` CLI:
-
 ## Deploying Using Terraform
 
 1. Switch your namespace to `edge-dev`
@@ -58,7 +54,7 @@ on `platform-devops.enthought.com`.
 
 After you have completed the OAuth client registration process,
 you must configure several values within the Terraform deployment files:
-- Optionally, change the [`namespace`](./edge_example.tf#L16) and app name from the default `edge-example-app`
+- Optionally, change the [`namespace`](./edge_example.tf#L16) and app name from the default `edge-example-app` to a different namespace provided by Product DevOps
 - [`container image`](./edge_example.tf#L56) should be your application's published container
 - [`OAUTH_CLIENT_ID`](./edge_example.tf#L69) from the application registration process
 - [`OAUTH_REDIRECT_URI`](./edge_example.tf#L73) should be the `/authorize` endpoint wherever your app will be deployed

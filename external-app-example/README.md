@@ -26,7 +26,7 @@ to perform this task from within an Edge notebook. Be sure to substitute the
 `external_hostname` with your application's hostname.
 
 ```python
-from edge.apps.application import Application, AppResource
+from edge.apps.application import Application
 from edge.apps.app_version import AppKindEnum, AppVersion
 
 external_hostname = "https://edge-external-app-demo.platform-devops.enthought.com"
@@ -45,15 +45,7 @@ ICON = (
   "8ws479akcYBsnQAAAABJRU5ErkJggg=="
 )
 
-
-app = Application(
-            app_id='edge-external-app-demo',
-            visible_versions=[],
-            visible_auto_add=True,
-            max_resources=AppResource(cpu=1, gpu=0, memory=1000000),
-            max_global_resources=AppResource(cpu=10, gpu=1, memory=20000000),
-        )
-
+app = Application('edge-external-app-demo', True)
 
 version1 = AppVersion(
             app_id=app.app_id,
@@ -63,16 +55,7 @@ version1 = AppVersion(
             icon=ICON,
             kind=AppKindEnum.External,
             link=external_hostname,
-            profiles={
-                "small": AppResource(cpu=1, gpu=0, memory=1000000, shutdown=7200),
-                "less-small": AppResource(cpu=2, gpu=0, memory=2000000, shutdown=14400),
-            },
-            default_profile="small",
-            volume_mount_point="/data",
-            suggested_volume_size=1,
         )
-
-
 
 edge.applications.add_application(app)
 edge.applications.add_app_version(version1)
