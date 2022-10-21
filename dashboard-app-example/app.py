@@ -13,6 +13,7 @@ from functools import wraps
 from uuid import uuid4
 
 import requests
+import json
 from flask import (
     Flask,
     make_response,
@@ -24,6 +25,7 @@ from flask import (
 from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
+
 
 from .opencv_model.model import detect_face
 
@@ -125,10 +127,21 @@ def create_app():
     @authenticated
     def serve(**kwargs):
         """The main handle to serve the index page."""
-        hub_user = kwargs.get("hub_user", {"name": "No user"})
+        hub_user = kwargs.get("hub_user", None)
+        data = get_data(hub_user)
         return render_template(
-            "index.html", **{"user": hub_user["name"], "url_prefix": PREFIX}
+            "index.html", **{"data": data, "url_prefix": PREFIX}
         )
+    
+
+    def get_data(hub_user):
+        """Get data for this hub user"""
+        return {
+            "graph": {
+                "x": [1, 2, 3],
+                "y": [2, 6, 3]
+            }
+        }
 
     @app.route(PREFIX + "job", methods=["GET", "POST"])
     @track_activity

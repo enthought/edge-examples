@@ -8,17 +8,27 @@ import Form from "react-bootstrap/Form";
 import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 
-interface IState {
-  id: string;
+
+interface IData {
+  graph?: {
+    x: Array<number>,
+    y: Array<number>
+  }
 }
 
-export class Main extends Component<{ urlPrefix: string }, IState> {
+interface IState {
+  id: string;
+  data?: IData
+}
+
+export class Main extends Component<{ urlPrefix: string, data?: IData }, IState> {
   private stageRef: React.RefObject<HTMLDivElement>;
   private pollHandler: any = null;
-  constructor(props: { urlPrefix: string }) {
+  constructor(props: { urlPrefix: string, data?: IData }) {
     super(props);
     this.state = {
-      id: ""
+      id: "",
+      data: props.data
     };
 
     window.addEventListener("resize", this.resizeCanvas);
@@ -40,17 +50,21 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
   };
 
   render(): React.ReactNode {
+    if (!this.state.data?.graph) {
+      return (
+        <div>No data</div>
+      )
+    }
     return (
       <Plot
         data={[
           {
-            x: [1, 2, 3],
-            y: [2, 6, 3],
+            x: this.state.data.graph.x,
+            y: this.state.data.graph.y,
             type: 'scatter',
             mode: 'lines+markers',
             marker: {color: 'red'},
           },
-          {type: 'bar', x: [1, 2, 3], y: [2, 5, 3]},
         ]}
         layout={{
           title: "A Fancy Plot",
