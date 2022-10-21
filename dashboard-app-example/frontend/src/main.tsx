@@ -56,19 +56,19 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
     console.log(rows);
 
     return (
-      <Col>
+      <Col style={{backgroundColor: "#eee"}}>
         <Row>
           <h2>Edge Dashboard Example</h2>
         </Row>
-        <Row>
+        <Row style={{backgroundColor: "#eee"}}>
           <Col id="sidebar" md={3}>
             Side Info
           </Col>
           <Col id="graphs" md={9}>
             {rows.map(row => (
-              <Row>
+              <Row style={{marginBottom: "1em", backgroundColor: "#eee"}}>
                 {row.map(plot => (
-                  <Col md={3}>
+                  <Col md={4}>
                     <Plot
                       data={plot.data}
                       layout={{
