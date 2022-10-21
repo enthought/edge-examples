@@ -2,79 +2,91 @@ import "../style/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import React, { Component } from "react";
+import { Data } from 'plotly.js';
 import Plot from 'react-plotly.js';
 import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 
 
-interface IData {
-  graph?: {
-    x: Array<number>,
-    y: Array<number>
-  }
+const PLOTS_PER_ROW = 3;
+
+interface IPlot {
+  title: string;
+  key: string;
+  data: Array<Data>;
+}
+
+export interface IDashboard {
+  plots?: Array<IPlot>
 }
 
 interface IState {
   id: string;
-  data?: IData
+  dashboard?: IDashboard
 }
-
-export class Main extends Component<{ urlPrefix: string, data?: IData }, IState> {
-  private stageRef: React.RefObject<HTMLDivElement>;
-  private pollHandler: any = null;
-  constructor(props: { urlPrefix: string, data?: IData }) {
+export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard }, IState> {
+  constructor(props: { urlPrefix: string, dashboard?: IDashboard }) {
     super(props);
     this.state = {
       id: "",
-      data: props.data
+      dashboard: props.dashboard
     };
-
-    window.addEventListener("resize", this.resizeCanvas);
-    this.stageRef = React.createRef<HTMLDivElement>();
   }
-
-  componentDidMount(): void {
-    this.resizeCanvas();
-  }
-
+  
   makeUrl = (url: string): string => `${this.props.urlPrefix}${url}`;
 
-  resizeCanvas = () => {
-  };
-
-  preventDefault = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   render(): React.ReactNode {
-    if (!this.state.data?.graph) {
+    console.log(this.state);
+    if (!this.state.dashboard?.plots?.length) {
       return (
         <div>No data</div>
       )
     }
+    const rows: Array<Array<IPlot>> = [];
+    this.state.dashboard?.plots.forEach(
+      (plot, index) => {
+        const rowNum = Math.floor(index / PLOTS_PER_ROW);
+        if (rowNum > rows.length - 1) {
+          rows.push([] as Array<IPlot>);
+        };
+        rows[rowNum].push(plot)
+      }
+    )
+
+    console.log(rows);
+
     return (
-      <Plot
-        data={[
-          {
-            x: this.state.data.graph.x,
-            y: this.state.data.graph.y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            marker: {color: 'red'},
-          },
-        ]}
-        layout={{
-          title: "A Fancy Plot",
-          autosize: true
-        }}
-        useResizeHandler={true}
-        style={{
-          width: "100%", height: "100%"
-        }}
-      />
+      <Col>
+        <Row>
+          <h2>Edge Dashboard Example</h2>
+        </Row>
+        <Row>
+          <Col id="sidebar" md={3}>
+            Side Info
+          </Col>
+          <Col id="graphs" md={9}>
+            {rows.map(row => (
+              <Row>
+                {row.map(plot => (
+                  <Col md={3}>
+                    <Plot
+                      data={plot.data}
+                      layout={{
+                        title: plot.title,
+                        autosize: true
+                      }}
+                      useResizeHandler={true}
+                      style={{
+                        width: "100%", height: "100%"
+                      }}
+                    />                   
+                  </Col>
+                ))}
+              </Row>
+            ))}
+          </Col>
+        </Row>
+      </Col>
     );
   }
 }

@@ -128,19 +128,37 @@ def create_app():
     def serve(**kwargs):
         """The main handle to serve the index page."""
         hub_user = kwargs.get("hub_user", None)
-        data = get_data(hub_user)
+        dashboard = get_dashboard(hub_user)
         return render_template(
-            "index.html", **{"data": data, "url_prefix": PREFIX}
+            "index.html", **{"dashboard": dashboard, "url_prefix": PREFIX}
         )
     
-
-    def get_data(hub_user):
-        """Get data for this hub user"""
+    def get_scatterplot(key):
         return {
-            "graph": {
-                "x": [1, 2, 3],
-                "y": [2, 6, 3]
-            }
+            "title": "A served plot",
+            "key": key,
+            "data": [
+                {
+                    "x": [ 1, 2, 3 ],
+                    "y": [ 2, 6, 4 ],
+                    "type": "scatter",
+                    "mode": "lines+markers",
+                    "marker": {"color": "red"},
+                }
+            ]
+        }
+
+
+    def get_dashboard(hub_user):
+        """Get dashboard for this hub user"""
+        return {
+            "plots": [
+                get_scatterplot("plot1"),
+                get_scatterplot("plot2"),
+                get_scatterplot("plot3"),
+                get_scatterplot("plot4"),
+                get_scatterplot("plot5"),
+            ]
         }
 
     @app.route(PREFIX + "job", methods=["GET", "POST"])
