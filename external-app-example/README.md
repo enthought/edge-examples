@@ -10,20 +10,13 @@ your app will be hosted. For this demonstration, we will integrate the applicati
 to [`https://edge-external-app-demo.platform-devops.enthought.com`](https://edge-external-app-demo.platform-devops.enthought.com)
 
 
-## Application Requirements
+## Creating an Application Icon in Edge
 
-Edge handles OAuth for your external web application. The requirements for authentication
-in this example Flask application are handled in [`api/auth.py`](./api/auth.py). These include:
-- An [`authenticated` decorator](./src/api/auth.py#L25)
-- A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
-- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the `redirect_uri` for handling Edge OAuth
-
-## Registering The Application
-
-As an Edge organization developer you must register a new Edge OAuth Client by
-providing a `redirect_uri` for your application. You can use the code below
+The first step in integrating your external web app with Edge is creating an icon
+on Edge's Home. As an Edge organization developer, you can use the code below
 to perform this task from within an Edge notebook. Be sure to substitute the
 `external_hostname` with your application's hostname.
+
 
 ```python
 from edge.apps.application import Application
@@ -59,7 +52,18 @@ version1 = AppVersion(
 
 edge.applications.add_application(app)
 edge.applications.add_app_version(version1)
+```
 
+After running this code, return to the Home screen in Edge. You should see an icon labeled
+*Edge External App Demo v1.0.0*.
+
+## Registering The Application
+
+As an Edge organization developer you must register a new Edge OAuth Client by
+providing a `redirect_uri` for the application that you added in the previous step.
+You can use the code below to perform this task from within an Edge notebook.
+
+```python
 result = edge.applications.register_oauth_client(app.app_id, f"{external_hostname}/authorize")
 result
 ```
@@ -73,14 +77,26 @@ The result will look similar to this:
  ```
 
 These values (along with Edge's base URL `https://edge-dev-main.platform-devops.enthought.com`)
-should be provided to your application when you deploy it. This example application
-provides this configuration to [`authlib`](./src/app.py#L31)
+should be provided to your application when you deploy it. 
+
+## Configuring Your Application
+
+Edge handles OAuth for your external web application. In this example, 
+we provide  `client_id`, `client_secret` and `redirect_uri` to the
+[`authlib`](./src/app.py#L31) library.
+
+The requirements for authentication in this example Flask application are handled 
+in [`api/auth.py`](./api/auth.py). These include:
+- An [`authenticated` decorator](./src/api/auth.py#L25)
+- A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
+- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the `redirect_uri` for handling Edge OAuth
+
 
 ## Accessing The Application
 
-Your application should now appear in Edge's home screen as a tile named
-"Edge External App Demo, v1.0.0". Clicking on the tile will take you to your application.
-If you click the Login button on the example application, it will perform a login
+Once your application has been deployed using the configuration provided by Edge, you can
+click on the *Edge External App Demo, v1.0.0* tile. This will take you to your deployed
+web app. If you click the Login button on the example application, it will perform a login
 using Edge.
 
  ## Running the Application Locally
