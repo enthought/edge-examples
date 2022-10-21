@@ -52,7 +52,14 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
           },
           {type: 'bar', x: [1, 2, 3], y: [2, 5, 3]},
         ]}
-        layout={ {width: 320, height: 240, title: 'A Fancy Plot'} }
+        layout={{
+          title: "A Fancy Plot",
+          autosize: true
+        }}
+        useResizeHandler={true}
+        style={{
+          width: "100%", height: "100%"
+        }}
       />
     );
   }
