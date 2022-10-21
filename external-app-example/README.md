@@ -16,12 +16,13 @@ Edge handles OAuth for your external web application. The requirements for authe
 in this example Flask application are handled in [`api/auth.py`](./api/auth.py). These include:
 - An [`authenticated` decorator](./src/api/auth.py#L25)
 - A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
-- A [`/authorize` endpoint to Edge OAuth responses](./src/api/auth.#L57)
+- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the `redirect_uri` for handling Edge OAuth
 
-## Registering Your Application
+## Registering The Application
 
-As an Edge organization developer, you must register your application. From the Analysis
-app on Edge, start an Edge notebook and use the code below. Be sure to substitute the
+As an Edge organization developer you must register a new Edge OAuth Client by
+providing a `redirect_uri` for your application. You can use the code below
+to perform this task from within an Edge notebook. Be sure to substitute the
 `external_hostname` with your application's hostname.
 
 ```python
@@ -130,53 +131,3 @@ You can run this application in debug mode without Edge authentication integrati
 ```commandline
 python -m ci watch backend
 ```
-
-## Deploying the Application
-
-You can deploy this application if you have access to the `edge-dev`
-namespace from Product DevOps
-
-### Requirements
-
-The requirements are:
-- Access to the `edge-dev` namespace from Product DevOps
-- A kube config file from Product DevOps, installed at `~/.kube/config`
-- [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
-- [`kubelogin`](https://github.com/int128/kubelogin)
-- [`terraform`](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-- A client ID from Edge (see above)
-- A `quay.io` username and password with access to the `quay.io/enthough/edge-external-app-demo` repo
-
-If it's your first time deploying the application, make sure you follow the
-steps below as they describe how to install and configure `kubectl` and
-the `terraform` CLI:
-
-### Deploying Using Terraform
-
-1. Switch your namespace to `edge-dev`
-```bash
-kubectl config set-context --current --namespace=edge-dev
-```
-2. Test your configuration by viewing existing pods. You will be prompted for a login.
-```bash
-kubectl get pods
-```
-3. `cd` to the `deploy` directory.
-
-4. If it's your first time deploying the demo application from your environment,
-run:
-```bash
-terraform init
-```
-5. To *deploy* the demo application, run:
-```bash
-terraform apply
-```
-
-You will be prompted for the client ID, `quay.io` password and `quay.io` username.
-
-To check that your deployment succeded you can run `kubectl describe pod` or 
-`kubectl describe deploy`.
-
-You can open the demo app in your browser by going to
-[`https://edge-external-app-demo.platform-devops.enthought.com`](https://edge-external-app-demo.platform-devops.enthought.com)
