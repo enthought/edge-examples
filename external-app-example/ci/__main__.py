@@ -121,7 +121,6 @@ def start_external_example(tag):
             f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}"
         ]
     )
-    # subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     subprocess.run(cmd, cwd=MODULE_DIR, check=True)
 
 

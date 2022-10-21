@@ -1,13 +1,14 @@
 
 # Deploying the Edge External App Demo
 
-You can deploy this application if you have been granted access to the `edge-dev`
-namespace by Product DevOps
+There are many ways to deploy a web application, such as Ansible or Helm.
+In this example, we are using Terraform to deploy the example application
+to Kubernetes, in a namespace called `edge-dev`.
 
 ## Requirements
 
 The requirements are:
-- Access to the `edge-dev` namespace from Product DevOps
+- Request a namespace from Product DevOps
 - A kube config file from Product DevOps, installed at `~/.kube/config`
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
 - [`kubelogin`](https://github.com/int128/kubelogin)
@@ -17,7 +18,7 @@ The requirements are:
 
 ## Deploying Using Terraform
 
-1. Switch your namespace to `edge-dev`
+1. Switch your namespace to the one created for you. In this example, we are using `edge-dev`.
 ```bash
 kubectl config set-context --current --namespace=edge-dev
 ```
@@ -49,12 +50,12 @@ You can open the demo app in your browser by going to
 
 If you are deploying a fork of this application to a different domain name,
 you must *first* register the application on Edge using your desired `redirect_uri`
-with the new domain name. Contact Product DevOps to get a new domain hosted 
-on `platform-devops.enthought.com`.
+with the domain name where it will be hosted.
 
 After you have completed the OAuth client registration process,
 you must configure several values within the Terraform deployment files:
-- Optionally, change the [`namespace`](./edge_example.tf#L16) and app name from the default `edge-example-app` to a different namespace provided by Product DevOps
+- Change the [`namespace`](./edge_example.tf#L16) from `edge-dev` to the one provided by DevOps
+- Optionally, replace the default app name `edge-example-app` with your own app name.
 - [`container image`](./edge_example.tf#L56) should be your application's published container
 - [`OAUTH_CLIENT_ID`](./edge_example.tf#L69) from the application registration process
 - [`OAUTH_REDIRECT_URI`](./edge_example.tf#L73) should be the `/authorize` endpoint wherever your app will be deployed
