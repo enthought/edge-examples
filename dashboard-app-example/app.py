@@ -9,11 +9,11 @@
 import datetime
 import multiprocessing as mp
 import os
+import random
 from functools import wraps
 from uuid import uuid4
 
 import requests
-import json
 from flask import (
     Flask,
     make_response,
@@ -132,22 +132,21 @@ def create_app():
         return render_template(
             "index.html", **{"dashboard": dashboard, "url_prefix": PREFIX}
         )
-    
+
     def get_scatterplot(key):
         return {
             "title": "A served plot",
             "key": key,
             "data": [
                 {
-                    "x": [ 1, 2, 3 ],
-                    "y": [ 2, 6, 4 ],
+                    "x": list(range(5)),
+                    "y": [random.random() * 10 for n in range(5)],
                     "type": "scatter",
                     "mode": "lines+markers",
                     "marker": {"color": "red"},
                 }
             ]
         }
-
 
     def get_dashboard(hub_user):
         """Get dashboard for this hub user"""
