@@ -13,7 +13,7 @@ The requirements are:
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
 - [`kubelogin`](https://github.com/int128/kubelogin)
 - [`terraform`](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-- A client ID from Edge (see above)
+- An Outh Client ID from Edge (see [`README.MD`](../README.md))
 - A `quay.io` username and password with access to the `quay.io/enthough/edge-external-app-demo` repo
 
 ## Deploying Using Terraform
