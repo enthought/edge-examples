@@ -14,7 +14,7 @@ RUN edm install --version 3.8 click opencv_python "flask>2" gunicorn requests -y
 RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session
 
 WORKDIR /home/app_admin
-COPY --chown=app_admin native-app-flask-example native-app-flask-example/
+COPY --chown=app_admin ./src native-app-flask-example/
 
 WORKDIR /home/app_admin
 RUN chmod 777 native-app-flask-example/startup-script.sh
