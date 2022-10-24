@@ -1,4 +1,4 @@
-node_modules/
-.parcel-cache/
-ci/
-deploy/
+**/node_modules
+**/.parcel-cache
+**/__pycache__
+**/flask_session
