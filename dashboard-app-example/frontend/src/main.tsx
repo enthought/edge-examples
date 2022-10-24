@@ -7,23 +7,20 @@ import Plot from 'react-plotly.js';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
-
-const PLOTS_PER_ROW = 3;
-
 interface IPlot {
-  key: string;
   data: Array<Data>;
   layout: Layout;
   style?: CSSProperties;
 }
-
 
 interface IUser {
   name: string;
 }
 
 export interface IDashboard {
-  plots?: Array<IPlot>;
+  plots?: {
+    [ key: string ]: IPlot
+  };
   user?: IUser;
 }
 
@@ -46,12 +43,10 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
     };
   }
   
-  makeUrl = (url: string): string => `${this.props.urlPrefix}${url}`;
-
   render(): React.ReactNode {
     const { user, plots } = this.state.dashboard ?? { user: undefined, plots: undefined };
     console.log(this.state.dashboard);
-    if (!plots?.length) {
+    if (!Object.keys(plots ?? {}).length) {
       return (
         <div>No data</div>
       )
@@ -65,23 +60,34 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
         <Row style={{backgroundColor: "#eee"}}>
           <Col id="sidebar" md={3}>
             <h5>{user ? `Welcome ${user.name}` : "User not logged in"}</h5>
+            <div>
+              Plots
+            </div>
+            {Object.entries(plots!).map(
+              ([id, plot]) => (
+                <div>
+                  <a href={`#${id}`}>{`${plot.layout.title}`}</a>
+                </div>
+              )
+            )}
           </Col>
           <Col id="graphs" md={9}>
             <div style={{width: "100%", height: "100%", backgroundColor: "#eee", display: "flex", "flexWrap": "wrap"}}>
-              {plots.map(
-                (plot) => {
+              {Object.entries(plots!).map(
+                ([id, plot]) => {
                   const { data, layout, style } = plot;
                   return (
-                    <Plot
-                      data={data}
-                      layout={layout}
-                      useResizeHandler={true}
-                      style={{
-                        ...DEFAULT_PLOT_STYLE,
-                        ...style
-                      }}
-                      key={plot.key}
-                  />
+                    <div id={id} key={id}>
+                      <Plot
+                        data={data}
+                        layout={layout}
+                        useResizeHandler={true}
+                        style={{
+                          ...DEFAULT_PLOT_STYLE,
+                          ...style
+                        }}
+                      />
+                    </div>
                   )
                 }
               )}

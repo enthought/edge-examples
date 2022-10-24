@@ -133,10 +133,9 @@ def create_app():
             "index.html", **{"dashboard": dashboard, "url_prefix": PREFIX}
         )
 
-    def get_scatterplot(key):
+    def get_scatterplot():
         return {
             "title": "A served plot",
-            "key": key,
             "data": [
                 {
                     "x": list(range(5)),
@@ -158,13 +157,13 @@ def create_app():
     def get_dashboard(hub_user):
         """Get dashboard for this hub user"""
         return {
-            "plots": [
-                get_scatterplot("plot1"),
-                get_scatterplot("plot2"),
-                get_scatterplot("plot3"),
-                get_scatterplot("plot4"),
-                get_scatterplot("plot5"),
-            ],
+            "plots": {
+                "plot1": get_scatterplot(),
+                "plot2": get_scatterplot(),
+                "plot3": get_scatterplot(),
+                "plot4": get_scatterplot(),
+                "plot5": get_scatterplot(),
+            },
             "user": hub_user
         }
 
