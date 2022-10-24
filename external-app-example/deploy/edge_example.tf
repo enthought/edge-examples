@@ -57,20 +57,20 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           image_pull_policy = "Always"
 
           env {
-            name  = "SESSION_SECRET_KEY"
+            name  = "SESSION_SECRET_KEY_FILE"
             value = "/secrets/secret_key"
           }
           env {
-            name  = "OAUTH_CLIENT_SECRET"
+            name  = "OAUTH_CLIENT_SECRET_FILE"
             value = "/secrets/client_secret"
           }
           env {
             name  = "OAUTH_CLIENT_ID"
-            value = "service-edge-app-default-external-demo"
+            value = "service-edge-app-default-edge-external-app-demo"
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
-            value = "http://edge-dev.platform-devops.enthought.com/authorize"
+            value = "http://edge-external-app-demo.platform-devops.enthought.com/authorize"
           }
           env {
             name  = "EDGE_BASE_URL"
@@ -153,7 +153,7 @@ resource "kubernetes_manifest" "virtualservice_edge-example-app" {
         "istio-ingress/platform-devops-enthought-com"
       ]
       hosts = [
-        "external-example.platform-devops.enthought.com"
+        "edge-external-app-demo.platform-devops.enthought.com"
       ]
       http = [
         {
