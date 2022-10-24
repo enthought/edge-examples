@@ -137,8 +137,8 @@ def create_app():
         return {
             "id": id,
             "data": [{
-                "x": list(range(5)),
-                "y": [random.random() * 10 for n in range(5)],
+                "x": list(range(20)),
+                "y": [random.random() * 10 for n in range(20)],
                 "type": "scatter",
                 "mode": "lines+markers",
                 "marker": {"color": "red"},
@@ -147,8 +147,8 @@ def create_app():
                 "title": "Scatter Plot"
             },
             "style": {
-                "width": "300px",
-                "height": "300px"
+                "width": "400px",
+                "height": "400px"
             }
         }
 
@@ -168,6 +168,27 @@ def create_app():
                 "height": "400px"
             }
         }
+    
+
+    def get_sunburst(id):
+        return {
+            "id": id,
+            "data": [{
+                "type": "sunburst",
+                "labels": ["Root", "Child A", "Child B", "Leaf B", "Leaf A",  "Child E", "Leaf C"],
+                "parents": ["", "Root", "Root", "Child B", "Child B", "Root", "Child A" ],
+                "values":  [10, 16, 14, 9, 12, 4, 3, 3],
+                "leaf": {"opacity": 0.5},
+                "marker": {"line": {"width": 1}},
+            }],
+            "layout": {
+                "title": "Sunburst Chart",
+            },
+            "style": {
+                "width": "450px",
+                "height": "450px"
+            }
+        }
 
     def get_dashboard(hub_user):
         """Get dashboard for this hub user"""
@@ -175,9 +196,7 @@ def create_app():
             "plots": [
                 get_scatterplot("scatter1"),
                 get_piechart("pie1"),
-                get_scatterplot("scatter2"),
-                get_scatterplot("scatter3"),
-                get_scatterplot("scatter4")
+                get_sunburst("sunburst1")
             ],
            "user": hub_user
         }
