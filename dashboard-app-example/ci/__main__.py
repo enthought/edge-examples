@@ -11,9 +11,10 @@ import subprocess
 
 import click
 
-NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-dashboard-demo"
-NATIVE_EXAMPLE_CONTAINER = "edge-dashboard-demo"
-MODULE_DIR = os.path.dirname(__file__)
+DASHBOARD_EXAMPLE_IMAGE = "quay.io/enthought/edge-dashboard-demo"
+DASHBOARD_EXAMPLE_CONTAINER = "edge-dashboard-demo"
+MODULE_DIR = os.path.join(os.path.dirname(__file__), '..')
+SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
 @click.group()
@@ -28,7 +29,7 @@ def build(tag):
     """Build the native example app"""
     click.echo("Building the Native Example App...")
 
-    cwd = os.path.join(MODULE_DIR, "..", "frontend")
+    cwd = os.path.join(SRC_DIR, "frontend")
     subprocess.run(
         ["npm", "install"],
         check=True,
@@ -45,10 +46,10 @@ def build(tag):
         "docker",
         "build",
         "-t",
-        f"{NATIVE_EXAMPLE_IMAGE}:{tag}",
+        f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
-        "..",
+        MODULE_DIR,
     ]
     subprocess.run(cmd, check=True)
     click.echo("Done")
@@ -59,7 +60,7 @@ def build(tag):
 def publish(tag):
     """Publish the native example app"""
     click.echo("Publishing the Native Example App...")
-    cmd = ["docker", "push", f"{NATIVE_EXAMPLE_IMAGE}:{tag}"]
+    cmd = ["docker", "push", f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
 
@@ -82,18 +83,19 @@ def watch_cmd():
 def watch_backend():
     """Start the application and watch backend changes"""
 
-    print(f"\nStart {NATIVE_EXAMPLE_CONTAINER} in files watching mode\n")
-    cmd = ["flask", "--app", "app.py", "--debug", "run"]
+    print(f"\nStart {DASHBOARD_EXAMPLE_CONTAINER} in files watching mode\n")
+    cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
+    env["FLASK_DEBUG"] = "1"
     env["DEV_MODE"] = "1"
-    subprocess.run(cmd, check=True, env=env)
+    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 
 @watch_cmd.command(name="frontend")
 def watch_frontend():
     """Start the application and watch frontend changes"""
 
-    cwd = os.path.join(MODULE_DIR, "..", "frontend")
+    cwd = os.path.join(SRC_DIR, "frontend")
     subprocess.run(
         ["npm", "install"],
         check=True,

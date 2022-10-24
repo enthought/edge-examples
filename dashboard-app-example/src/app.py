@@ -25,8 +25,6 @@ from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
 
 
-from .opencv_model.model import detect_face
-
 # Flag to deactivate the `authenticated` and `track_activity` decorator.
 # It is used to develop the app outside of JupyterHub environment.
 DEV_MODE = int(os.environ.get("DEV_MODE", 0))
@@ -148,7 +146,7 @@ def create_app():
         return {
             "id": "piechart",
             "data": [{
-                "values": [random.random() * 3 for n in range(3)],
+                "values": [random.random() * 10 for n in range(3)],
                 "labels": ['Group A', 'Group B', 'Group C'],
                 "type": "pie"
             }],
