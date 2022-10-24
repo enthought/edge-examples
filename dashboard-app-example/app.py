@@ -147,8 +147,8 @@ def create_app():
                 "title": "Scatter Plot"
             },
             "style": {
-                "width": "400px",
-                "height": "400px"
+                "width": "350px",
+                "height": "350px"
             }
         }
 
@@ -164,8 +164,8 @@ def create_app():
                 "title": "Pie Chart"
             },
             "style": {
-                "width": "400px",
-                "height": "400px"
+                "width": "350px",
+                "height": "350px"
             }
         }
     
@@ -185,8 +185,35 @@ def create_app():
                 "title": "Sunburst Chart",
             },
             "style": {
-                "width": "450px",
-                "height": "450px"
+                "width": "350px",
+                "height": "350px"
+            }
+        }
+    
+    def get_choropleth(id):
+        locations = ["United States", "Switzerland", "Japan", "United Kingdom"]
+        z = [random.random() * 10 for n in range(len(locations))]
+        return {
+            "id": id,
+            "data": [{
+                "type": "choropleth",
+                "locationmode": "country names",
+                "locations": locations,
+                "z": z,
+                "text": locations,
+                "autocolorscale": True
+            }],
+            "layout": {
+                "title": "Choropleth Map",
+                "geo": {
+                    "projection": {
+                        "type": "equirectangular"
+                    }
+                }
+            },
+            "style": {
+                "width": "1070px",
+                "height": "400px"
             }
         }
 
@@ -196,7 +223,8 @@ def create_app():
             "plots": [
                 get_scatterplot("scatter1"),
                 get_piechart("pie1"),
-                get_sunburst("sunburst1")
+                get_sunburst("sunburst1"),
+                get_choropleth("choropleth1")
             ],
            "user": hub_user
         }

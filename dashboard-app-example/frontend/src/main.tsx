@@ -2,7 +2,7 @@ import "../style/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import React, { Component, CSSProperties } from "react";
-import { Data, Layout, Plots } from 'plotly.js';
+import { Data, Layout, Config } from 'plotly.js';
 import Plot from 'react-plotly.js';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -12,6 +12,7 @@ interface IPlot {
   data: Array<Data>;
   layout: Layout;
   style?: CSSProperties;
+  config?: Config;
 }
 
 interface IUser {
@@ -29,8 +30,8 @@ interface IState {
 }
 
 const DEFAULT_PLOT_STYLE: CSSProperties = {
-  marginRight: "0.5em",
-  marginBottom: "0.5em"
+  marginRight: "10px",
+  marginBottom: "10px"
 }
 
 export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard }, IState> {
@@ -74,7 +75,7 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
             <div style={{width: "100%", height: "100%", backgroundColor: "#eee", display: "flex", "flexWrap": "wrap"}}>
               {plots.map(
                 (plot) => {
-                  const { id, data, layout, style } = plot;
+                  const { id, data, layout, config, style } = plot;
                   return (
                     <div id={id} key={id}>
                       <Plot
@@ -85,6 +86,7 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
                           ...DEFAULT_PLOT_STYLE,
                           ...style
                         }}
+                        config={config}
                       />
                     </div>
                   )
