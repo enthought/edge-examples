@@ -1,13 +1,13 @@
-# Native App Example
+# Dashboard App Example
 
 This folder contains a Flask + React application that showcases how to
-create an Edge native application. The native app is packaged as a docker image that will be consumed by the JupyterHub spawner system.
+create an Dashboard in Edge. The app is packaged as a docker image that will be consumed by the JupyterHub spawner system.
 
 ## Requirements
 
 To build and run the example application you will need:
-- [Docker](https://docke.com)
-- [Node JS}(https://nodejs.org)
+- [Docker](https://docker.com)
+- [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
 ## Set up the development environment
@@ -31,7 +31,7 @@ edm shell -e dev_env
 ## Running the Application
 
 If you are running the application for the first time, you will need to build
-the application's Docker image. From within the `native-app-flask-example` directory
+the application's Docker image. From within the `dashboard-app-example` directory
 run:
 
 ```commandline

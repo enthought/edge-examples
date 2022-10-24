@@ -11,8 +11,8 @@ import subprocess
 
 import click
 
-NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
-NATIVE_EXAMPLE_CONTAINER = "edge-native-app-flask"
+NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-dashboard-demo"
+NATIVE_EXAMPLE_CONTAINER = "edge-dashboard-demo"
 MODULE_DIR = os.path.dirname(__file__)
 
 

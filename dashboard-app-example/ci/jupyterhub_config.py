@@ -45,7 +45,7 @@ c.JupyterHub.ip = "127.0.0.1"
 c.DockerSpawner.remove = True
 
 # docker image for the spawner
-c.DockerSpawner.image = "quay.io/enthought/edge-native-app-flask-demo:latest"
+c.DockerSpawner.image = "quay.io/enthought/edge-dashboard-demo:latest"
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
