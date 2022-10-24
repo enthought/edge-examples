@@ -10,9 +10,9 @@ your app will be hosted. For this demonstration, we will integrate the applicati
 to [`https://edge-external-app-demo.platform-devops.enthought.com`](https://edge-external-app-demo.platform-devops.enthought.com)
 
 
-## Creating an Application Icon in Edge
+## Creating an Application Tile in Edge
 
-The first step in integrating your external web app with Edge is creating an icon
+The first step in integrating your external web app with Edge is creating a tile
 on Edge's Home. As an Edge organization developer, you can use the code below
 to perform this task from within an Edge notebook. Be sure to substitute the
 `external_hostname` with your application's hostname.
@@ -54,7 +54,7 @@ edge.applications.add_application(app)
 edge.applications.add_app_version(version1)
 ```
 
-After running this code, return to the Home screen in Edge. You should see an icon labeled
+After running this code, return to the Home screen in Edge. You should see a tile labeled
 *Edge External App Demo v1.0.0*.
 
 ## Registering The Application
