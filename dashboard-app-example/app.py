@@ -164,7 +164,8 @@ def create_app():
                 get_scatterplot("plot3"),
                 get_scatterplot("plot4"),
                 get_scatterplot("plot5"),
-            ]
+            ],
+            "user": hub_user
         }
 
     @app.route(PREFIX + "job", methods=["GET", "POST"])

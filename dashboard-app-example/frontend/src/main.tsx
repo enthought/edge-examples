@@ -17,13 +17,19 @@ interface IPlot {
   style?: CSSProperties;
 }
 
+
+interface IUser {
+  name: string;
+}
+
 export interface IDashboard {
-  plots?: Array<IPlot>
+  plots?: Array<IPlot>;
+  user?: IUser;
 }
 
 interface IState {
   id: string;
-  dashboard?: IDashboard
+  dashboard?: IDashboard;
 }
 
 const DEFAULT_PLOT_STYLE: CSSProperties = {
@@ -43,8 +49,9 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
   makeUrl = (url: string): string => `${this.props.urlPrefix}${url}`;
 
   render(): React.ReactNode {
-    console.log(this.state);
-    if (!this.state.dashboard?.plots?.length) {
+    const { user, plots } = this.state.dashboard ?? { user: undefined, plots: undefined };
+    console.log(this.state.dashboard);
+    if (!plots?.length) {
       return (
         <div>No data</div>
       )
@@ -57,11 +64,11 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
         </Row>
         <Row style={{backgroundColor: "#eee"}}>
           <Col id="sidebar" md={3}>
-            Side Info
+            <h5>{user ? `Welcome ${user.name}` : "User not logged in"}</h5>
           </Col>
           <Col id="graphs" md={9}>
             <div style={{width: "100%", height: "100%", backgroundColor: "#eee", display: "flex", "flexWrap": "wrap"}}>
-              {this.state.dashboard?.plots.map(
+              {plots.map(
                 (plot) => {
                   const { data, layout, style } = plot;
                   return (
