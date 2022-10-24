@@ -133,20 +133,18 @@ def create_app():
             "index.html", **{"dashboard": dashboard, "url_prefix": PREFIX}
         )
 
-    def get_scatterplot():
+    def get_scatterplot(id):
         return {
-            "title": "A served plot",
-            "data": [
-                {
-                    "x": list(range(5)),
-                    "y": [random.random() * 10 for n in range(5)],
-                    "type": "scatter",
-                    "mode": "lines+markers",
-                    "marker": {"color": "red"},
-                }
-            ],
+            "id": id,
+            "data": [{
+                "x": list(range(5)),
+                "y": [random.random() * 10 for n in range(5)],
+                "type": "scatter",
+                "mode": "lines+markers",
+                "marker": {"color": "red"},
+            }],
             "layout": {
-                "title": "A served plot"
+                "title": "Scatter Plot"
             },
             "style": {
                 "width": "300px",
@@ -154,17 +152,34 @@ def create_app():
             }
         }
 
+    def get_piechart(id):
+        return {
+            "id": id,
+            "data": [{
+                "values": [23, 26, 51],
+                "labels": ['Group A', 'Group B', 'Group C'],
+                "type": "pie"
+            }],
+            "layout": {
+                "title": "Pie Chart"
+            },
+            "style": {
+                "width": "400px",
+                "height": "400px"
+            }
+        }
+
     def get_dashboard(hub_user):
         """Get dashboard for this hub user"""
         return {
-            "plots": {
-                "plot1": get_scatterplot(),
-                "plot2": get_scatterplot(),
-                "plot3": get_scatterplot(),
-                "plot4": get_scatterplot(),
-                "plot5": get_scatterplot(),
-            },
-            "user": hub_user
+            "plots": [
+                get_scatterplot("scatter1"),
+                get_piechart("pie1"),
+                get_scatterplot("scatter2"),
+                get_scatterplot("scatter3"),
+                get_scatterplot("scatter4")
+            ],
+           "user": hub_user
         }
 
     @app.route(PREFIX + "job", methods=["GET", "POST"])

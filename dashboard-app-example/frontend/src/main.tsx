@@ -2,12 +2,13 @@ import "../style/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import React, { Component, CSSProperties } from "react";
-import { Data, Layout } from 'plotly.js';
+import { Data, Layout, Plots } from 'plotly.js';
 import Plot from 'react-plotly.js';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 
 interface IPlot {
+  id: string;
   data: Array<Data>;
   layout: Layout;
   style?: CSSProperties;
@@ -18,9 +19,7 @@ interface IUser {
 }
 
 export interface IDashboard {
-  plots?: {
-    [ key: string ]: IPlot
-  };
+  plots?: Array<IPlot>;
   user?: IUser;
 }
 
@@ -44,9 +43,9 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
   }
   
   render(): React.ReactNode {
-    const { user, plots } = this.state.dashboard ?? { user: undefined, plots: undefined };
+    const { user, plots } = this.state.dashboard ?? { user: undefined, plots: [] };
     console.log(this.state.dashboard);
-    if (!Object.keys(plots ?? {}).length) {
+    if (!plots?.length) {
       return (
         <div>No data</div>
       )
@@ -63,19 +62,19 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
             <div>
               Plots
             </div>
-            {Object.entries(plots!).map(
-              ([id, plot]) => (
+            {plots.map(
+              (plot) => (
                 <div>
-                  <a href={`#${id}`}>{`${plot.layout.title}`}</a>
+                  <a href={`#${plot.id}`}>{`${plot.layout.title}`}</a>
                 </div>
               )
             )}
           </Col>
           <Col id="graphs" md={9}>
             <div style={{width: "100%", height: "100%", backgroundColor: "#eee", display: "flex", "flexWrap": "wrap"}}>
-              {Object.entries(plots!).map(
-                ([id, plot]) => {
-                  const { data, layout, style } = plot;
+              {plots.map(
+                (plot) => {
+                  const { id, data, layout, style } = plot;
                   return (
                     <div id={id} key={id}>
                       <Plot
