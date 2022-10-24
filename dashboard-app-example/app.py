@@ -7,11 +7,9 @@
 # Distribution is prohibited.
 
 import datetime
-import multiprocessing as mp
 import os
 import random
 from functools import wraps
-from uuid import uuid4
 
 import requests
 from flask import (
@@ -105,12 +103,6 @@ def task(id: str, result_dict: dict,
 
 
 def create_app():
-
-    mp.set_start_method("spawn")  # Starts a fresh process instead of forking.
-    manager = mp.Manager()
-
-    RESULTS = manager.dict()
-
     app = Flask(
         __name__,
         template_folder="frontend/templates",
@@ -133,9 +125,9 @@ def create_app():
             "index.html", **{"dashboard": dashboard, "url_prefix": PREFIX}
         )
 
-    def get_scatterplot(id):
+    def get_scatterplot():
         return {
-            "id": id,
+            "id": "scatterplot",
             "data": [{
                 "x": list(range(20)),
                 "y": [random.random() * 10 for n in range(20)],
@@ -147,16 +139,16 @@ def create_app():
                 "title": "Scatter Plot"
             },
             "style": {
-                "width": "350px",
-                "height": "350px"
+                "width": "400px",
+                "height": "400px"
             }
         }
 
-    def get_piechart(id):
+    def get_piechart():
         return {
-            "id": id,
+            "id": "piechart",
             "data": [{
-                "values": [23, 26, 51],
+                "values": [random.random() * 3 for n in range(3)],
                 "labels": ['Group A', 'Group B', 'Group C'],
                 "type": "pie"
             }],
@@ -164,19 +156,20 @@ def create_app():
                 "title": "Pie Chart"
             },
             "style": {
-                "width": "350px",
-                "height": "350px"
+                "width": "400px",
+                "height": "400px"
             }
         }
-    
 
-    def get_sunburst(id):
+    def get_sunburst():
         return {
-            "id": id,
+            "id": "sunburst",
             "data": [{
                 "type": "sunburst",
-                "labels": ["Root", "Child A", "Child B", "Leaf B", "Leaf A",  "Child E", "Leaf C"],
-                "parents": ["", "Root", "Root", "Child B", "Child B", "Root", "Child A" ],
+                "labels": ["Root", "Child A", "Child B",
+                           "Leaf B", "Leaf A",  "Child E", "Leaf C"],
+                "parents": ["", "Root", "Root", "Child B",
+                            "Child B", "Root", "Child A"],
                 "values":  [10, 16, 14, 9, 12, 4, 3, 3],
                 "leaf": {"opacity": 0.5},
                 "marker": {"line": {"width": 1}},
@@ -185,16 +178,16 @@ def create_app():
                 "title": "Sunburst Chart",
             },
             "style": {
-                "width": "350px",
-                "height": "350px"
+                "width": "400px",
+                "height": "400px"
             }
         }
-    
-    def get_choropleth(id):
+
+    def get_choropleth():
         locations = ["United States", "Switzerland", "Japan", "United Kingdom"]
         z = [random.random() * 10 for n in range(len(locations))]
         return {
-            "id": id,
+            "id": "choropleth",
             "data": [{
                 "type": "choropleth",
                 "locationmode": "country names",
@@ -212,7 +205,7 @@ def create_app():
                 }
             },
             "style": {
-                "width": "1070px",
+                "width": "1220px",
                 "height": "400px"
             }
         }
@@ -221,36 +214,13 @@ def create_app():
         """Get dashboard for this hub user"""
         return {
             "plots": [
-                get_scatterplot("scatter1"),
-                get_piechart("pie1"),
-                get_sunburst("sunburst1"),
-                get_choropleth("choropleth1")
+                get_scatterplot(),
+                get_piechart(),
+                get_sunburst(),
+                get_choropleth()
             ],
-           "user": hub_user
+            "user": hub_user
         }
-
-    @app.route(PREFIX + "job", methods=["GET", "POST"])
-    @track_activity
-    @authenticated
-    def job(**kwargs):
-        if request.method == "GET":
-            ret = {}
-            for taskId, value in RESULTS.items():
-                if value:
-                    ret[taskId] = value
-                del RESULTS[taskId]
-            return ret
-
-        if request.method == "POST":
-            body = request.json
-            id = str(uuid4())
-            RESULTS[id] = None
-            p = mp.Process(
-                target=task, args=(id, RESULTS, body["image"], body["params"])
-            )
-            p.start()
-
-            return {"id": id}
 
     @app.route(PREFIX + "oauth_callback")
     def oauth_callback():
