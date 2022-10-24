@@ -145,7 +145,14 @@ def create_app():
                     "mode": "lines+markers",
                     "marker": {"color": "red"},
                 }
-            ]
+            ],
+            "layout": {
+                "title": "A served plot"
+            },
+            "style": {
+                "width": "300px",
+                "height": "300px"
+            }
         }
 
     def get_dashboard(hub_user):

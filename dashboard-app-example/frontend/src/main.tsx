@@ -1,8 +1,8 @@
 import "../style/style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import React, { Component } from "react";
-import { Data } from 'plotly.js';
+import React, { Component, CSSProperties } from "react";
+import { Data, Layout } from 'plotly.js';
 import Plot from 'react-plotly.js';
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -11,9 +11,10 @@ import Row from "react-bootstrap/Row";
 const PLOTS_PER_ROW = 3;
 
 interface IPlot {
-  title: string;
   key: string;
   data: Array<Data>;
+  layout: Layout;
+  style?: CSSProperties;
 }
 
 export interface IDashboard {
@@ -24,6 +25,12 @@ interface IState {
   id: string;
   dashboard?: IDashboard
 }
+
+const DEFAULT_PLOT_STYLE: CSSProperties = {
+  marginRight: "0.5em",
+  marginBottom: "0.5em"
+}
+
 export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard }, IState> {
   constructor(props: { urlPrefix: string, dashboard?: IDashboard }) {
     super(props);
@@ -42,18 +49,6 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
         <div>No data</div>
       )
     }
-    const rows: Array<Array<IPlot>> = [];
-    this.state.dashboard?.plots.forEach(
-      (plot, index) => {
-        const rowNum = Math.floor(index / PLOTS_PER_ROW);
-        if (rowNum > rows.length - 1) {
-          rows.push([] as Array<IPlot>);
-        };
-        rows[rowNum].push(plot)
-      }
-    )
-
-    console.log(rows);
 
     return (
       <Col style={{backgroundColor: "#eee"}}>
@@ -65,25 +60,25 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
             Side Info
           </Col>
           <Col id="graphs" md={9}>
-            {rows.map(row => (
-              <Row style={{marginBottom: "1em", backgroundColor: "#eee"}}>
-                {row.map(plot => (
-                  <Col md={4}>
+            <div style={{width: "100%", height: "100%", backgroundColor: "#eee", display: "flex", "flexWrap": "wrap"}}>
+              {this.state.dashboard?.plots.map(
+                (plot) => {
+                  const { data, layout, style } = plot;
+                  return (
                     <Plot
-                      data={plot.data}
-                      layout={{
-                        title: plot.title,
-                        autosize: true
-                      }}
+                      data={data}
+                      layout={layout}
                       useResizeHandler={true}
                       style={{
-                        width: "100%", height: "100%"
+                        ...DEFAULT_PLOT_STYLE,
+                        ...style
                       }}
-                    />                   
-                  </Col>
-                ))}
-              </Row>
-            ))}
+                      key={plot.key}
+                  />
+                  )
+                }
+              )}
+            </div>
           </Col>
         </Row>
       </Col>
