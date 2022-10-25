@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <script id="server-config-data" type="application/json">
+      {
+        "urlPrefix": "{{url_prefix}}",
+        "dashboard": {{ dashboard | tojson }}
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+  <script
+    type="module"
+    src="{{ url_for('static', filename='index.js') }}"
+  ></script>
+</html>
