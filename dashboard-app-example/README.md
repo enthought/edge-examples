@@ -2,7 +2,7 @@
 
 This folder contains a Flask + React application that showcases how to
 create a dashboard hosted by Edge native application. The dashboard app is packaged as 
-a docker image that will be consumed by the Edge's JupyterHub spawner system.
+a Docker image that will be consumed by the Edge's JupyterHub spawner system.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ To build and run the example application you will need:
 First, you will need to create an EDM environment named `dev_env` and install some dependencies.
 
 ```commandline
-edm install -e dev_env --version 3.8 -y click requests opencv_python "flask>2" && \
+edm install -e dev_env --version 3.8 -y click requests "flask>2" && \
 edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
     dockerspawner \
     "configurable-http-proxy" \

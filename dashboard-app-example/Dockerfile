@@ -9,7 +9,7 @@ RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.1
 RUN adduser app_admin
 USER app_admin
 
-RUN edm install --version 3.8 click opencv_python "flask>2" gunicorn requests -y
+RUN edm install --version 3.8 click "flask>2" gunicorn requests -y
 
 RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session
 
