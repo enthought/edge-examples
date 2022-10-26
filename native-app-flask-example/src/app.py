@@ -13,6 +13,7 @@ import os
 import sys
 from functools import wraps
 from uuid import uuid4
+from urllib.parse import unquote
 
 import requests
 from flask import (
@@ -51,7 +52,6 @@ API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
-
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
@@ -143,8 +143,17 @@ def create_app():
     app.config['SECRET_KEY'] = "super secret key"
     sess = Session()
     sess.init_app(app)
+    app.jinja_env.filters['url_decode'] = lambda url: unquote(url)
 
-    @app.route(PREFIX)
+    # When running with ci start, preserve the trailing slash in the prefix
+    # When launching from jupyterhub, strip the trailing slash in the prefix
+    ROOT_PATH = PREFIX
+    if SERVER_NAME is not None and len(SERVER_NAME) > 0:
+        ROOT_PATH = ROOT_PATH[:-1]
+    
+    LOG.info(f"Root path at {ROOT_PATH}")
+
+    @app.route(ROOT_PATH)
     @track_activity
     @authenticated
     def serve(**kwargs):
@@ -198,6 +207,7 @@ def create_app():
         session["token"] = AUTH.token_for_code(code)
 
         next_url = AUTH.get_next_url(cookie_state) or PREFIX
+        LOG.info(f"OAuth Callback redirecting to {next_url}")
         response = make_response(redirect(next_url))
         return response
 
