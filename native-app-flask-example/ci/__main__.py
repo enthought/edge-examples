@@ -87,7 +87,6 @@ def watch_backend():
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"
-    env["DEV_MODE"] = "1"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 
