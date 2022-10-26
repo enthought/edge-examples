@@ -41,6 +41,7 @@ handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(formatter)
 handler.setLevel(logging.DEBUG)
 LOG.addHandler(handler)
+LOG.setLevel(logging.INFO)
 if FLASK_DEBUG:
     LOG.setLevel(logging.DEBUG)
 
@@ -57,7 +58,6 @@ AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
 LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
 LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
-
 
 def track_activity(f):
     """Decorator for reporting server activities with the Hub"""
@@ -106,6 +106,7 @@ def authenticated(f):
         else:
             # redirect to login url on failed auth
             state = AUTH.generate_state(next_url=request.path)
+            LOG.info(f"Redirecting to login url {AUTH.login_url}")
             response = make_response(
                 redirect(AUTH.login_url + "&state=%s" % state)
             )
