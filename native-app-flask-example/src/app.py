@@ -49,9 +49,10 @@ PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
+API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 
 
-AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60)
+AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
 LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
 LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
