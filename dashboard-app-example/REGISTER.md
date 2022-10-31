@@ -4,7 +4,7 @@ After the image for this application has been published using `python -m ci publ
 an application tile can be created on Edge. You will need:
 
 - The `enthought_edge` package from the `enthought/edge` EDM repository
-- A quay.io deployment credential for the `quay.io/enthought/edge-native-app-flask-demo:latest` repo
+- A quay.io deployment credential for the `quay.io/enthought/edge-dashboard-demo:latest` repo
 - Development access for an Edge organization
 - An Edge API token
 
@@ -54,11 +54,12 @@ ICON = (
 version1 = AppVersion(
     app.app_id,
     "1",
-    "Edge Native App Demo, v1",
-    "Demonstration of an native application",
+    "Edge Dashboard App Demo, v1",
+    "Demonstration of a dashboard application",
     ICON,
     AppKindEnum.Native,
-    "quay.io/enthought/edge-native-app-flask-demo:latest",
+    "quay.io/enthought/edge-dashboard-demo:latest",
+    "edge.dashboard"
 )
 edge.applications.add_app_version(version1)
 ```
