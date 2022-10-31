@@ -3,7 +3,7 @@
   <head>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='index.css') }}"
+      href="{{ url_for('static', filename='index.css') | url_decode }}"
     />
     <script id="server-config-data" type="application/json">
       {
@@ -17,6 +17,6 @@
   </body>
   <script
     type="module"
-    src="{{ url_for('static', filename='index.js') }}"
+    src="{{ url_for('static', filename='index.js') | url_decode }}"
   ></script>
 </html>
