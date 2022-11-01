@@ -66,7 +66,7 @@ To watch the frontend changes:
 Edge's JupyterHub spawner will launch a native application's container and provide
 environment variables for routing and authentication. 
 
-### Using port and URL prefix provided by `JupyterHub`: 
+### Using port and URL prefix provided by Edge: 
 
 Once the native application is spawned, the `JUPYTERHUB_SERVICE_URL`
 and `JUPYTERHUB_SERVICE_NAME` environment variables will be provided
