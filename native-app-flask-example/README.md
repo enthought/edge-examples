@@ -68,8 +68,9 @@ environment variables for routing and authentication.
 
 ### Using port and URL prefix provided by `JupyterHub`: 
 
-Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
-will be available. Application authors need to set the listening port and URL prefix of the
+Once the native application is spawned, the `JUPYTERHUB_SERVICE_URL`
+and `JUPYTERHUB_SERVICE_NAME` environment variables will be provided
+by Edge. Application authors need to set the listening port and URL prefix of the
 application with values extracted from this variable. See the [`ROUTING.md`](./ROUTING.md)
 for more details.
 
