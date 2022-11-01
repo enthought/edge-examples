@@ -25,7 +25,7 @@ edge = EdgeSession(
 )
 
 # Register a new application
-app = Application('nativeapp', True)
+app = Application('dashboard', True)
 edge.applications.add_application(app)
 
 # Register server info
