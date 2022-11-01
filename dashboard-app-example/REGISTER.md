@@ -25,12 +25,12 @@ edge = EdgeSession(
 )
 
 # Register a new application
-app = Application('dashboard', True)
+app = Application('mydashboard', True)
 edge.applications.add_application(app)
 
 # Register server info
 server = ServerInfo(
-    'dashboard',
+    app.app_id,
     'quay.io',
     '<QUAY_USERNAME>',
     '<QUAY_PASSWORD>'
