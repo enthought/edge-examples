@@ -70,8 +70,8 @@ environment variables for routing and authentication.
 
 Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
 will be available. Application authors need to set the listening port and URL prefix of the
-application with values extracted from this variable. In this native app example,
-the binding information is provided to the [`wsgi` application](./src/wsgi.py#L43).
+application with values extracted from this variable. See the [`ROUTING.md`](./ROUTING.md)
+for more details.
 
 ### Reporting server activities back to Edge: 
 
