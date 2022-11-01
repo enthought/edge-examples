@@ -30,10 +30,10 @@ edge.applications.add_application(app)
 
 # Register server info
 server = ServerInfo(
-    app.app_id,
-    'quay.io',
-    '<QUAY_USERNAME>',
-    '<QUAY_PASSWORD>'
+    app_id=app.app_id,
+    domain='quay.io',
+    username='<QUAY_USERNAME>',
+    password='<QUAY_PASSWORD>'
 )
 edge.applications.add_server_info(server)
 
@@ -52,14 +52,14 @@ ICON = (
     "8ws479akcYBsnQAAAABJRU5ErkJggg=="
 )
 version1 = AppVersion(
-    app.app_id,
-    "1",
-    "Edge Dashboard App Demo, v1",
-    "Demonstration of a dashboard application",
-    ICON,
-    AppKindEnum.Native,
-    "quay.io/enthought/edge-dashboard-demo:latest",
-    "edge.dashboard"
+    app_id=app.app_id,
+    version="1.0.0",
+    title="Edge Dashboard App Demo, v1",
+    description="Demonstration of a dashboard application",
+    icon=ICON,
+    kind=AppKindEnum.Native,
+    link="quay.io/enthought/edge-dashboard-demo:latest",
+    recommended_profile="edge.dashboard"
 )
 edge.applications.add_app_version(version1)
 ```

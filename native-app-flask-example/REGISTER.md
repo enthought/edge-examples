@@ -30,10 +30,10 @@ edge.applications.add_application(app)
 
 # Register server info
 server = ServerInfo(
-    app.app_id,
-    'quay.io',
-    '<QUAY_USERNAME>',
-    '<QUAY_PASSWORD>'
+    app_id=app.app_id,
+    domain='quay.io',
+    username='<QUAY_USERNAME>',
+    username='<QUAY_PASSWORD>'
 )
 edge.applications.add_server_info(server)
 
@@ -52,13 +52,13 @@ ICON = (
     "8ws479akcYBsnQAAAABJRU5ErkJggg=="
 )
 version1 = AppVersion(
-    app.app_id,
-    "1",
-    "Edge Native App Demo, v1",
-    "Demonstration of an native application",
-    ICON,
-    AppKindEnum.Native,
-    "quay.io/enthought/edge-native-app-flask-demo:latest",
+    app_id=app.app_id,
+    version="1.0.0",
+    title="Edge Native App Demo, v1",
+    description="Demonstration of an native application",
+    icon=ICON,
+    kind=AppKindEnum.Native,
+    link="quay.io/enthought/edge-native-app-flask-demo:latest",
 )
 edge.applications.add_app_version(version1)
 ```
