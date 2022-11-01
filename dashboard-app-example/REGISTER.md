@@ -30,7 +30,7 @@ edge.applications.add_application(app)
 
 # Register server info
 server = ServerInfo(
-    'nativeapp',
+    'dashboard',
     'quay.io',
     '<QUAY_USERNAME>',
     '<QUAY_PASSWORD>'
