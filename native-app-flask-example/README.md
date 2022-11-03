@@ -61,17 +61,18 @@ To watch the frontend changes:
 ```
 
 
-## Requirements for a Edge native application
+## Requirements for an Edge native application
 
 Edge's JupyterHub spawner will launch a native application's container and provide
-environment variables for routing and authentication.
+environment variables for routing and authentication. 
 
-### Using port and URL prefix provided by `JupyterHub`: 
+### Using port and URL prefix provided by Edge: 
 
-Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
-will be available. Application authors need to set the listening port and URL prefix of the
-application with values extracted from this variable. In this native app example,
-the binding information is provided to the [`wsgi` application](./src/wsgi.py#L43).
+Once the native application is spawned, the `JUPYTERHUB_SERVICE_URL`
+and `JUPYTERHUB_SERVICE_NAME` environment variables will be provided
+by Edge. Application authors need to set the listening port and URL prefix of the
+application with values extracted from this variable. See the [`ROUTING.md`](./ROUTING.md)
+for more details.
 
 ### Reporting server activities back to Edge: 
 
@@ -92,3 +93,9 @@ for your application. Your application only needs to provide two components to t
 advantage of Edge authentication:
 - An [OAuth callback handler](./src/app.py#L182) to process Edge OAuth
 - An [`authenticated` decorator](./src/app#L90) that protects endpoints requiring authentication
+
+## Registering the Application
+
+Once the application has been tested locally, built using `python -m ci build` and
+published using `python -m ci publish`, it can be registered on Edge as an Application tile.
+Full instructions for registering the application can be found in [`REGISTER.md`](./REGISTER.md).

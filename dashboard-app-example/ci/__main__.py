@@ -58,8 +58,8 @@ def build(tag):
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):
-    """Publish the native example app"""
-    click.echo("Publishing the Native Example App...")
+    """Publish the dashboard example app"""
+    click.echo("Publishing the Dashboard Example App...")
     cmd = ["docker", "push", f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
@@ -67,7 +67,7 @@ def publish(tag):
 
 @cli.command("start")
 def start():
-    """Start the native example application"""
+    """Start the dashboard example application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     subprocess.run(cmd, check=True)
@@ -87,7 +87,6 @@ def watch_backend():
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"
-    env["DEV_MODE"] = "1"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 

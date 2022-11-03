@@ -23,11 +23,26 @@ from flask import (
 from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
+from urllib.parse import unquote
+import logging
+import sys
 
 
 # Flag to deactivate the `authenticated` and `track_activity` decorator.
 # It is used to develop the app outside of JupyterHub environment.
-DEV_MODE = int(os.environ.get("DEV_MODE", 0))
+FLASK_DEBUG = int(os.environ.get("FLASK_DEBUG", 0))
+
+LOG = logging.getLogger(__name__)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(formatter)
+handler.setLevel(logging.DEBUG)
+LOG.addHandler(handler)
+LOG.setLevel(logging.INFO)
+if FLASK_DEBUG:
+    LOG.setLevel(logging.DEBUG)
 
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
@@ -43,7 +58,7 @@ def track_activity(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if DEV_MODE == 1:
+        if FLASK_DEBUG == 1:
             return f(*args, **kwargs)
         last_activity = isoformat(datetime.datetime.now())
         if ACTIVITY_URL:
@@ -72,7 +87,7 @@ def authenticated(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if DEV_MODE == 1:
+        if FLASK_DEBUG == 1:
             return f(*args, **kwargs)
         token = session.get("token")
         if token:
@@ -93,13 +108,6 @@ def authenticated(f):
 
     return decorated
 
-
-def task(id: str, result_dict: dict,
-         encoded_string: str, params: dict) -> None:
-    result = detect_face(encoded_string, params)
-    result_dict[id] = result
-
-
 def create_app():
     app = Flask(
         __name__,
@@ -111,8 +119,17 @@ def create_app():
     app.config['SECRET_KEY'] = "super secret key"
     sess = Session()
     sess.init_app(app)
+    app.jinja_env.filters['url_decode'] = lambda url: unquote(url)
 
-    @app.route(PREFIX)
+    # When running with ci start, preserve the trailing slash in the prefix
+    # When launching from jupyterhub, strip the trailing slash in the prefix
+    ROOT_PATH = PREFIX
+    if SERVER_NAME is not None and len(SERVER_NAME) > 0:
+        ROOT_PATH = ROOT_PATH[:-1]
+    
+    LOG.info(f"Root path at {ROOT_PATH}")
+
+    @app.route(ROOT_PATH)
     @track_activity
     @authenticated
     def serve(**kwargs):

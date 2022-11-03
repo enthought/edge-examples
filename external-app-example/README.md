@@ -41,14 +41,14 @@ ICON = (
 app = Application('edge-external-app-demo', True)
 
 version1 = AppVersion(
-            app_id=app.app_id,
-            version="1.0.0",
-            title="Edge External App Demo, v1.0.0",
-            description="Demonstration of an external application",
-            icon=ICON,
-            kind=AppKindEnum.External,
-            link=external_hostname,
-        )
+    app_id=app.app_id,
+    version="1.0.0",
+    title="Edge External App Demo, v1.0.0",
+    description="Demonstration of an external application",
+    icon=ICON,
+    kind=AppKindEnum.External,
+    link=external_hostname,
+)
 
 edge.applications.add_application(app)
 edge.applications.add_app_version(version1)
