@@ -19,4 +19,7 @@ COPY --chown=app_admin ./src dashboard-app-example/
 WORKDIR /home/app_admin
 RUN chmod 777 dashboard-app-example/startup-script.sh
 
+ARG CI_IMAGE_TAG=quay.io/enthought/edge-dashboard-demo:latest
+ENV APP_VERSION=$CI_IMAGE_TAG
+
 CMD ["tini", "-g", "--", "dashboard-app-example/startup-script.sh"]

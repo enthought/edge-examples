@@ -13,7 +13,7 @@ import click
 
 DASHBOARD_EXAMPLE_IMAGE = "quay.io/enthought/edge-dashboard-demo"
 DASHBOARD_EXAMPLE_CONTAINER = "edge-dashboard-demo"
-MODULE_DIR = os.path.join(os.path.dirname(__file__), '..')
+MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
@@ -26,8 +26,8 @@ def cli():
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def build(tag):
-    """Build the native example app"""
-    click.echo("Building the Native Example App...")
+    """Build the dashboard example app"""
+    click.echo("Building the Dashboard Example App...")
 
     cwd = os.path.join(SRC_DIR, "frontend")
     subprocess.run(
@@ -42,11 +42,15 @@ def build(tag):
         cwd=cwd,
     )
 
+    image_tag = f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}"
+
     cmd = [
         "docker",
         "build",
         "-t",
-        f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}",
+        image_tag,
+        "--build-arg",
+        f"CI_IMAGE_TAG={image_tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,
@@ -66,11 +70,14 @@ def publish(tag):
 
 
 @cli.command("start")
-def start():
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def start(tag):
     """Start the dashboard example application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
-    subprocess.run(cmd, check=True)
+    env = os.environ.copy()
+    env["IMAGE_TAG"] = tag
+    subprocess.run(cmd, check=True, env=env)
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
 
@@ -87,6 +94,7 @@ def watch_backend():
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"
+    env["APP_VERSION"] = "dashboard-app-example running on ci watch backend"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 

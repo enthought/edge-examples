@@ -22,6 +22,7 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
     https://docs.gunicorn.org/en/stable/custom.html
     """
+
     def __init__(self, app, options=None):
         self.options = options or {}
         self.application = app

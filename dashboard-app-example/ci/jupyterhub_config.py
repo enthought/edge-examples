@@ -6,11 +6,15 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
+import os
 import socket
 import tempfile
 from os import path
 
 from dockerspawner import DockerSpawner
+
+
+IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
 
 
 def discover_ip():
@@ -45,7 +49,7 @@ c.JupyterHub.ip = "127.0.0.1"
 c.DockerSpawner.remove = True
 
 # docker image for the spawner
-c.DockerSpawner.image = "quay.io/enthought/edge-dashboard-demo:latest"
+c.DockerSpawner.image = f"quay.io/enthought/edge-dashboard-demo:{IMAGE_TAG}"
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
