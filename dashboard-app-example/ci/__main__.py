@@ -42,15 +42,15 @@ def build(tag):
         cwd=cwd,
     )
 
-    image_tag = f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}"
-
     cmd = [
         "docker",
         "build",
         "-t",
-        image_tag,
+        f"{DASHBOARD_EXAMPLE_IMAGE}:{tag}",
         "--build-arg",
-        f"CI_IMAGE_TAG={image_tag}",
+        f"CI_IMAGE_REPOSITORY={DASHBOARD_EXAMPLE_IMAGE}",
+        "--build-arg",
+        f"CI_IMAGE_TAG={tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,

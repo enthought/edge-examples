@@ -19,7 +19,8 @@ COPY --chown=app_admin ./src native-app-flask-example/
 WORKDIR /home/app_admin
 RUN chmod 777 native-app-flask-example/startup-script.sh
 
-ARG CI_IMAGE_TAG=quay.io/enthought/edge-native-app-flask-demo:latest
-ENV APP_VERSION=$CI_IMAGE_TAG
+ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-native-app-flask-demo
+ARG CI_IMAGE_TAG=latest
+ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
 
 CMD ["tini", "-g", "--", "native-app-flask-example/startup-script.sh"]

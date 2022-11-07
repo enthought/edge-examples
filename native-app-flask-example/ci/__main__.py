@@ -42,15 +42,15 @@ def build(tag):
         cwd=cwd,
     )
 
-    image_tag = f"{NATIVE_EXAMPLE_IMAGE}:{tag}"
-
     cmd = [
         "docker",
         "build",
         "-t",
-        image_tag,
+        f"{NATIVE_EXAMPLE_IMAGE}:{tag}",
         "--build-arg",
-        f"CI_IMAGE_TAG={image_tag}",
+        f"CI_IMAGE_REPOSITORY={NATIVE_EXAMPLE_IMAGE}",
+        "--build-arg",
+        f"CI_IMAGE_TAG={tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,
