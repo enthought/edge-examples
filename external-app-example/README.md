@@ -93,12 +93,13 @@ in [`api/auth.py`](./api/auth.py). These include:
 
 ## Application Specific Security Requirements
 
-During authentication, Edge provides the identity of any user that can sign
-in to Edge via OAuth2. However, the OAuth2 specification does not provide
-identity management specific to your organization. Therefore, your application
-should perform further validation on the returned username to make sure
-they have access to your organization's resources. In this example, further
-validation should occur after [retrieving the user's identity](./src/api/auth.py#79).
+During authentication, Edge provides your application the identity of any user 
+that can sign in to Edge. However, the OAuth2 specification does not allow
+Edge to restrict identity validation to your specific organization within Edge.
+Therefore, your application should perform further validation on the returned 
+username to make sure they have access to your organization's resources. In this 
+example, further validation should occur after
+[retrieving the user's identity](./src/api/auth.py#79).
 
 ## Accessing The Application
 
