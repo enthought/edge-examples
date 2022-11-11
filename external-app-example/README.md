@@ -91,6 +91,14 @@ in [`api/auth.py`](./api/auth.py). These include:
 - A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
 - A [`/authorize` endpoint](./src/api/auth.#L57) which will be the `redirect_uri` for handling Edge OAuth
 
+## Application Specific Security Requirements
+
+During authentication, Edge provides the identity of any user that can sign
+in to Edge via OAuth2. However, the OAuth2 specification does not provide
+identity management specific to your organization. Therefore, your application
+should perform further validation on the returned username to make sure
+they have access to your organization's resources. In this example, further
+validation should occur after [retrieving the user's identity](./src/api/auth.py#79).
 
 ## Accessing The Application
 

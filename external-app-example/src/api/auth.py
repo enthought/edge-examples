@@ -74,9 +74,14 @@ def authorize():
 
     # Get the user information from the provider
     response = app.OAUTH.get("user")
+    user_id = response.json().get("name") 
+
+    # IMPORTANT: Additional validation should occur here to verify that
+    # the user_id provided by Edge has access to your application.
+
     # Save the user ID to our Flask session to be referenced later throughout
     # our application
-    session["user_id"] = response.json().get("name")
+    session["user_id"] = user_id
 
     return redirect("/")
 
