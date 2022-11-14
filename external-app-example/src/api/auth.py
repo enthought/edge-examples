@@ -74,9 +74,16 @@ def authorize():
 
     # Get the user information from the provider
     response = app.OAUTH.get("user")
+    user_id = response.json().get("name")
+
+    # IMPORTANT: Additional validation should occur here to verify that
+    # the user_id provided by Edge has access to your application.
+    if not user_is_authorized(user_id):
+        return "User does not have permission to access this app", 403
+
     # Save the user ID to our Flask session to be referenced later throughout
     # our application
-    session["user_id"] = response.json().get("name")
+    session["user_id"] = user_id
 
     return redirect("/")
 
@@ -87,3 +94,17 @@ def logout():
     # Remove the user id from our session
     session.pop("user_id", None)
     return redirect("login")
+
+
+def user_is_authorized(user_id):
+    """ Stub function for checking if a particular user ID is allowed access.
+
+    You can trust that the user_id is genuine; Edge guarantees this as part
+    of the login process.  As the app developer, you're responsible for also
+    deciding whether to grant a particular user access.
+
+    One example of a way to perform an authorization check would be to maintain
+    a database table, or even a configuration file, with a list of allowed
+    users.
+    """
+    return True
