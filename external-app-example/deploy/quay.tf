@@ -6,9 +6,9 @@ variable "quay_password" {
   type = string
 }
 
-resource "kubernetes_secret_v1" "quay_login" {
+resource "kubernetes_secret_v1" "quay_login_dev" {
   metadata {
-    name      = "quay-login"
+    name      = "quay-login-dev"
     namespace = "edge-dev"
   }
 
