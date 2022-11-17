@@ -7,21 +7,60 @@
 # Distribution is prohibited.
 
 import os
+import shutil
 import subprocess
 
 import click
 
 NATIVE_EXAMPLE_IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
 NATIVE_EXAMPLE_CONTAINER = "edge-native-app-flask"
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
+CI_DIR = os.path.dirname(__file__)
+MODULE_DIR = os.path.join(CI_DIR, "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
+BUNDLE_NAME = "enthought_edge.zbundle"
+ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
+BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
+
+# Generating a bundle does not automatically include basic python
+# dependencies in the default edm environment that many eggs
+# assume but do not explicitly list as dependencies
+BUNDLE_PACKAGES = [
+    "enthought_edge",
+    "appdirs",
+    "packaging",
+    "pip",
+    "pyparsing",
+    "setuptools",
+    "six"
+]
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
 
+@cli.command("generate_edge_bundle")
+def generate_edge_bundle():
+    _generate_edge_bundle()
+
+def _generate_edge_bundle():
+    """Build enthought_edge bundle"""
+    shutil.rmtree(ARTIFACT_DIR, ignore_errors=False)
+    os.mkdir(ARTIFACT_DIR)
+    env = os.environ.copy()
+    cmd = [
+        "edm",
+        "bundle",
+        "generate",
+        "--platform",
+        "rh7-x86_64",
+        "--version=3.8",
+        "-i",
+        "-f",
+        BUNDLE_PATH,
+    ] + BUNDLE_PACKAGES
+    subprocess.run(cmd, env=env, check=True)
 
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
@@ -42,11 +81,18 @@ def build(tag):
         cwd=cwd,
     )
 
+    if not os.path.isfile(BUNDLE_PATH):
+        _generate_edge_bundle()
+
+    BUNDLE_ARG = os.path.join("ci", "artifacts", BUNDLE_NAME)
+
     cmd = [
         "docker",
         "build",
         "-t",
         f"{NATIVE_EXAMPLE_IMAGE}:{tag}",
+        "--build-arg",
+        f"EDGE_BUNDLE={BUNDLE_ARG}",
         "--build-arg",
         f"CI_IMAGE_REPOSITORY={NATIVE_EXAMPLE_IMAGE}",
         "--build-arg",

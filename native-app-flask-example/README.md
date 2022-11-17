@@ -17,9 +17,9 @@ First, you will need to create an EDM environment named `dev_env` and install so
 
 ```commandline
 edm install -e dev_env --version 3.8 -y click \
-    enthought_edge \
     requests \
     opencv_python \
+    enthought_edge \
     "flask>2" && \
 edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
     dockerspawner \
