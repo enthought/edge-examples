@@ -55,12 +55,7 @@ LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
 LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
 
 if EDGE_API_SERVICE_URL and EDGE_API_ORG and API_TOKEN:
-    edge = EdgeSession(
-        service_url=EDGE_API_SERVICE_URL,
-        organization=EDGE_API_ORG,
-        version_num="1",
-        api_token=API_TOKEN
-    )
+    edge = EdgeSession()
     LOG.info(f"Edge initialized")
 
 
