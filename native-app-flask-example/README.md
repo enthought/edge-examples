@@ -9,13 +9,18 @@ To build and run the example application you will need:
 - [Docker](https://docker.com)
 - [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+- The `enthought/edge` EDM repository added to your `~/.edm.yaml` configuration
 
 ## Set up the development environment
 
 First, you will need to create an EDM environment named `dev_env` and install some dependencies.
 
 ```commandline
-edm install -e dev_env --version 3.8 -y click requests opencv_python "flask>2" && \
+edm install -e dev_env --version 3.8 -y click \
+    enthought_edge \
+    requests \
+    opencv_python \
+    "flask>2" && \
 edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
     dockerspawner \
     "configurable-http-proxy" \
