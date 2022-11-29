@@ -18,13 +18,10 @@ CI_DIR = os.path.dirname(__file__)
 MODULE_DIR = os.path.join(CI_DIR, "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
-BUNDLE_NAME = "enthought_edge.zbundle"
+BUNDLE_NAME = "app_environment.zbundle"
 ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 
-# Generating a bundle does not automatically include basic python
-# dependencies in the default edm environment that many eggs
-# assume but do not explicitly list as dependencies
 BUNDLE_PACKAGES = [
     "enthought_edge",
     "appdirs",
@@ -32,7 +29,12 @@ BUNDLE_PACKAGES = [
     "pip",
     "pyparsing",
     "setuptools",
-    "six"
+    "six",
+    "click",
+    "opencv_python",
+    "flask>2",
+    "gunicorn",
+    "requests"
 ]
 
 @click.group()
@@ -40,11 +42,12 @@ def cli():
     """All commands constituting continuous integration."""
     pass
 
-@cli.command("generate_edge_bundle")
-def generate_edge_bundle():
-    _generate_edge_bundle()
+@cli.command("generate_bundle")
+def generate_bundle():
+    """Generate a bundle with Edge packages"""
+    _generate_bundle()
 
-def _generate_edge_bundle():
+def _generate_bundle():
     """Build enthought_edge bundle"""
     shutil.rmtree(ARTIFACT_DIR, ignore_errors=False)
     os.mkdir(ARTIFACT_DIR)

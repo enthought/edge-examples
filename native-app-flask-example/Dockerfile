@@ -3,7 +3,7 @@
 # Intermediate image with enthought_edge package included via bundle
 FROM quay.io/enthought/edm-centos-7:latest as enthought_edge_stage
 
-ARG EDGE_BUNDLE=ci/artifacts/enthought_edge.zbundle
+ARG EDGE_BUNDLE=ci/artifacts/app_environment.zbundle
 
 # install tini
 RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.19.0-amd64.rpm && \
@@ -17,18 +17,16 @@ USER app_admin
 
 WORKDIR /home/app_admin
 
-ADD $EDGE_BUNDLE /home/app_admin/enthought_edge.zbundle
+COPY $EDGE_BUNDLE /home/app_admin/app_environment.zbundle
 
-RUN edm env import -f enthought_edge.zbundle edm 
+RUN edm env import -f app_environment.zbundle edm 
 
-RUN rm enthought_edge.zbundle
+RUN rm app_environment.zbundle
 
 # Final image
 FROM enthought_edge_stage
 
 USER app_admin
-
-RUN edm install click opencv_python "flask>2" gunicorn requests -y
 
 RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session
 
