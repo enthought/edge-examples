@@ -20,6 +20,7 @@ from flask import Flask, make_response, redirect, render_template, request, sess
 from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
+from edge.api import EdgeSession
 
 from .opencv_model.model import detect_face
 
@@ -44,12 +45,32 @@ ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
 LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
 LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
 LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
+
+
+_EDGE_SESSION = None
+
+def get_edge_session():
+    """Helper function to get an EdgeSession object
+    
+    Returns:
+        An EdgeSession object, if the container environment has
+        the EDGE_API_SERVICE_URL, EDGE_API_ORG and API_TOKEN
+        environment variables. If these variables are not set,
+        then None is returned
+    """
+    global _EDGE_SESSION
+    if _EDGE_SESSION is None and \
+       EDGE_API_SERVICE_URL and EDGE_API_ORG and API_TOKEN:
+        _EDGE_SESSION = EdgeSession()
+    return _EDGE_SESSION
 
 
 def track_activity(f):
