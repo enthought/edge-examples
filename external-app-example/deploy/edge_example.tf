@@ -66,15 +66,15 @@ resource "kubernetes_deployment_v1" "edge-example-app-dev" {
           }
           env {
             name  = "OAUTH_CLIENT_ID"
-            value = "service-edge-app-default-devexternal"
+            value = "service-edge-app-default-testexternal"
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
-            value = "http://edge-external-app-demo.platform-devops.enthought.com/authorize"
+            value = "http://edge-external-app-dev.platform-devops.enthought.com/authorize"
           }
           env {
             name  = "EDGE_BASE_URL"
-            value = "https://edge-dev-main.platform-devops.enthought.com"
+            value = "https://edge-dev-764.platform-devops.enthought.com"
           }
 
           volume_mount {
@@ -153,7 +153,7 @@ resource "kubernetes_manifest" "virtualservice_edge-example-app-dev" {
         "istio-ingress/platform-devops-enthought-com"
       ]
       hosts = [
-        "edge-external-app-demo.platform-devops.enthought.com"
+        "edge-external-app-dev.platform-devops.enthought.com"
       ]
       http = [
         {
