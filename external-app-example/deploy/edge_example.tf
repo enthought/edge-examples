@@ -66,7 +66,7 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           }
           env {
             name  = "OAUTH_CLIENT_ID"
-            value = "service-edge-app-default-edge-external-app-demo"
+            value = "service-edge-app-demo-edge-external-app-demo"
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
@@ -74,7 +74,7 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           }
           env {
             name  = "EDGE_BASE_URL"
-            value = "https://edge-dev-main.platform-devops.enthought.com"
+            value = "https://edge.enthought.com"
           }
 
           volume_mount {
