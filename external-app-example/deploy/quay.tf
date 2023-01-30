@@ -8,8 +8,8 @@ variable "quay_password" {
 
 resource "kubernetes_secret_v1" "quay_login_dev" {
   metadata {
-    name      = "quay-login-dev"
-    namespace = "edge-dev"
+    name      = "quay-login"
+    namespace = "external-app"
   }
 
   data = {
