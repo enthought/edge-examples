@@ -40,7 +40,7 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
       }
       spec {
         image_pull_secrets {
-          name = kubernetes_secret_v1.quay_login.metadata[0].name
+          name = kubernetes_secret_v1.quay_login_demo.metadata[0].name
         }
 
         volume {
@@ -66,7 +66,7 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           }
           env {
             name  = "OAUTH_CLIENT_ID"
-            value = "service-edge-app-demo-edge-external-app-demo"
+            value = "service-edge-app-demo-external-demo"
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
