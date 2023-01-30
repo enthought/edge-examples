@@ -13,7 +13,7 @@ provider "kubernetes" {
 }
 
 locals {
-  namespace = "edge-dev"
+  namespace = "external-app"
 }
 
 resource "kubernetes_deployment_v1" "edge-example-app" {
