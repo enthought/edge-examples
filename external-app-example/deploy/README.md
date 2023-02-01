@@ -18,9 +18,9 @@ The requirements are:
 
 ## Deploying Using Terraform
 
-1. Switch your namespace to the one created for you. In this example, we are using `edge-dev`.
+1. Switch your namespace to the one created for you. In this example, we are using `external-app`.
 ```bash
-kubectl config set-context --current --namespace=edge-dev
+kubectl config set-context --current --namespace=external-app
 ```
 2. Test your configuration by viewing existing pods. You will be prompted for a login.
 ```bash
@@ -54,8 +54,8 @@ with the domain name where it will be hosted.
 
 After you have completed the OAuth client registration process,
 you must configure several values within the Terraform deployment files:
-- Change the [`namespace`](./edge_example.tf#L16) from `edge-dev` to the one provided by DevOps
-- Optionally, replace the default app name `edge-example-app` with your own app name.
+- Change the [`namespace`](./edge_example.tf#L16) from `external-app` to the one provided by DevOps
+- Optionally, replace the default app name `edge-example-app-dev` with your own app name.
 - [`container image`](./edge_example.tf#L56) should be your application's published container
 - [`OAUTH_CLIENT_ID`](./edge_example.tf#L69) from the application registration process
 - [`OAUTH_REDIRECT_URI`](./edge_example.tf#L73) should be the `/authorize` endpoint wherever your app will be deployed

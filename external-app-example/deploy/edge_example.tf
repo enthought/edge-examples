@@ -13,15 +13,15 @@ provider "kubernetes" {
 }
 
 locals {
-  namespace = "edge-dev"
+  namespace = "external-app"
 }
 
-resource "kubernetes_deployment_v1" "edge-example-app" {
+resource "kubernetes_deployment_v1" "edge-example-app-dev" {
   metadata {
-    name      = "edge-example-app"
+    name      = "edge-example-app-dev"
     namespace = local.namespace
     labels = {
-      app = "edge-example-app"
+      app = "edge-example-app-dev"
     }
   }
 
@@ -29,30 +29,30 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
     replicas = 1
     selector {
       match_labels = {
-        app = "edge-example-app"
+        app = "edge-example-app-dev"
       }
     }
     template {
       metadata {
         labels = {
-          app = "edge-example-app"
+          app = "edge-example-app-dev"
         }
       }
       spec {
         image_pull_secrets {
-          name = kubernetes_secret_v1.quay_login.metadata[0].name
+          name = kubernetes_secret_v1.quay_login_dev.metadata[0].name
         }
 
         volume {
           name = "secrets"
 
           secret {
-            secret_name = kubernetes_secret_v1.edge-example-app.metadata[0].name
+            secret_name = kubernetes_secret_v1.edge-example-app-dev.metadata[0].name
           }
         }
 
         container {
-          name  = "edge-example-app"
+          name  = "edge-example-app-dev"
           image = "quay.io/enthought/edge-external-app-demo:latest"
           image_pull_policy = "Always"
 
@@ -66,15 +66,15 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
           }
           env {
             name  = "OAUTH_CLIENT_ID"
-            value = "service-edge-app-default-edge-external-app-demo"
+            value = "service-edge-app-default-testexternal"
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
-            value = "http://edge-external-app-demo.platform-devops.enthought.com/authorize"
+            value = "http://edge-external-app-dev.edge-dev.enthought.com/authorize"
           }
           env {
             name  = "EDGE_BASE_URL"
-            value = "https://edge-dev-main.platform-devops.enthought.com"
+            value = "https://edge-dev-main.edge-dev.enthought.com"
           }
 
           volume_mount {
@@ -102,15 +102,15 @@ resource "kubernetes_deployment_v1" "edge-example-app" {
   }
 }
 
-resource "kubernetes_service_v1" "edge-example-app" {
+resource "kubernetes_service_v1" "edge-example-app-dev" {
   metadata {
-    name      = "edge-example-app"
+    name      = "edge-example-app-dev"
     namespace = local.namespace
   }
 
   spec {
     selector = {
-      app = "edge-example-app"
+      app = "edge-example-app-dev"
     }
     port {
       port        = 8020
@@ -119,7 +119,7 @@ resource "kubernetes_service_v1" "edge-example-app" {
   }
 }
 
-resource "random_password" "edge-example-app" {
+resource "random_password" "edge-example-app-dev" {
   length  = 24
   special = false
 }
@@ -128,32 +128,32 @@ variable "client_secret" {
   type = string
 }
 
-resource "kubernetes_secret_v1" "edge-example-app" {
+resource "kubernetes_secret_v1" "edge-example-app-dev" {
   metadata {
-    name      = "edge-example-app"
+    name      = "edge-example-app-dev"
     namespace = local.namespace
   }
 
   data = {
-    secret_key        = random_password.edge-example-app.result
+    secret_key        = random_password.edge-example-app-dev.result
     client_secret     = var.client_secret
   }
 }
 
-resource "kubernetes_manifest" "virtualservice_edge-example-app" {
+resource "kubernetes_manifest" "virtualservice_edge-example-app-dev" {
   manifest = {
     apiVersion = "networking.istio.io/v1alpha3"
     kind = "VirtualService"
     metadata = {
-      name = "edge-example-app"
+      name = "edge-example-app-dev"
       namespace = local.namespace
     }
     spec = {
       gateways = [
-        "istio-ingress/platform-devops-enthought-com"
+        "istio-ingress/edge-dev-enthought-com"
       ]
       hosts = [
-        "edge-external-app-demo.platform-devops.enthought.com"
+        "edge-external-app-dev.edge-dev.enthought.com"
       ]
       http = [
         {
@@ -167,7 +167,7 @@ resource "kubernetes_manifest" "virtualservice_edge-example-app" {
           route = [
             {
               destination = {
-                host = kubernetes_service_v1.edge-example-app.metadata[0].name
+                host = kubernetes_service_v1.edge-example-app-dev.metadata[0].name
                 port = {
                   number = 8020
                 }

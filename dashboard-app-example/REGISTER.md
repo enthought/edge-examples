@@ -18,7 +18,7 @@ from edge.apps.server_info import ServerInfo
 
 # Create an Edge session
 edge = EdgeSession(
-    service_url="https://edge-dev-main.platform-devops.enthought.com/services/api",
+    service_url="https://edge-dev-main.edge-dev.enthought.com/services/api",
     version_num=1,
     organization="<YOUR_ORGANIZATION>",
     api_token="<YOUR_API_TOKEN>"
