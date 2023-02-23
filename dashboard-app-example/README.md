@@ -13,20 +13,17 @@ To build and run the example application you will need:
 
 ## Set up the development environment
 
-First, you will need to create an EDM environment named `dev_env` and install some dependencies.
+First, you will need to create an EDM environment and install some dependencies.
+To do this, use the "bootstrap.py" script:
 
 ```commandline
-edm install -e dev_env --version 3.8 -y click requests "flask>2" && \
-edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
-    dockerspawner \
-    "configurable-http-proxy" \
-    Flask-Session
-```   
+python bootstrap.py
+```
 
-Once you have created the `dev_env` environment, you may activate it with:
+This will create the `edge-dash-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e dev_env
+edm shell -e edge-dash-dev
 ```   
 
 ## Running the Application
