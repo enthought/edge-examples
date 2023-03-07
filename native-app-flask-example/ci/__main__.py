@@ -85,7 +85,7 @@ def build(tag):
     )
 
     if not os.path.isfile(BUNDLE_PATH):
-        _generate_edge_bundle()
+        _generate_bundle()
 
     BUNDLE_ARG = os.path.join("ci", "artifacts", BUNDLE_NAME)
 
