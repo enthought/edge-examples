@@ -49,7 +49,7 @@ def generate_bundle():
 
 def _generate_bundle():
     """Build enthought_edge bundle"""
-    shutil.rmtree(ARTIFACT_DIR, ignore_errors=False)
+    shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
     os.mkdir(ARTIFACT_DIR)
     env = os.environ.copy()
     cmd = [
@@ -143,6 +143,7 @@ def watch_backend():
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"
+    env["JUPYTERHUB_API_TOKEN"] = "1"
     env["APP_VERSION"] = "native-app-example running on ci watch backend"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
