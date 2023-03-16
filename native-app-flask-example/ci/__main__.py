@@ -34,18 +34,23 @@ BUNDLE_PACKAGES = [
     "opencv_python",
     "flask>2",
     "gunicorn",
-    "requests"
+    "requests",
 ]
+
+JH_PORT = "8081"
+
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
 
+
 @cli.command("generate_bundle")
 def generate_bundle():
     """Generate a bundle with Edge packages"""
     _generate_bundle()
+
 
 def _generate_bundle():
     """Build enthought_edge bundle"""
@@ -64,6 +69,7 @@ def _generate_bundle():
         BUNDLE_PATH,
     ] + BUNDLE_PACKAGES
     subprocess.run(cmd, env=env, check=True)
+
 
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
@@ -123,11 +129,11 @@ def publish(tag):
 def start(tag):
     """Start the native example application"""
     click.echo("Starting the JupyterHub container...")
-    cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
+    cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py", "--port", JH_PORT]
     env = os.environ.copy()
     env["IMAGE_TAG"] = tag
     subprocess.run(cmd, check=True, env=env)
-    click.echo("JupyterHub is running at: http://127.0.0.1:8888")
+    click.echo(f"JupyterHub is running at: http://127.0.0.1:{JH_PORT}")
 
 
 @cli.group(name="watch")

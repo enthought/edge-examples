@@ -10,9 +10,11 @@
     Bootstrap file for the dashboard example.
 """
 
+import os
+import os.path as op
 import subprocess
 
-ENV_NAME = "edge-dash-dev"
+ENV_NAME = "edge-native-dev"
 
 EDM_DEPS = [
     "click",
@@ -30,6 +32,8 @@ PIP_DEPS = [
     "Flask-Session",
 ]
 
+HERE = op.abspath(op.join(op.dirname(__file__)))
+
 
 def bootstrap():
     """Create and populate dev env"""
@@ -45,6 +49,9 @@ def bootstrap():
     print("Installing pip dependencies...")
     cmd = ["edm", "run", "-e", ENV_NAME, "--", "pip", "install"] + PIP_DEPS
     subprocess.run(cmd, check=True)
+
+    print("Creating artifacts directory if needed...")
+    os.makedirs(op.join(HERE, "ci", "artifacts"), exist_ok=True)
 
     print("Bootstrap complete.")
     print(f'To use your new dev environment, run "edm shell -e {ENV_NAME}"')
