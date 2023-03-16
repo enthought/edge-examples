@@ -58,7 +58,21 @@ To watch the frontend changes:
     python -m ci watch frontend
 ```
 
+## Development and debugging tips
 
+* When making your own app, start with a complete copy of the example app, and
+  modify it step by step with your own code.  It's much easier to
+  incrementally modify a working system than to develop one from scratch.
+
+* First, try to run the app via `python -m ci watch backend`.  That will run it
+  outside of the JupyterHub machinery, and makes it easier to get log output.
+  If your app doesn't work for a simple reason like a missing dependency or
+  a syntax error, this will catch it.
+
+* When running from a local JupyterHub instance with `python -m ci start`, you
+  can use Docker to get the logs from your container.  Use `docker ps` to find
+  your app's container, and `docker logs` to view the log output.
+  
 ## Requirements for a Edge native application
 
 Edge's JupyterHub spawner will launch a native application's container and provide
