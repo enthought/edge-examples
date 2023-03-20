@@ -13,24 +13,17 @@ To build and run the example application you will need:
 
 ## Set up the development environment
 
-First, you will need to create an EDM environment named `dev_env` and install some dependencies.
+First, you will need to create an EDM environment and install some dependencies.
+To do this, use the "bootstrap.py" script:
 
 ```commandline
-edm install -e dev_env --version 3.8 -y click \
-    requests \
-    opencv_python \
-    enthought_edge \
-    "flask>2" && \
-edm run -e dev_env -- python -m pip install "jupyterhub==2.2.2" \
-    dockerspawner \
-    "configurable-http-proxy" \
-    Flask-Session
-```   
+python bootstrap.py
+```
 
-Once you have created the `dev_env` environment, you may activate it with:
+This will create the `edge-native-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e dev_env
+edm shell -e edge-native-dev
 ```   
 
 ## Running the Application
@@ -51,6 +44,7 @@ Once built, you can run the image from a local JupyterHub session by running:
 
 For your local JupyterHub session, enter any username with the password `password`.
 
+
 ## Local Development
 
 For development purposes, you may run this application outside of a JupyterHub using file
@@ -65,6 +59,20 @@ To watch the frontend changes:
     python -m ci watch frontend
 ```
 
+## Development and debugging tips
+
+* When making your own app, start with a complete copy of the example app, and
+  modify it step by step with your own code.  It's much easier to
+  incrementally modify a working system than to develop one from scratch.
+
+* First, try to run the app via `python -m ci watch backend`.  That will run it
+  outside of the JupyterHub machinery, and makes it easier to get log output.
+  If your app doesn't work for a simple reason like a missing dependency or
+  a syntax error, this will catch it.
+
+* When running from a local JupyterHub instance with `python -m ci start`, you
+  can use Docker to get the logs from your container.  Use `docker ps` to find
+  your app's container, and `docker logs` to view the log output.
 
 ## Requirements for an Edge native application
 

@@ -45,8 +45,8 @@ c.JupyterHub.spawner_class = DockerSpawner
 c.JupyterHub.hub_ip = discover_ip()
 c.JupyterHub.ip = "127.0.0.1"
 
-# delete containers when the stop
-c.DockerSpawner.remove = True
+# Don't delete containers when they stop
+c.DockerSpawner.remove = False
 
 # docker image for the spawner
 c.DockerSpawner.image = f"quay.io/enthought/edge-native-app-flask-demo:{IMAGE_TAG}"
