@@ -28,20 +28,6 @@ def cli():
 def build(tag):
     """Build the panel example app"""
     click.echo("Building the Panel Example App...")
-
-    cwd = os.path.join(SRC_DIR, "frontend")
-    subprocess.run(
-        ["npm", "install"],
-        check=True,
-        cwd=cwd,
-    )
-    cmd = ["npm", "run", "build"]
-    subprocess.run(
-        cmd,
-        check=True,
-        cwd=cwd,
-    )
-
     cmd = [
         "docker",
         "build",
@@ -57,7 +43,6 @@ def build(tag):
     ]
     subprocess.run(cmd, check=True)
     click.echo("Done")
-
 
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
