@@ -16,13 +16,14 @@ ENV_NAME = "edge-streamlit-dev"
 
 EDM_DEPS = [
     "click",
-    "jupyterhub"
+    "jupyterhub",
 ]
 
 PIP_DEPS = [
     "sqlalchemy<2",
     "dockerspawner",
-    "streamlit"
+    "streamlit",
+    "streamlit-javascript"
 ]
 
 def bootstrap():

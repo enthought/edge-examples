@@ -9,9 +9,9 @@ RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.1
 RUN adduser app_admin
 USER app_admin
 
-RUN edm install --version 3.8 click pandas numpy -y
+RUN edm install --version 3.8 click pandas numpy requests -y
 
-RUN edm run -- python -m pip install streamlit
+RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript
 
 WORKDIR /home/app_admin
 COPY --chown=app_admin ./src streamlit-app-example/

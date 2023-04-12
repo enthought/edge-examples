@@ -9,9 +9,44 @@
 # Streamlit Example App:
 # https://docs.streamlit.io/library/get-started/create-an-app
 
+import logging
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
+from jupyterhub.services.auth import HubOAuth
+
+LOG = logging.getLogger(__name__)
+
+
+# When run from Edge, these environment variables will be provided
+PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
+ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
+SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
+JUPYTERHUB_SERVICE_URL = os.environ.get("JUPYTERHUB_SERVICE_URL")
+JUPYTERHUB_OAUTH_SCOPES = os.environ.get("JUPYTERHUB_OAUTH_SCOPES")
+API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
+
+AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
+
+
+if 'token' in st.session_state:
+    hub_user = AUTH.user_for_token(st.session_state['token'])
+else:
+    hub_user = None
+    state = AUTH.generate_state(next_url=JUPYTERHUB_SERVICE_URL)
+    redirect_url = f"{AUTH.login_url}&state={state}"
+    # Use a meta tag to perform an automatic redirect
+    st.markdown(
+        f'''
+        <meta http-equiv="refresh" content="0;URL='{redirect_url}'" />
+        ''',
+        unsafe_allow_html=True
+    )
+
 
 st.title('Uber pickups in NYC')
 
@@ -26,6 +61,7 @@ def load_data(nrows):
     data.rename(lowercase, axis='columns', inplace=True)
     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
     return data
+
 
 data_load_state = st.text('Loading data...')
 data = load_data(10000)
