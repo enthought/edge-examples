@@ -13,7 +13,7 @@ import logging
 import os
 import streamlit as st
 from jupyterhub.services.auth import HubOAuth
-from streamlit_javascript import st_javascript
+from streamlit_extras.switch_page_button import switch_page
 
 LOG = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
+
 query_params = st.experimental_get_query_params()
 oauth_code = query_params.get('code')
 oauth_state = query_params.get('state')
@@ -36,7 +37,7 @@ token = st.session_state.get("token")
 if token is not None:
     hub_user = AUTH.user_for_token(token)
     username = hub_user["name"]
-    st.write(f"Logged in as {hub_user}")
+    switch_page("app")
 elif oauth_code is not None and oauth_state is not None:
     # Only attempt to redeem the oauth code for a token if
     # token does not exist in the session
@@ -49,3 +50,4 @@ elif oauth_code is not None and oauth_state is not None:
     hub_user = AUTH.user_for_token(token)
     username = hub_user["name"]
     st.write(f"Logged in as {hub_user}")
+    switch_page("app")

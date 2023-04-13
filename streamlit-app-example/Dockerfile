@@ -11,7 +11,7 @@ USER app_admin
 
 RUN edm install --version 3.8 click pandas numpy requests -y
 
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript
+RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript streamlit-extras
 
 WORKDIR /home/app_admin
 COPY --chown=app_admin ./src streamlit-app-example/

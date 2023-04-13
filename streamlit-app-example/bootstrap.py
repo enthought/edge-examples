@@ -23,7 +23,8 @@ PIP_DEPS = [
     "sqlalchemy<2",
     "dockerspawner",
     "streamlit",
-    "streamlit-javascript"
+    "streamlit-javascript",
+    "streamlit-extras"
 ]
 
 def bootstrap():
