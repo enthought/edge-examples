@@ -28,9 +28,12 @@ AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
 st.set_page_config(page_title="", initial_sidebar_state="collapsed")
 
+# Perform authentication checks
 if 'token' in st.session_state:
     hub_user = AUTH.user_for_token(st.session_state['token'])
 else:
+    # If a user does not have an Edge token in their session state
+    # perform a login redirect
     hub_user = None
     state = AUTH.generate_state(next_url=JUPYTERHUB_SERVICE_URL)
     redirect_url = f"{AUTH.login_url}&state={state}"
@@ -43,11 +46,6 @@ else:
     )
     st.stop()
 
-
-
-if hub_user is not None:
-    st.write(f"Logged in as {hub_user['name']}")
-
 """
 TODO: Once user identity is established through authentication,
 authorization needs to be determined. For example:
@@ -57,6 +55,9 @@ if hub_user['name'] not in authorized_users:
 """ 
 
 st.title('Uber pickups in NYC')
+
+if hub_user is not None:
+    st.write(f"Logged in as {hub_user['name']}")
 
 DATE_COLUMN = 'date/time'
 DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
