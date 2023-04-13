@@ -14,6 +14,21 @@ from os import path
 from dockerspawner import DockerSpawner
 
 
+
+
+def discover_ip():
+    """Find the IP address we are connected to."""
+    st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        st.connect(("10.255.255.255", 1))
+        ip = st.getsockname()[0]
+    except Exception:
+        ip = "127.0.0.1"
+    finally:
+        st.close()
+    return ip
+
+
 IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
 
 c = get_config()  # noqa
@@ -27,7 +42,8 @@ c.DummyAuthenticator.password = "password"
 c.JupyterHub.spawner_class = DockerSpawner
 
 # the hostname/ip that should be used to connect to the hub
-c.JupyterHub.hub_ip = "0.0.0.0"
+c.JupyterHub.hub_ip = discover_ip()
+c.JupyterHub.ip = "127.0.0.1"
 c.JupyterHub.redirect_to_server = False
 
 # Don't delete containers when the stop
