@@ -26,7 +26,6 @@ API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
-
 query_params = st.experimental_get_query_params()
 oauth_code = query_params.get('code')
 oauth_state = query_params.get('state')

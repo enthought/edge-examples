@@ -32,6 +32,7 @@ EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
+st.set_page_config(page_title="", initial_sidebar_state="collapsed")
 
 if 'token' in st.session_state:
     hub_user = AUTH.user_for_token(st.session_state['token'])
@@ -46,7 +47,20 @@ else:
         ''',
         unsafe_allow_html=True
     )
+    st.stop()
 
+
+
+if hub_user is not None:
+    st.write(f"Logged in as {hub_user['name']}")
+
+"""
+TODO: Once user identity is established through authentication,
+authorization needs to be determined. For example:
+
+if hub_user['name'] not in authorized_users:
+    st.stop()
+""" 
 
 st.title('Uber pickups in NYC')
 
