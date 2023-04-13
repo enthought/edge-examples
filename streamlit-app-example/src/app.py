@@ -20,15 +20,9 @@ LOG = logging.getLogger(__name__)
 
 
 # When run from Edge, these environment variables will be provided
-PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
-ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
-SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 JUPYTERHUB_SERVICE_URL = os.environ.get("JUPYTERHUB_SERVICE_URL")
-JUPYTERHUB_OAUTH_SCOPES = os.environ.get("JUPYTERHUB_OAUTH_SCOPES")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
-EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
-EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 

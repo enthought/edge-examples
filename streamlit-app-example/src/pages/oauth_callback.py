@@ -40,7 +40,6 @@ if token is not None:
 elif oauth_code is not None and oauth_state is not None:
     # Only attempt to redeem the oauth code for a token if
     # token does not exist in the session
-
     # Currently cannot check oauth_state because of inability to
     # persist cookies
     oauth_code = oauth_code[0]
