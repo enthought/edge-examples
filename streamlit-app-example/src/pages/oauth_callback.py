@@ -4,7 +4,7 @@
 # All rights reserved.
 #
 # This file and its contents are confidential information and NOT open source.
-# Distribution is 
+# Distribution is
 
 # Streamlit Example App:
 # https://docs.streamlit.io/library/get-started/create-an-app
@@ -26,9 +26,11 @@ API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
+st.set_page_config(page_title="Refresh")
+
 query_params = st.experimental_get_query_params()
-oauth_code = query_params.get('code')
-oauth_state = query_params.get('state')
+oauth_code = query_params.get("code")
+oauth_state = query_params.get("state")
 
 # See if the token is stored in the session. This may be the case because
 # streamlit continuously runs this code

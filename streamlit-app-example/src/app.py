@@ -26,7 +26,9 @@ API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
-st.set_page_config(page_title="", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title="Edge Streamlit Example", initial_sidebar_state="collapsed"
+)
 
 # Perform authentication checks
 if "token" in st.session_state:
