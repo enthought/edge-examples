@@ -56,6 +56,20 @@ def publish(tag):
     click.echo("Done")
 
 
+@cli.command("publish-hack")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def publish(tag):
+    """Publish to edge-native-app-flask-demo ("real" repo not ready)"""
+    click.echo("Publishing the streamlit Example App to old repo...")
+    xtag = "quay.io/enthought/edge-native-app-flask-demo:streamlit"
+    subprocess.run(
+        ["docker", "image", "tag", f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}", xtag], check=True
+    )
+    cmd = ["docker", "push", xtag]
+    subprocess.run(cmd, check=True)
+    click.echo("Done")
+
+
 @cli.command("start")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def start(tag):

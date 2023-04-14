@@ -8,19 +8,19 @@ RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.1
 
 RUN adduser app_admin
 USER app_admin
-
-RUN edm install --version 3.8 click pandas numpy requests -y
-
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript streamlit-extras
-
 WORKDIR /home/app_admin
+
+RUN edm envs create edm --version 3.8 && edm cache purge --yes
+RUN edm run -- python -m pip install --no-cache-dir \
+    click pandas numpy requests "jupyterhub==2.2.2" \
+    streamlit streamlit-javascript streamlit-extras
+
 COPY --chown=app_admin ./src streamlit-app-example/
-
-WORKDIR /home/app_admin
 RUN chmod 777 streamlit-app-example/startup-script.sh
 
 ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-streamlit-demo
 ARG CI_IMAGE_TAG=latest
 ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
+
 
 CMD ["tini", "-g", "--", "streamlit-app-example/startup-script.sh"]

@@ -20,16 +20,10 @@ To do this, use the "bootstrap.py" script:
 python bootstrap.py
 ```
 
-This will create the `edge-dash-dev` EDM environment.  You may activate it with:
+This will create the `edge-streamlit-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e edge-dash-dev
-```
-
-You must also install the NodeJS version of `configurable-http-proxy`:
-
-```commandline
-npm install -g configurable-http-proxy
+edm shell -e edge-streamlit-dev
 ```
 
 ## Running the Application
