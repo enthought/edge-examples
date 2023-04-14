@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') | url_decode }}"
+    />
+    <script id="server-config-data" type="application/json">
+      {
+        "urlPrefix": "{{url_prefix}}"
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="version" style="position: absolute; bottom: 0px;">
+      {{ app_version }}
+    </div>
+  </body>
+  <script
+    type="module"
+    src="{{ url_for('static', filename='index.js') | url_decode }}"
+  ></script>
+</html>
