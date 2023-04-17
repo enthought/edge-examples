@@ -52,9 +52,9 @@ c.DockerSpawner.remove = False
 
 # docker image for the spawner
 # We don't have time for a new quay repo for this test, so re-use native with
-# a custon TAG
+# a custom TAG
 # c.DockerSpawner.image = f"quay.io/enthought/native-dash-app-demo:{IMAGE_TAG}"
-c.DockerSpawner.image = f"quay.io/enthought/native-dash-app-demo:dash"
+c.DockerSpawner.image = "quay.io/enthought/native-dash-app-demo:dash"
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")

@@ -56,4 +56,4 @@ if __name__ == "__main__":
         host = url.hostname
     options = {"bind": f"{host}:{port}", "workers": 1, "threads": 1}
     application = create_app()
-    StandaloneApplication(application, options).run()
+    StandaloneApplication(application.server, options).run()
