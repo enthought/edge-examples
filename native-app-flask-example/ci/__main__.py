@@ -23,6 +23,7 @@ ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 
 BUNDLE_PACKAGES = [
+    "enthought_edge",
     "appdirs",
     "packaging",
     "pip",
