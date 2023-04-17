@@ -1,7 +1,7 @@
 FROM quay.io/enthought/edm-centos-7:latest
 
 # Install nginx
-RUN yum -y install openssl pcre2
+RUN yum -y install openssl pcre2 gettext
 ADD http://nginx.org/packages/centos/7/x86_64/RPMS/nginx-1.24.0-1.el7.ngx.x86_64.rpm /tmp
 RUN rpm -iv /tmp/nginx-1.24.0-1.el7.ngx.x86_64.rpm
 
@@ -11,6 +11,7 @@ ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLA
 RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
 ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
 RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
+
 
 RUN adduser app_admin
 
@@ -28,4 +29,4 @@ ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-streamlit-demo
 ARG CI_IMAGE_TAG=latest
 ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
 
-ENTRYPOINT ["/init"]
+CMD ["/init"]

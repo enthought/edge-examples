@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/command/with-contenv sh
 exec 2>&1
 cd /home/app_admin
 set -e

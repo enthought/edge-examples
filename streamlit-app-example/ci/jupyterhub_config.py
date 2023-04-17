@@ -44,7 +44,8 @@ c.JupyterHub.spawner_class = DockerSpawner
 # the hostname/ip that should be used to connect to the hub
 c.JupyterHub.hub_ip = discover_ip()
 c.JupyterHub.ip = "127.0.0.1"
-c.JupyterHub.redirect_to_server = False
+c.JupyterHub.bind_url = "http://127.0.0.1:8000"
+c.JupyterHub.redirect_to_server = False 
 
 # Don't delete containers when the stop
 c.DockerSpawner.remove = False
@@ -57,4 +58,5 @@ c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
 c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")
-c.JupyterHub.log_level = 10
+c.ConfigurableHTTPProxy.debug = True
+c.JupyterHub.log_level = 'DEBUG'
