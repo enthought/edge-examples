@@ -11,8 +11,12 @@ import shutil
 import subprocess
 
 import click
+import yaml
 
-DASH_EXAMPLE_IMAGE = "quay.io/enthought/native-dash-app-demo"
+# We don't have time for a new quay repo for this test, so re-use native with
+# a custon TAG
+# DASH_EXAMPLE_IMAGE = "quay.io/enthought/native-dash-app-demo"
+DASH_EXAMPLE_IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
 DASH_EXAMPLE_CONTAINER = "native-dash-app-flask"
 
 CI_DIR = os.path.dirname(__file__)
@@ -22,6 +26,9 @@ SRC_DIR = os.path.join(MODULE_DIR, "src")
 BUNDLE_NAME = "app_environment.zbundle"
 ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
+
+# EDM environment used for style checking
+LINT_ENV_NAME = "edge-dev-3.8"
 
 BUNDLE_PACKAGES = [
     "enthought_edge",
@@ -34,20 +41,23 @@ BUNDLE_PACKAGES = [
     "packaging",
     "pip",
     "pyparsing",
-    "requests"
+    "requests",
     "setuptools",
     "six",
 ]
+
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
 
+
 @cli.command("generate_bundle")
 def generate_bundle():
     """Generate a bundle with Edge packages"""
     _generate_bundle()
+
 
 def _generate_bundle():
     """Build enthought_edge bundle"""
@@ -67,8 +77,10 @@ def _generate_bundle():
     ] + BUNDLE_PACKAGES
     subprocess.run(cmd, env=env, check=True)
 
+
 @cli.command("build")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+# @click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default="dash", help="Docker tag to use.")
 def build(tag):
     """Build the native example app"""
     click.echo("Building the Native Dash Example App...")
@@ -111,7 +123,8 @@ def build(tag):
 
 
 @cli.command("publish")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+# @click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default="dash", help="Docker tag to use.")
 def publish(tag):
     """Publish the native example app"""
     click.echo("Publishing the Native Dash Example App...")
@@ -121,7 +134,8 @@ def publish(tag):
 
 
 @cli.command("start")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+# @click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default="dash", help="Docker tag to use.")
 def start(tag):
     """Start the native example application"""
     click.echo("Starting the JupyterHub container...")
@@ -167,6 +181,72 @@ def watch_frontend():
         check=True,
         cwd=cwd,
     )
+
+
+@cli.command()
+@click.option(
+    "--apply",
+    is_flag=True,
+    default=False,
+    help="Whether or not to apply isort and black formatting.",
+)
+@click.option(
+    "--rebuild", is_flag=True, default=False, help="Force-rebuild style checking env"
+)
+def style(apply, rebuild):
+    """Run formatting checks"""
+
+    cmd = ["edm", "envs", "list"]
+    proc = subprocess.run(cmd, check=True, capture_output=True)
+
+    # Build env if needed
+    if rebuild or (LINT_ENV_NAME not in proc.stdout.decode("utf8")):
+        cmd = ["edm", "envs", "create", LINT_ENV_NAME, "--force", "--version", "3.8"]
+        subprocess.run(cmd, check=True)
+
+        cmd = [
+            "edm",
+            "install",
+            "-e",
+            LINT_ENV_NAME,
+            "-y",
+            "black",
+            "click",
+            "flake8",
+            "isort",
+            "pyyaml",
+        ]
+        subprocess.run(cmd, check=True)
+
+    # Then run checking commands
+    commands = [
+        (["isort", "."], ["--check", "--diff"], "isort check failed"),
+        (["black", "."], ["--check"], "Black check failed"),
+        (["python", "-m", "flake8"], [], "Flake8 check failed"),
+    ]
+
+    for cmd, options, fail_message in commands:
+        if not apply:
+            cmd = cmd + options
+        cproc = subprocess.run(["edm", "run", "-e", LINT_ENV_NAME, "--"] + cmd)
+        rc = cproc.returncode
+        if rc is not None and rc != 0:
+            # Ensure user can see why the check failed
+            click.echo(cproc.stderr)
+            raise click.ClickException(fail_message)
+
+    # Check yaml syntax validity.
+    # Otherwise GitHub Actions likes to silently fail.
+    count = 0
+    actions_folder = os.path.join(MODULE_DIR, ".github")
+    for subfolder, _, filenames in os.walk(actions_folder):
+        filenames = [x for x in filenames if x.endswith(".yaml")]
+        for filename in filenames:
+            full_path = os.path.join(actions_folder, subfolder, filename)
+            with open(full_path, "r") as f:
+                yaml.safe_load(f)
+            count += 1
+    click.echo(f"Checked {count} yaml files for correct syntax")
 
 
 if __name__ == "__main__":

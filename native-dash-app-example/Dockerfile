@@ -35,8 +35,12 @@ COPY --chown=app_admin ./src native-dash-app-example/
 WORKDIR /home/app_admin
 RUN chmod 777 native-dash-app-example/startup-script.sh
 
+# We don't have time for a new quay repo for this test, so re-use native with
+# a custon TAG
+#ARG CI_IMAGE_REPOSITORY=quay.io/enthought/native-dash-app-demo
+#ARG CI_IMAGE_TAG=latest
 ARG CI_IMAGE_REPOSITORY=quay.io/enthought/native-dash-app-demo
-ARG CI_IMAGE_TAG=latest
+ARG CI_IMAGE_TAG=dash
 ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
 
 CMD ["tini", "-g", "--", "native-dash-app-example/startup-script.sh"]

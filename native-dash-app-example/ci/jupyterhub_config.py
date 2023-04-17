@@ -5,6 +5,7 @@
 #
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
+# isort: skip_file
 
 import os
 import socket
@@ -14,7 +15,8 @@ from os import path
 from dockerspawner import DockerSpawner
 
 
-IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
+# IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
+IMAGE_TAG = os.environ.get("IMAGE_TAG", "dash")
 
 
 def discover_ip():
@@ -49,7 +51,10 @@ c.JupyterHub.ip = "127.0.0.1"
 c.DockerSpawner.remove = False
 
 # docker image for the spawner
-c.DockerSpawner.image = f"quay.io/enthought/native-dash-app-demo:{IMAGE_TAG}"
+# We don't have time for a new quay repo for this test, so re-use native with
+# a custon TAG
+# c.DockerSpawner.image = f"quay.io/enthought/native-dash-app-demo:{IMAGE_TAG}"
+c.DockerSpawner.image = f"quay.io/enthought/native-dash-app-demo:dash"
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")

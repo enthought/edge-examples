@@ -20,6 +20,7 @@ EDM_DEPS = [
     "enthought_edge",
     "flask>2",
     "opencv_python",
+    "pyyaml",
     "requests",
 ]
 
