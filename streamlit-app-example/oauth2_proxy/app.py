@@ -70,8 +70,16 @@ def create_app():
     sess = Session()
     sess.init_app(app)
 
-    @app.route("/oauth_callback")
-    def oauth_callback(**kwargs):
+    @app.route("/")
+    def hello_world(**kwargs):
+        return "Hello World" 
+
+    @app.route("/oauth_status")
+    def oauth_status(**kwargs):
         return "OK", 202
+
+    @app.route("/oauth_callback/")
+    def oauth_callback(**kwargs):
+        return "Oauth Callback URL"
 
     return app
