@@ -1,26 +1,28 @@
 FROM quay.io/enthought/edm-centos-7:latest
 
-# install tini
-RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.19.0-amd64.rpm && \
-    echo "ab82980245169e93f8507f8d9a5fd008f5057df61a06fe46f464c4d624e6424a tini_0.19.0-amd64.rpm" | sha256sum --check && \
-    rpm -i tini_0.19.0-amd64.rpm && \
-    rm tini_0.19.0-amd64.rpm
+ARG S6_OVERLAY_VERSION=3.1.4.1
+
+# Install s6-overlay
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 
 RUN adduser app_admin
 USER app_admin
 
-RUN edm install --version 3.8 click pandas numpy requests -y
+RUN edm install --version 3.8 click pandas numpy flask requests gunicorn -y
 
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript streamlit-extras
+RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript streamlit-extras Flask-Session
+
+COPY ./s6 /
 
 WORKDIR /home/app_admin
+COPY --chown=app_admin ./oauth2_proxy oauth2_proxy/
 COPY --chown=app_admin ./src streamlit-app-example/
-
-WORKDIR /home/app_admin
-RUN chmod 777 streamlit-app-example/startup-script.sh
 
 ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-streamlit-demo
 ARG CI_IMAGE_TAG=latest
 ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
 
-CMD ["tini", "-g", "--", "streamlit-app-example/startup-script.sh"]
+ENTRYPOINT ["/init"]

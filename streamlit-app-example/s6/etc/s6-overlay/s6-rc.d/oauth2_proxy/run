@@ -1,0 +1,7 @@
+#!/bin/sh
+exec 2>&1
+cd /home/app_admin
+set -e
+export LC_ALL=en_US.utf-8
+export LANG=en_US.utf-8
+exec edm run -- python -m oauth2_proxy.wsgi
