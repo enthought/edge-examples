@@ -16,11 +16,13 @@ from urllib.parse import unquote
 from uuid import uuid4
 
 import requests
-# from edge.api import EdgeSession
+from dash import dash, dcc, html
+from dash.dependencies import Input, Output
 from flask import Flask, make_response, redirect, render_template, request, session
-from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
+
+from flask_session import Session
 
 from .opencv_model.model import detect_face
 
@@ -48,29 +50,13 @@ APP_VERSION = os.environ.get("APP_VERSION", "native-dash-app-example")
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
+DASH_URL_BASE_PATHNAME = "/dashboard/"
+
 AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 
 LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
 LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
 LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
-
-
-# _EDGE_SESSION = None
-
-
-# def get_edge_session():
-#     """Helper function to get an EdgeSession object
-#
-#     Returns:
-#         An EdgeSession object, if the container environment has
-#         the EDGE_API_SERVICE_URL, EDGE_API_ORG and API_TOKEN
-#         environment variables. If these variables are not set,
-#         then None is returned
-#     """
-#     global _EDGE_SESSION
-#     if _EDGE_SESSION is None and EDGE_API_SERVICE_URL and EDGE_API_ORG and API_TOKEN:
-#         _EDGE_SESSION = EdgeSession()
-#     return _EDGE_SESSION
 
 
 def track_activity(f):
@@ -124,12 +110,6 @@ def authenticated(f):
     return decorated
 
 
-def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
-    """Run face detection and store the result"""
-    result = detect_face(encoded_string, params)
-    result_dict[id] = result
-
-
 def create_app():
     """Creates the Flask app with routes for serving the React application
     and API routes for running jobs
@@ -140,17 +120,68 @@ def create_app():
     # Use a multiprocessing shared dictionary for aggregating job results
     RESULTS = manager.dict()
 
-    app = Flask(
+    flask = Flask(
         __name__,
-        template_folder="frontend/templates",
-        static_folder="frontend/dist",
+        template_folder="templates",
         static_url_path=PREFIX + "static",
     )
-    app.config["SESSION_TYPE"] = "filesystem"
-    app.config["SECRET_KEY"] = "super secret key"
+    flask.config["SESSION_TYPE"] = "filesystem"
+    flask.config["SECRET_KEY"] = "super secret key"
     sess = Session()
-    sess.init_app(app)
-    app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
+    sess.init_app(flask)
+    flask.jinja_env.filters["url_decode"] = lambda url: unquote(url)
+
+    app = dash.Dash(
+        __name__,
+        server=flask,
+        url_base_pathname=DASH_URL_BASE_PATHNAME,
+
+    )
+
+    app.layout = html.Div(
+        [
+            html.Div(id="page-content"),
+            dcc.Interval(id="auth-check-interval", interval=3600 * 1000),
+        ]
+    )
+
+    # All of your Dash UI components go in this function.
+    # Your dashboard users are not able to view those UI components unless
+    # they are authenticated and authorized.
+    @app.callback(
+        Output("page-content", "children"), Input("auth-check-interval", "n_intervals")
+    )
+    @track_activity
+    @authenticated
+    def layout_components(n):
+        # For example, the following function returns Dropdown and Div UI components that display information about
+        # the Flask and Dash frameworks.
+        return [
+            dcc.Dropdown(
+                id="frameworks_dropdown",
+                options=[
+                    {"label": framework, "value": framework}
+                    for framework in ["Dash", "Flask"]
+                ],
+            ),
+            html.Div(id="framework_details"),
+        ]
+
+    # All callback functions for your UI components go here.
+    # For example, following is the callback for UI components in the previous function.
+    @app.callback(
+        Output("framework_details", "children"), Input("frameworks_dropdown", "value")
+    )
+    def display_framework_details(framework):
+        details = ""
+        if framework is None:
+            details = "You have not selected a framework yet"
+        else:
+            if framework == "Dash":
+                details = "Dash is an open source framework for developing full-blown data applications using modern UI components. It is based upon Flask, Plotly.js and React.js. This tutorial describes how you can make your Dash applications 'Enterprise Ready' by using the IBM Cloud App ID service for authentication and authorization, and the IBM Cloud Code Engine service for deployment and scaling."
+            else:
+                details = "Flask is a lightweight web application framework. Although it is called a 'micro framework', it is simple but extensible. It can be used to build complex dashboards like the Dash open source framework which is based upon Flask."
+        return details
 
     # When running with ci start, preserve the trailing slash in the prefix
     # When launching from jupyterhub, strip the trailing slash in the prefix
@@ -160,11 +191,12 @@ def create_app():
 
     LOG.info(f"Root path at {ROOT_PATH}")
 
-    @app.route(ROOT_PATH)
+    @flask.route(ROOT_PATH)
     @track_activity
     @authenticated
     def serve(**kwargs):
         """The main handle to serve the index page."""
+        # return redirect(DASH_URL_BASE_PATHNAME)
         hub_user = kwargs.get("hub_user", {"name": "No user"})
         return render_template(
             "index.html",
@@ -175,33 +207,7 @@ def create_app():
             },
         )
 
-    @app.route(PREFIX + "job", methods=["GET", "POST"])
-    @track_activity
-    @authenticated
-    def job(**kwargs):
-        """A job endpoint for receiving images and returning job results"""
-        if request.method == "GET":
-            # Return finished task results and remove them from shared results
-            ret = {}
-            for taskId, value in RESULTS.items():
-                if value:
-                    ret[taskId] = value
-                del RESULTS[taskId]
-            return ret
-
-        if request.method == "POST":
-            # Spawn a face detection task and an id
-            body = request.json
-            id = str(uuid4())
-            RESULTS[id] = None
-            p = mp.Process(
-                target=task, args=(id, RESULTS, body["image"], body["params"])
-            )
-            p.start()
-
-            return {"id": id}
-
-    @app.route(PREFIX + "oauth_callback")
+    @flask.route(PREFIX + "oauth_callback")
     def oauth_callback():
         """The OAuth callback handler, this handler is required for the
         authentication process with Hub.
@@ -223,4 +229,4 @@ def create_app():
         response = make_response(redirect(next_url))
         return response
 
-    return app
+    return flask

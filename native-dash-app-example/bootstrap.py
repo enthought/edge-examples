@@ -17,7 +17,6 @@ ENV_NAME = "dash-native-dev"
 EDM_DEPS = [
     "click",
     "dash",
-    "enthought_edge",
     "flask>2",
     "opencv_python",
     "pyyaml",

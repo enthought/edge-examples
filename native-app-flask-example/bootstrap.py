@@ -18,7 +18,6 @@ EDM_DEPS = [
     "click",
     "requests",
     "opencv_python",
-    "enthought_edge",
     "flask>2",
 ]
 

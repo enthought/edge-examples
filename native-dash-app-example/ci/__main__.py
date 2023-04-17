@@ -31,7 +31,6 @@ BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 LINT_ENV_NAME = "edge-dev-3.8"
 
 BUNDLE_PACKAGES = [
-    "enthought_edge",
     "appdirs",
     "click",
     "dash",
@@ -84,19 +83,6 @@ def _generate_bundle():
 def build(tag):
     """Build the native example app"""
     click.echo("Building the Native Dash Example App...")
-
-    cwd = os.path.join(SRC_DIR, "frontend")
-    subprocess.run(
-        ["npm", "install"],
-        check=True,
-        cwd=cwd,
-    )
-    cmd = ["npm", "run", "build"]
-    subprocess.run(
-        cmd,
-        check=True,
-        cwd=cwd,
-    )
 
     if not os.path.isfile(BUNDLE_PATH):
         _generate_bundle()
@@ -162,25 +148,6 @@ def watch_backend():
     env["JUPYTERHUB_API_TOKEN"] = "1"
     env["APP_VERSION"] = "native-dash-app-example running on ci watch backend"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
-
-
-@watch_cmd.command(name="frontend")
-def watch_frontend():
-    """Start the application and watch frontend changes"""
-
-    cwd = os.path.join(SRC_DIR, "frontend")
-    subprocess.run(
-        ["npm", "install"],
-        check=True,
-        cwd=cwd,
-    )
-
-    cmd = ["npm", "run", "dev"]
-    subprocess.run(
-        cmd,
-        check=True,
-        cwd=cwd,
-    )
 
 
 @cli.command()
