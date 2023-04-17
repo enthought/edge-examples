@@ -4,7 +4,7 @@ After the image for this application has been published using `python -m ci publ
 an application tile can be created on Edge. You will need:
 
 - The `enthought_edge` package from the `enthought/edge` EDM repository
-- A quay.io deployment credential for the `quay.io/enthought/edge-dashboard-demo:latest` repo
+- A quay.io deployment credential for the `quay.io/enthought/edge-streamlit-demo:latest` repo
 - Development access for an Edge organization
 - An Edge API token
 
@@ -25,7 +25,7 @@ edge = EdgeSession(
 )
 
 # Register a new application
-app = Application('mydashboard', True)
+app = Application('mystreamlit', True)
 edge.applications.add_application(app)
 
 # Register server info
@@ -54,12 +54,12 @@ ICON = (
 version1 = AppVersion(
     app_id=app.app_id,
     version="1.0.0",
-    title="Edge Dashboard App Demo, v1",
-    description="Demonstration of a dashboard application",
+    title="Edge StreamLit Demo, v1",
+    description="Demonstration of a StreamLit application",
     icon=ICON,
     kind=AppKindEnum.Native,
-    link="quay.io/enthought/edge-dashboard-demo:latest",
-    recommended_profile="edge.dashboard"
+    link="quay.io/enthought/edge-streamlit-demo:latest",
+    recommended_profile="edge.medium"
 )
 edge.applications.add_app_version(version1)
 ```

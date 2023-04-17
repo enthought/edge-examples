@@ -1,7 +1,7 @@
-# Native App Example
+# StreamLit App Example
 
-This folder contains a Flask + React application that showcases how to
-create a dashboard hosted by Edge native application. The dashboard app is packaged as 
+This folder contains a Streamlit application that showcases how to
+create a data visualization hosted by Edge native application. The app is packaged as 
 a Docker image that will be consumed by the Edge's JupyterHub spawner system.
 
 ## Requirements
@@ -26,10 +26,16 @@ This will create the `edge-streamlit-dev` EDM environment.  You may activate it 
 edm shell -e edge-streamlit-dev
 ```
 
+You will also need to install the `configurable-http-proxy` Node application:
+
+```commandline
+sudo npm install -g configurable-http-proxy
+```
+
 ## Running the Application
 
 If you are running the application for the first time, you will need to build
-the application's Docker image. From within the `dashboard-app-example` directory
+the application's Docker image. From within the `streamlit-app-example` directory
 run:
 
 ```commandline
@@ -50,12 +56,7 @@ For development purposes, you may run this application outside of a JupyterHub u
 watch modes for automatic reloading. To start the application and watch backend changes:
 
 ```commandline
-    python -m ci watch backend
-```
-To watch the frontend changes:
-
-```commandline
-    python -m ci watch frontend
+    python -m ci watch
 ```
 
 ## Development and debugging tips
@@ -64,7 +65,7 @@ To watch the frontend changes:
   modify it step by step with your own code.  It's much easier to
   incrementally modify a working system than to develop one from scratch.
 
-* First, try to run the app via `python -m ci watch backend`.  That will run it
+* First, try to run the app via `python -m ci watch`.  That will run it
   outside of the JupyterHub machinery, and makes it easier to get log output.
   If your app doesn't work for a simple reason like a missing dependency or
   a syntax error, this will catch it.
@@ -82,28 +83,16 @@ environment variables for routing and authentication.
 
 Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
 will be available. Application authors need to set the listening port and URL prefix of the
-application with values extracted from this variable. In this native app example,
-the binding information is provided to the [`wsgi` application](./src/wsgi.py#L43).
-
-### Reporting server activities back to Edge: 
-
-Edge will shut your application down after a while if it is considered inactive.
-To avoid this, you will need to report activity back to the server when the user
-interacts with your app. 
-
-To report activities, applications can send a POST to the URL provided in the
-`JUPYTERHUB_ACTIVITY_URL` environment variable, using the token provided
-in `JUPYTERHUB_API_TOKEN`. In this native app example, the 
-[`trackactivity` decorator](./src/app.py#L61) is used to perform this POST
-whenever any Flask endpoint is accessed.
+application with values extracted from this variable. In this streamlit app example,
+the binding information is provided to the [`startup-script.sh` streamlit command](./src/startup-script.sh#5).
 
 ## Using Edge as an OAuth provider
 
 Edge proxies connections to the single-user server and provides OAuth authentication
 for your application. Your application only needs to provide two components to take
 advantage of Edge authentication:
-- An [OAuth callback handler](./src/app.py#L182) to process Edge OAuth
-- An [`authenticated` decorator](./src/app#L90) that protects endpoints requiring authentication
+- An [OAuth callback handler](./src/pages/oauth_callback.py) to process Edge OAuth
+- A [token check](./src/app.py#36) during application rendering for authentication
 
 ## Registering the Application
 
