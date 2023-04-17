@@ -64,18 +64,11 @@ def create_app():
 
     app = Flask(
         __name__,
-        template_folder="frontend/templates",
-        static_folder="frontend/dist",
-        static_url_path=PREFIX + "static",
     )
     app.config["SESSION_TYPE"] = "filesystem"
     app.config["SECRET_KEY"] = "super secret key"
     sess = Session()
     sess.init_app(app)
-
-    @app.route("/")
-    def hello_world():
-        return "Hello World"
 
     @app.route("/oauth_callback")
     def oauth_callback(**kwargs):
