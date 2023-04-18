@@ -13,6 +13,8 @@ import sys
 from functools import partial, wraps
 from urllib.parse import unquote
 
+import pandas as pd
+import plotly.express as px
 import requests
 from dash import dash, dcc, html
 from dash.dependencies import Input, Output
@@ -123,10 +125,18 @@ def create_app():
         url_base_pathname=PREFIX + DASH_URL_BASE_PATHNAME,
     )
 
+    df = pd.read_csv(
+        "https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv"
+    )
+
     app.layout = html.Div(
         [
-            html.Div(id="page-content"),
-            dcc.Interval(id="auth-check-interval", interval=3600 * 1000),
+            html.H1(
+                children="Population by country",
+                style={"textAlign": "center"},
+            ),
+            dcc.Dropdown(df.country.unique(), "Canada", id="dropdown-selection"),
+            dcc.Graph(id="graph-content"),
         ]
     )
 
@@ -156,31 +166,11 @@ def create_app():
     # For example, following is the callback for UI components in the previous
     # function.
     @app.callback(
-        Output("framework_details", "children"),
-        Input("frameworks_dropdown", "value"),
+        Output("graph-content", "figure"), Input("dropdown-selection", "value")
     )
-    def display_framework_details(framework):
-        if framework is None:
-            details = "You have not selected a framework yet"
-        else:
-            if framework == "Dash":
-                details = (
-                    "Dash is an open source framework for developing "
-                    "full-blown data applications using modern UI "
-                    "components. It is based upon Flask, Plotly.js and "
-                    "React.js."
-                )
-            elif framework == "Flask":
-                details = (
-                    "Flask is a lightweight web application framework. "
-                    "Although it is called a 'micro framework', it is "
-                    "simple but extensible. It can be used to build "
-                    "complex dashboards like the Dash open source "
-                    "framework which is based upon Flask."
-                )
-            else:
-                details = f"Framework {framework} is not detailed here."
-        return details
+    def update_graph(value):
+        dff = df[df.country == value]
+        return px.line(dff, x="year", y="pop")
 
     # When running with ci start, preserve the trailing slash in the prefix
     # When launching from jupyterhub, strip the trailing slash in the prefix

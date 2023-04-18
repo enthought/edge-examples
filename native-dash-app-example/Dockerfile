@@ -28,7 +28,7 @@ FROM enthought_edge_stage
 
 USER app_admin
 
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session
+RUN edm run -- python -m pip install "jupyterhub==2.2.2" dockerspawner "configurable-http-proxy" Flask-Session pandas
 
 COPY --chown=app_admin ./src native-dash-app-example/
 

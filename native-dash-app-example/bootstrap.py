@@ -24,11 +24,12 @@ EDM_DEPS = [
 ]
 
 PIP_DEPS = [
-    "jupyterhub==2.2.2",
-    "sqlalchemy<2",
     "configurable-http-proxy",
     "dockerspawner",
     "Flask-Session",
+    "jupyterhub==2.2.2",
+    "pandas",
+    "sqlalchemy<2",
 ]
 
 
