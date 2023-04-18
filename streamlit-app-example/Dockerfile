@@ -19,10 +19,14 @@ RUN edm install --version 3.8 click pandas numpy flask requests gunicorn -y
 
 RUN edm run -- python -m pip install "jupyterhub==2.2.2" streamlit streamlit-javascript streamlit-extras Flask-Session
 
-COPY ./s6 /
+COPY ./container_config /
 
 WORKDIR /home/app_admin
 COPY --chown=app_admin ./oauth2_proxy oauth2_proxy/
+
+# Copy startup script and application
+COPY --chown=app_admin ./startup-script.sh ./startup-script.sh
+RUN chmod +x ./startup-script.sh
 COPY --chown=app_admin ./src streamlit-app-example/
 
 ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-streamlit-demo
