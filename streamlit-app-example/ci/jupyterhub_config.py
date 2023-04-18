@@ -14,8 +14,6 @@ from os import path
 from dockerspawner import DockerSpawner
 
 
-
-
 def discover_ip():
     """Find the IP address we are connected to."""
     st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

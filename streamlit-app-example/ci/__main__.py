@@ -75,7 +75,6 @@ def watch_cmd():
     print(f"\nStart {STREAMLIT_EXAMPLE_CONTAINER} in files watching mode\n")
     cmd = ["streamlit", "run", "app.py"]
     env = os.environ.copy()
-    env["JUPYTERHUB_API_TOKEN"] = "1"
     env["APP_VERSION"] = "streamlit-app-example running on ci watch backend"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
