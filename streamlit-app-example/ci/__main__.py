@@ -15,12 +15,26 @@ STREAMLIT_EXAMPLE_IMAGE = "quay.io/enthought/edge-streamlit-demo"
 STREAMLIT_EXAMPLE_CONTAINER = "edge-streamlit-demo"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
-
+CI_DATA_DIR = os.path.join(MODULE_DIR, "ci", "data")
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
+
+@cli.command("baseimg")
+def baseimg():
+    """Build the base image"""
+    cmd = [
+        "docker",
+        "build",
+        "-t",
+        "quay.io/enthought/edge-oauth2-native:latest",
+        "-f",
+        "Dockerfile",
+        CI_DATA_DIR
+    ]
+    subprocess.run(cmd, check=True, cwd=CI_DATA_DIR)
 
 
 @cli.command("build")
