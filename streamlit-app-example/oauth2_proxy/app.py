@@ -32,9 +32,7 @@ handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(formatter)
 handler.setLevel(logging.DEBUG)
 LOG.addHandler(handler)
-LOG.setLevel(logging.INFO)
-if FLASK_DEBUG:
-    LOG.setLevel(logging.DEBUG)
+LOG.setLevel(logging.DEBUG)
 
 # When run from Edge, these environment variables will be provided
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
