@@ -36,20 +36,18 @@ LOG.setLevel(logging.DEBUG)
 
 # When run from Edge, these environment variables will be provided
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
+API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
-API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
-APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
+API_URL = os.environ.get("JUPYTERHUB_API_URL")
+JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX")
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
-#AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
-
-LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
-LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
-LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
-
+if API_TOKEN is not None and API_URL is not None:
+    AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
+else:
+    AUTH = None
 
 def create_app():
     """Creates the Flask app with routes for serving the React application
@@ -72,12 +70,43 @@ def create_app():
     def hello_world(**kwargs):
         return "Hello World" 
 
-    @app.route("/oauth_status")
+    @app.route("/oauth_status/")
     def oauth_status(**kwargs):
-        return "OK", 202
+        token = session.get("token")
+        if token:
+            hub_user = AUTH.user_for_token(token)
+            LOG.debug(f"Auth hub user {hub_user}")
+            return "OK", 202
+        else:
+            hub_user = None
+            LOG.debug("Hub user unauthorized")
+            return "Unauthorized", 401
+        
+    
+    @app.route("/oauth_start/")
+    def oauth_start(**kwargs):
+        state = AUTH.generate_state(next_url=request.path)
+        LOG.info(f"Redirecting to login url {AUTH.login_url}")
+        response = make_response(redirect(AUTH.login_url + "&state=%s" % state))
+        response.set_cookie(AUTH.state_cookie_name, state)
+        return response
 
     @app.route("/oauth_callback/")
     def oauth_callback(**kwargs):
-        return "Oauth Callback URL"
+        code = request.args.get("code", None)
+        if code is None:
+            return "Forbidden", 403
+
+        arg_state = request.args.get("state", None)
+        cookie_state = request.cookies.get(AUTH.state_cookie_name)
+        if arg_state is None or arg_state != cookie_state:
+            return "Forbidden", 403
+
+        session["token"] = AUTH.token_for_code(code)
+
+        next_url = JUPYTERHUB_SERVICE_PREFIX
+        LOG.info(f"OAuth Callback redirecting to {JUPYTERHUB_SERVICE_PREFIX}")
+        response = make_response(redirect(next_url))
+        return response
 
     return app

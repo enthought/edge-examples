@@ -13,21 +13,39 @@ http {
         error_log /dev/stdout notice;
         access_log /dev/stdout;
         listen 8888;
+
+        error_page 401 = @error401;
+
+        location @error401 {
+            return 302 ${JUPYTERHUB_SERVICE_PREFIX}oauth_start/;
+        }
+
+        location ${JUPYTERHUB_SERVICE_PREFIX}oauth_start/ {
+            proxy_pass http://localhost:5000/oauth_start/;
+            proxy_redirect off;
+        }
+
         location ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/ {
             proxy_pass http://localhost:5000/oauth_status/;
             proxy_redirect off;
         }
-        location = ${JUPYTERHUB_SERVICE_PREFIX}oauth_callback {
-            proxy_set_header Host $http_host;
-            proxy_pass http://localhost:5000/oauth_callback/;
-            proxy_redirect off;
-        }        
+
+        location = ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/ {
+            internal;
+            proxy_pass http://localhost:5000/oauth_status/;
+            proxy_pass_request_body off;
+            proxy_set_header        Content-Length "";
+            proxy_set_header        X-Original-URI $request_uri;
+        }
+
         location ${JUPYTERHUB_SERVICE_PREFIX}oauth_callback/ {
             proxy_set_header Host $http_host;
             proxy_pass http://localhost:5000/oauth_callback/;
             proxy_redirect off;
         }
+
         location ${JUPYTERHUB_SERVICE_PREFIX} { 
+            auth_request ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/;
             proxy_pass http://localhost:9000/;
             proxy_redirect off;
             proxy_http_version 1.1;
