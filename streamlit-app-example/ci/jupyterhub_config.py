@@ -57,5 +57,4 @@ c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
 c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")
 c.ConfigurableHTTPProxy.debug = True
-c.ConfigurableHTTPProxy.autoRewrite = True
 c.JupyterHub.log_level = 'DEBUG'

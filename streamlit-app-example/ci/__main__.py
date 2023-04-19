@@ -16,6 +16,7 @@ STREAMLIT_EXAMPLE_CONTAINER = "edge-streamlit-demo"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
+
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
@@ -49,6 +50,16 @@ def build(tag):
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):
     """Publish the streamlit example app"""
+    click.echo("Publishing the streamlit Example App...")
+    cmd = ["docker", "push", f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"]
+    subprocess.run(cmd, check=True)
+    click.echo("Done")
+
+
+@cli.command("publish")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def publish(tag):
+    """Publish to quay.io/enthought/edge-streamlit-demo"""
     click.echo("Publishing the streamlit Example App...")
     cmd = ["docker", "push", f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)

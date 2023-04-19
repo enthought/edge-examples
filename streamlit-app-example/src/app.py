@@ -4,7 +4,7 @@
 # All rights reserved.
 #
 # This file and its contents are confidential information and NOT open source.
-# Distribution is 
+# Distribution is prohibited.
 
 # Streamlit Example App:
 # https://docs.streamlit.io/library/get-started/create-an-app
