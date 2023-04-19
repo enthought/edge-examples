@@ -22,6 +22,7 @@ LOG.setLevel(logging.INFO)
 
 def create_app():
     app = Flask(__name__)
+
     @app.route("/")
     def hello_world():
         """The main handle to serve the index page."""

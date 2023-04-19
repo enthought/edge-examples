@@ -14,9 +14,6 @@ from os import path
 from dockerspawner import DockerSpawner
 
 
-IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
-
-
 def discover_ip():
     """Find the IP address we are connected to."""
     st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,6 +27,8 @@ def discover_ip():
     return ip
 
 
+IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
+
 c = get_config()  # noqa
 temp = tempfile.gettempdir()
 
@@ -40,17 +39,22 @@ c.DummyAuthenticator.password = "password"
 # launch with docker
 c.JupyterHub.spawner_class = DockerSpawner
 
-c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 # the hostname/ip that should be used to connect to the hub
-c.JupyterHub.hub_ip = "0.0.0.0"
+c.JupyterHub.hub_ip = discover_ip()
 c.JupyterHub.ip = "127.0.0.1"
-c.JupyterHub.log_level = 30
+c.JupyterHub.bind_url = "http://127.0.0.1:8000"
+c.JupyterHub.redirect_to_server = False 
+
 # Don't delete containers when the stop
 c.DockerSpawner.remove = False
 
 # docker image for the spawner
 c.DockerSpawner.image = f"quay.io/enthought/edge-panel-demo:{IMAGE_TAG}"
+c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
+
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
 c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")
+c.ConfigurableHTTPProxy.debug = True
+c.JupyterHub.log_level = 'DEBUG'

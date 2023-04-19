@@ -1,26 +1,11 @@
-FROM quay.io/enthought/edm-centos-7:latest
+FROM quay.io/enthought/edge-oauth2-app:latest 
 
-# install tini
-RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.19.0-amd64.rpm && \
-    echo "ab82980245169e93f8507f8d9a5fd008f5057df61a06fe46f464c4d624e6424a tini_0.19.0-amd64.rpm" | sha256sum --check && \
-    rpm -i tini_0.19.0-amd64.rpm && \
-    rm tini_0.19.0-amd64.rpm
+# Install panel dependencies
+RUN edm install -e application click panel pandas numpy matplotlib -y
 
-RUN adduser app_admin
-USER app_admin
+COPY ./nginx.conf.template /etc/nginx/nginx.conf.template
 
-RUN edm install --version 3.8 click panel pandas numpy matplotlib -y
-
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" "sqlalchemy<2" dockerspawner "configurable-http-proxy"
-
-WORKDIR /home/app_admin
-COPY --chown=app_admin ./src panel-app-example/
-
-WORKDIR /home/app_admin
-RUN chmod 777 panel-app-example/startup-script.sh
-
-ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-panel-demo
-ARG CI_IMAGE_TAG=latest
-ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
-
-CMD ["tini", "-g", "--", "panel-app-example/startup-script.sh"]
+# Copy startup script and application
+COPY ./startup-script.sh /opt/startup-script.sh
+RUN chmod +x /opt/startup-script.sh
+COPY ./src /opt/application

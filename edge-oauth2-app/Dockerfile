@@ -16,21 +16,20 @@ RUN edm environments create oauth2_proxy --version 3.8
 RUN edm install -e oauth2_proxy click flask requests gunicorn -y
 RUN edm run -e oauth2_proxy  -- python -m pip install "jupyterhub==2.2.2" Flask-Session
 
-COPY ./container_config /
-COPY ./oauth2_proxy /opt/oauth2_proxy/
 
 # Create default EDM environment
 RUN edm envs create edm --version 3.8 && edm cache purge --yes
 RUN edm envs create application --version 3.8 && edm cache purge --yes
 
-# Init command to start s6-overlay
-CMD ["/init"]
-
-# User application goes here
-
 RUN edm install -e application click "flask>2" gunicorn requests -y
+
+COPY ./container_config /
+COPY ./oauth2_proxy /opt/oauth2_proxy/
 
 # Copy startup script and application
 COPY ./startup-script.sh /opt/startup-script.sh
 RUN chmod +x /opt/startup-script.sh
 COPY ./src /opt/application
+
+# Init command to start s6-overlay
+CMD ["/init"]

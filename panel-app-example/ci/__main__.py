@@ -27,7 +27,8 @@ def cli():
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def build(tag):
     """Build the panel example app"""
-    click.echo("Building the Panel Example App...")
+    click.echo("Building the panel Example App...")
+
     cmd = [
         "docker",
         "build",
@@ -44,11 +45,22 @@ def build(tag):
     subprocess.run(cmd, check=True)
     click.echo("Done")
 
+
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):
     """Publish the panel example app"""
-    click.echo("Publishing the Panel Example App...")
+    click.echo("Publishing the panel Example App...")
+    cmd = ["docker", "push", f"{PANEL_EXAMPLE_IMAGE}:{tag}"]
+    subprocess.run(cmd, check=True)
+    click.echo("Done")
+
+
+@cli.command("publish")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def publish(tag):
+    """Publish to quay.io/enthought/edge-panel-demo"""
+    click.echo("Publishing the panel Example App...")
     cmd = ["docker", "push", f"{PANEL_EXAMPLE_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
@@ -66,16 +78,15 @@ def start(tag):
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
 
-@cli.command(name="watch")
+@cli.command("watch")
 def watch_cmd():
-    """Start the application and watch backend changes"""
+    """Start the application and watch changes"""
 
     print(f"\nStart {PANEL_EXAMPLE_CONTAINER} in files watching mode\n")
-    cmd = ["panel", "serve", "app.py", "--show", "--autoreload"]
+    cmd = ["panel", "serve", "app.py"]
     env = os.environ.copy()
-    env["JUPYTERHUB_API_TOKEN"] = "1"
-    env["APP_VERSION"] = "panel-app-example running on ci watch backend"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+
 
 if __name__ == "__main__":
     cli(prog_name="python -m ci")
