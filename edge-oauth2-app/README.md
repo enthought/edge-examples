@@ -56,9 +56,12 @@ For your local JupyterHub session, enter any username with the password `passwor
 This base image is designed to run:
 
 * An `oauth2_proxy` component
-* A simple Hello World Flask application, located in `/home/app_admin` that starts using
-  the [`startup-script.sh`](./startup-script.sh) file
+* A simple Hello World Flask application, with source files in `/opt/application` and
+  a [`startup-script.sh`](./startup-script.sh) file. The Flask application is internally 
+  served within the container at `http://localhost:9000`
 * An nginx proxy that serves the application and the `oauth2_proxy`
+* The `s6-overlay` process manager, with configuration files in the
+  [`container_config`](./container_config/) directory
 
 When extending using this image as a base for an Edge native application,
 be sure to:
