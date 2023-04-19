@@ -1,4 +1,3 @@
 #!/bin/bash
-
 set -e
-exec edm run -e application -- python -m application.wsgi
+exec edm run -- python -m application.wsgi
