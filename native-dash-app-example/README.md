@@ -8,7 +8,6 @@ spawner system.
 
 To build and run the example application you will need:
 - [Docker](https://docker.com)
-- [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 - The `enthought/edge` EDM repository added to your `~/.edm.yaml` configuration
 
@@ -53,11 +52,6 @@ watch modes for automatic reloading. To start the application and watch backend 
 
 ```commandline
     python -m ci watch backend
-```
-To watch the frontend changes:
-
-```commandline
-    python -m ci watch frontend
 ```
 
 ## Development and debugging tips
