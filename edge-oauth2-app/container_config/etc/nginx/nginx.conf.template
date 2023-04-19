@@ -28,11 +28,6 @@ http {
             proxy_redirect off;
         }
 
-        location ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/ {
-            proxy_pass http://localhost:5000/oauth_status/;
-            proxy_redirect off;
-        }
-
         location = ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/ {
             internal;
             proxy_pass http://localhost:5000/oauth_status/;
