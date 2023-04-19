@@ -1,14 +1,18 @@
 # Panel App Example
 
-This folder contains a Flask + React application that showcases how to
-create a dashboard hosted by Edge native application. The dashboard app is packaged as 
-a Docker image that will be consumed by the Edge's JupyterHub spawner system.
+This folder contains a Panel application that showcases how to
+create a data visualization hosted by Edge native application. 
+The panel app is packaged as Docker image that will be consumed 
+by Edge's JupyterHub spawner system.
 
 ## Requirements
 
 To build and run the example application you will need:
 - [Docker](https://docker.com)
+- [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+- The `quay.io/enthought/edge-oauth2-app:latest` example image,
+  built from the [`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository.
 
 ## Set up the development environment
 
@@ -19,11 +23,17 @@ To do this, use the "bootstrap.py" script:
 python bootstrap.py
 ```
 
-This will create the `edge-dash-dev` EDM environment.  You may activate it with:
+This will create the `edge-panel-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e edge-dash-dev
-```   
+edm shell -e edge-panel-dev
+```
+
+You must also install the NodeJS version of `configurable-http-proxy`:
+
+```commandline
+npm install -g configurable-http-proxy
+```
 
 ## Running the Application
 
@@ -46,15 +56,10 @@ For your local JupyterHub session, enter any username with the password `passwor
 ## Local Development
 
 For development purposes, you may run this application outside of a JupyterHub using file
-watch modes for automatic reloading. To start the application and watch backend changes:
+watch modes for automatic reloading. To start the application and watch changes:
 
 ```commandline
-    python -m ci watch backend
-```
-To watch the frontend changes:
-
-```commandline
-    python -m ci watch frontend
+    python -m ci watch
 ```
 
 ## Development and debugging tips
@@ -75,34 +80,21 @@ To watch the frontend changes:
 ## Requirements for a Edge native application
 
 Edge's JupyterHub spawner will launch a native application's container and provide
-environment variables for routing and authentication.
+environment variables required for routing and authentication. The
+`quay.io/enthought/edge-oauth2-app:latest` image built from the 
+[`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository implements
+the necessary endpoints and workflow for authentication, using these provided
+environment variables.
 
-### Using port and URL prefix provided by `JupyterHub`: 
+## Requirements for a Edge native application
 
-Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
-will be available. Application authors need to set the listening port and URL prefix of the
-application with values extracted from this variable. In this native app example,
-the binding information is provided to the [`wsgi` application](./src/wsgi.py#L43).
+Edge's JupyterHub spawner will launch a native application's container and provide
+environment variables required for routing and authentication. The
+`quay.io/enthought/edge-oauth2-app:latest` image built from the 
+[`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository implements
+the necessary endpoints and workflow for authentication, using these provided
+environment variables.
 
-### Reporting server activities back to Edge: 
-
-Edge will shut your application down after a while if it is considered inactive.
-To avoid this, you will need to report activity back to the server when the user
-interacts with your app. 
-
-To report activities, applications can send a POST to the URL provided in the
-`JUPYTERHUB_ACTIVITY_URL` environment variable, using the token provided
-in `JUPYTERHUB_API_TOKEN`. In this native app example, the 
-[`trackactivity` decorator](./src/app.py#L61) is used to perform this POST
-whenever any Flask endpoint is accessed.
-
-## Using Edge as an OAuth provider
-
-Edge proxies connections to the single-user server and provides OAuth authentication
-for your application. Your application only needs to provide two components to take
-advantage of Edge authentication:
-- An [OAuth callback handler](./src/app.py#L182) to process Edge OAuth
-- An [`authenticated` decorator](./src/app#L90) that protects endpoints requiring authentication
 
 ## Registering the Application
 
