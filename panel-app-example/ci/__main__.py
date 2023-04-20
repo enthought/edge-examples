@@ -56,6 +56,31 @@ def publish(tag):
     click.echo("Done")
 
 
+@cli.command("standalone")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def start(tag):
+    """Start the OAuth2 example application in standalone mode"""
+    env = os.environ.copy()
+    remove_container_cmd = [
+        "docker",
+        "container",
+        "rm",
+        PANEL_EXAMPLE_CONTAINER
+    ]
+    subprocess.run(remove_container_cmd, env=env)
+    cmd = [
+        "docker",
+        "run",
+        "-p",
+        "8888:8888",
+        "--name",
+        PANEL_EXAMPLE_CONTAINER,
+        "-e",
+        "NO_OAUTH=1",
+        f"{PANEL_EXAMPLE_IMAGE}:{tag}"
+    ]
+    subprocess.run(cmd, check=True, env=env)
+
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):

@@ -1,7 +1,7 @@
 FROM quay.io/enthought/edge-oauth2-app:latest 
 
 # Install panel dependencies
-RUN edm install -e application click panel pandas numpy matplotlib -y
+RUN edm install click panel pandas numpy matplotlib -y
 
 COPY ./nginx.conf.template /etc/nginx/nginx.conf.template
 
