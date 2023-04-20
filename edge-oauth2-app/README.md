@@ -43,7 +43,14 @@ run:
     python -m ci build
 ```
 
-Once built, you can run the image from a local JupyterHub session by running:
+Once built, you can check to see that the application container works by running:
+
+```commandline
+    python -m ci standalone
+````
+
+Finally, you can make sure your application is compatible with Edge by running
+a standalone JupyterHub. Use this command:
 
 ```commandline
     python -m ci start
@@ -51,7 +58,36 @@ Once built, you can run the image from a local JupyterHub session by running:
 
 For your local JupyterHub session, enter any username with the password `password`.
 
-## Using the `quay.io/enthought/edge-oauth2-app` Base Image
+## Local Development
+
+For development purposes, you may run this application outside of a JupyterHub using file
+watch modes for automatic reloading. To start the application and watch changes:
+
+```commandline
+    python -m ci watch
+```
+
+## Development and debugging tips
+
+* When making your own app, start with a complete copy of the example app, and
+  modify it step by step with your own code.  It's much easier to
+  incrementally modify a working system than to develop one from scratch.
+
+* First, try to run the app via `python -m ci watch backend`.  That will run it
+  outside of the JupyterHub machinery, and makes it easier to get log output.
+  If your app doesn't work for a simple reason like a missing dependency or
+  a syntax error, this will catch it.
+
+* You can check to see that the application container and its `startup-script.sh`
+  configuration is working by running it with `python -m ci standalone`. This will
+  start up the container and make it browseable at `http://localhost:8888`, which
+  is where JupyterHub will expect it to be visible.
+
+* When running from a local JupyterHub instance with `python -m ci start`, you
+  can use Docker to get the logs from your container.  Use `docker ps` to find
+  your app's container, and `docker logs` to view the log output.
+
+## Extending the `quay.io/enthought/edge-oauth2-app` Base Image
 
 This base image is designed to run:
 
@@ -74,18 +110,3 @@ be sure to:
   will proxy requests to `http://localhost:9000` within the application container
 
 **Important**: Do not replace the `CMD` directive in your Dockerfile.
-
-## Development and debugging tips
-
-* When making your own app, start with a complete copy of the example app, and
-  modify it step by step with your own code.  It's much easier to
-  incrementally modify a working system than to develop one from scratch.
-
-* First, try to run the app via `python -m ci watch`.  That will run it
-  outside of the JupyterHub machinery, and makes it easier to get log output.
-  If your app doesn't work for a simple reason like a missing dependency or
-  a syntax error, this will catch it.
-
-* When running from a local JupyterHub instance with `python -m ci start`, you
-  can use Docker to get the logs from your container.  Use `docker ps` to find
-  your app's container, and `docker logs` to view the log output.
