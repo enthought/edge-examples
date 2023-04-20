@@ -78,6 +78,32 @@ def start(tag):
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
 
+@cli.command("standalone")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def start(tag):
+    """Start the streamlit example application in standalone mode"""
+    env = os.environ.copy()
+    remove_container_cmd = [
+        "docker",
+        "container",
+        "rm",
+        STREAMLIT_EXAMPLE_CONTAINER
+    ]
+    subprocess.run(remove_container_cmd, env=env)
+    cmd = [
+        "docker",
+        "run",
+        "-p",
+        "8888:8888",
+        "--name",
+        STREAMLIT_EXAMPLE_CONTAINER,
+        "-e",
+        "NO_OAUTH=1",
+        f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"
+    ]
+    subprocess.run(cmd, check=True, env=env)
+
+
 @cli.command("watch")
 def watch_cmd():
     """Start the application and watch backend changes"""

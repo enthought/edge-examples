@@ -23,10 +23,10 @@ To do this, use the "bootstrap.py" script:
 python bootstrap.py
 ```
 
-This will create the `edge-dash-dev` EDM environment.  You may activate it with:
+This will create the `edge-streamlit-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e edge-dash-dev
+edm shell -e edge-streamlit-dev
 ```
 
 You must also install the NodeJS version of `configurable-http-proxy`:
@@ -38,7 +38,7 @@ npm install -g configurable-http-proxy
 ## Running the Application
 
 If you are running the application for the first time, you will need to build
-the application's Docker image. From within the `dashboard-app-example` directory
+the application's Docker image. From within the `streamlit-app-example` directory
 run:
 
 ```commandline
