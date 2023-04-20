@@ -49,7 +49,7 @@ c.JupyterHub.redirect_to_server = False
 c.DockerSpawner.remove = False
 
 # docker image for the spawner
-c.DockerSpawner.image = f"quay.io/enthought/edge-streamlit-demo:{IMAGE_TAG}"
+c.DockerSpawner.image = f"quay.io/enthought/edge-oauth2-app:{IMAGE_TAG}"
 c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 
 # File in which to store the database and cookie secret.
@@ -57,4 +57,5 @@ c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
 c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")
 c.ConfigurableHTTPProxy.debug = True
+c.ConfigurableHTTPProxy.autoRewrite = True
 c.JupyterHub.log_level = 'DEBUG'

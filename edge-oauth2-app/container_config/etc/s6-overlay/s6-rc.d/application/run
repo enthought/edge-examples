@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+
+# Main application entrypoint
+
+exec 2>&1
+cd /opt
+exec ./startup-script.sh

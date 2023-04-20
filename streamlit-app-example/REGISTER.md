@@ -54,12 +54,12 @@ ICON = (
 version1 = AppVersion(
     app_id=app.app_id,
     version="1.0.0",
-    title="Edge StreamLit Demo, v1",
-    description="Demonstration of a StreamLit application",
+    title="Edge Streamlit App Demo, v1",
+    description="Demonstration of a Streamlit application",
     icon=ICON,
     kind=AppKindEnum.Native,
     link="quay.io/enthought/edge-streamlit-demo:latest",
-    recommended_profile="edge.medium"
+    recommended_profile="edge.dashboard"
 )
 edge.applications.add_app_version(version1)
 ```

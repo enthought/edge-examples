@@ -11,8 +11,8 @@ import subprocess
 
 import click
 
-STREAMLIT_EXAMPLE_IMAGE = "quay.io/enthought/edge-streamlit-demo"
-STREAMLIT_EXAMPLE_CONTAINER = "edge-streamlit-demo"
+EDGE_OAUTH2_APP_IMAGE = "quay.io/enthought/edge-oauth2-app"
+EDGE_OAUTH2_APP_CONTAINER = "edge-oauth2-app"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
@@ -22,22 +22,17 @@ def cli():
     """All commands constituting continuous integration."""
     pass
 
-
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def build(tag):
-    """Build the streamlit example app"""
-    click.echo("Building the streamlit Example App...")
+    """Build the OAuth2 example app"""
+    click.echo("Building the OAuth2 Example App...")
 
     cmd = [
         "docker",
         "build",
         "-t",
-        f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}",
-        "--build-arg",
-        f"CI_IMAGE_REPOSITORY={STREAMLIT_EXAMPLE_IMAGE}",
-        "--build-arg",
-        f"CI_IMAGE_TAG={tag}",
+        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,
@@ -49,19 +44,9 @@ def build(tag):
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):
-    """Publish the streamlit example app"""
-    click.echo("Publishing the streamlit Example App...")
-    cmd = ["docker", "push", f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"]
-    subprocess.run(cmd, check=True)
-    click.echo("Done")
-
-
-@cli.command("publish")
-@click.option("--tag", default="latest", help="Docker tag to use.")
-def publish(tag):
-    """Publish to quay.io/enthought/edge-streamlit-demo"""
-    click.echo("Publishing the streamlit Example App...")
-    cmd = ["docker", "push", f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"]
+    """Publish the OAuth2 example app"""
+    click.echo("Publishing the OAuth2 Example App...")
+    cmd = ["docker", "push", f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
 
@@ -69,7 +54,7 @@ def publish(tag):
 @cli.command("start")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def start(tag):
-    """Start the streamlit example application"""
+    """Start the OAuth2 example application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     env = os.environ.copy()
@@ -81,13 +66,13 @@ def start(tag):
 @cli.command("standalone")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def start(tag):
-    """Start the streamlit example application in standalone mode"""
+    """Start the OAuth2 example application in standalone mode"""
     env = os.environ.copy()
     remove_container_cmd = [
         "docker",
         "container",
         "rm",
-        STREAMLIT_EXAMPLE_CONTAINER
+        EDGE_OAUTH2_APP_CONTAINER
     ]
     subprocess.run(remove_container_cmd, env=env)
     cmd = [
@@ -96,24 +81,22 @@ def start(tag):
         "-p",
         "8888:8888",
         "--name",
-        STREAMLIT_EXAMPLE_CONTAINER,
+        EDGE_OAUTH2_APP_CONTAINER,
         "-e",
         "NO_OAUTH=1",
-        f"{STREAMLIT_EXAMPLE_IMAGE}:{tag}"
+        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"
     ]
     subprocess.run(cmd, check=True, env=env)
 
-
 @cli.command("watch")
-def watch_cmd():
+def watch():
     """Start the application and watch backend changes"""
 
-    print(f"\nStart {STREAMLIT_EXAMPLE_CONTAINER} in files watching mode\n")
-    cmd = ["streamlit", "run", "app.py"]
+    print(f"\nStart example application in files watching mode\n")
+    cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
-    env["APP_VERSION"] = "streamlit-app-example running on ci watch backend"
+    env["FLASK_DEBUG"] = "1"
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
-
 
 if __name__ == "__main__":
     cli(prog_name="python -m ci")

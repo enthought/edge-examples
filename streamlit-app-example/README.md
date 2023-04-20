@@ -1,15 +1,18 @@
-# StreamLit App Example
+# Streamlit App Example
 
 This folder contains a Streamlit application that showcases how to
-create a data visualization hosted by Edge native application. The app is packaged as 
-a Docker image that will be consumed by the Edge's JupyterHub spawner system.
+create a data visualization hosted by Edge native application. 
+The streamlit  app is packaged as a Docker image that will be consumed
+by the Edge's JupyterHub spawner system.
 
 ## Requirements
 
 To build and run the example application you will need:
 - [Docker](https://docker.com)
 - [Node JS](https://nodejs.org)
-- [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+- [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager
+- The `quay.io/enthought/edge-oauth2-app:latest` example image,
+  built from the [`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository.
 
 ## Set up the development environment
 
@@ -26,10 +29,10 @@ This will create the `edge-streamlit-dev` EDM environment.  You may activate it 
 edm shell -e edge-streamlit-dev
 ```
 
-You will also need to install the `configurable-http-proxy` Node application:
+You must also install the NodeJS version of `configurable-http-proxy`:
 
 ```commandline
-sudo npm install -g configurable-http-proxy
+npm install -g configurable-http-proxy
 ```
 
 ## Running the Application
@@ -77,22 +80,11 @@ watch modes for automatic reloading. To start the application and watch backend 
 ## Requirements for a Edge native application
 
 Edge's JupyterHub spawner will launch a native application's container and provide
-environment variables for routing and authentication.
-
-### Using port and URL prefix provided by `JupyterHub`: 
-
-Once the native application is spawned, the environment variable `JUPYTERHUB_SERVICE_URL`
-will be available. Application authors need to set the listening port and URL prefix of the
-application with values extracted from this variable. In this streamlit app example,
-the binding information is provided to the [`startup-script.sh` streamlit command](./src/startup-script.sh#5).
-
-## Using Edge as an OAuth provider
-
-Edge proxies connections to the single-user server and provides OAuth authentication
-for your application. Your application only needs to provide two components to take
-advantage of Edge authentication:
-- An [OAuth callback handler](./src/pages/oauth_callback.py) to process Edge OAuth
-- A [token check](./src/app.py#36) during application rendering for authentication
+environment variables required for routing and authentication. The
+`quay.io/enthought/edge-oauth2-app:latest` image built from the 
+[`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository implements
+the necessary endpoints and workflow for authentication, using these provided
+environment variables.
 
 ## Registering the Application
 
