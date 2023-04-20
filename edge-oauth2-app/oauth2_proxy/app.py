@@ -30,6 +30,7 @@ JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX")
 SESSION_SECRET_KEY = os.environ.get("SESSION_SECRET_KEY", "super secret key")
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
+NO_OAUTH = os.environ.get("NO_OAUTH")
 
 if API_TOKEN is not None and API_URL is not None:
     AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
@@ -57,6 +58,8 @@ def create_app():
             A 202 status if the user has an auth session
 
         """
+        if NO_OAUTH is not None:
+            return "OK", 202
         token = session.get("token")
         if token:
             hub_user = AUTH.user_for_token(token)

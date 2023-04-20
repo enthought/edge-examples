@@ -11,8 +11,8 @@ import subprocess
 
 import click
 
-EDGE_OAUTH2_NATIVE_IMAGE = "quay.io/enthought/edge-oauth2-app"
-STREAMLIT_EXAMPLE_CONTAINER = "edge-streamlit-demo"
+EDGE_OAUTH2_APP_IMAGE = "quay.io/enthought/edge-oauth2-app"
+EDGE_OAUTH2_APP_CONTAINER = "edge-oauth2-app"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
@@ -25,14 +25,14 @@ def cli():
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def build(tag):
-    """Build the streamlit example app"""
-    click.echo("Building the streamlit Example App...")
+    """Build the OAuth2 example app"""
+    click.echo("Building the OAuth2 Example App...")
 
     cmd = [
         "docker",
         "build",
         "-t",
-        f"{EDGE_OAUTH2_NATIVE_IMAGE}:{tag}",
+        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,
@@ -44,9 +44,9 @@ def build(tag):
 @cli.command("publish")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def publish(tag):
-    """Publish the streamlit example app"""
-    click.echo("Publishing the streamlit Example App...")
-    cmd = ["docker", "push", f"{EDGE_OAUTH2_NATIVE_IMAGE}:{tag}"]
+    """Publish the OAuth2 example app"""
+    click.echo("Publishing the OAuth2 Example App...")
+    cmd = ["docker", "push", f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
 
@@ -54,7 +54,7 @@ def publish(tag):
 @cli.command("start")
 @click.option("--tag", default="latest", help="Docker tag to use.")
 def start(tag):
-    """Start the dashboard example application"""
+    """Start the OAuth2 example application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     env = os.environ.copy()
@@ -62,6 +62,31 @@ def start(tag):
     subprocess.run(cmd, check=True, env=env)
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
+
+@cli.command("standalone")
+@click.option("--tag", default="latest", help="Docker tag to use.")
+def start(tag):
+    """Start the OAuth2 example application in standalone mode"""
+    env = os.environ.copy()
+    remove_container_cmd = [
+        "docker",
+        "container",
+        "rm",
+        EDGE_OAUTH2_APP_CONTAINER
+    ]
+    subprocess.run(remove_container_cmd, env=env)
+    cmd = [
+        "docker",
+        "run",
+        "-p",
+        "8888:8888",
+        "--name",
+        EDGE_OAUTH2_APP_CONTAINER,
+        "-e",
+        "NO_OAUTH=1",
+        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"
+    ]
+    subprocess.run(cmd, check=True, env=env)
 
 @cli.command("watch")
 def watch():
