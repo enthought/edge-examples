@@ -43,7 +43,6 @@ run:
     python -m ci build
 ```
 
-<<<<<<< HEAD
 Once built, you can check to see that the application container works by running:
 
 ```commandline
@@ -52,9 +51,6 @@ Once built, you can check to see that the application container works by running
 
 Finally, you can make sure your application is compatible with Edge by running
 a standalone JupyterHub. Use this command:
-=======
-Once built, you can run the image from a local JupyterHub session by running:
->>>>>>> PRD-23_integration
 
 ```commandline
     python -m ci start
