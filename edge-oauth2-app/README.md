@@ -36,10 +36,11 @@ npm install -g configurable-http-proxy
 ## Running the Application
 
 If you are running the application for the first time, you will need to build
-the application's Docker image. From within the `dashboard-app-example` directory
+the application's Docker image. From within the `edge-oauth2-app` directory
 run:
 
 ```commandline
+    python -m ci generate_bundle
     python -m ci build
 ```
 

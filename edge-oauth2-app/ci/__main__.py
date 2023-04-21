@@ -8,6 +8,7 @@
 
 import os
 import subprocess
+import shutil
 
 import click
 
@@ -16,11 +17,49 @@ EDGE_OAUTH2_APP_CONTAINER = "edge-oauth2-app"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
+CI_DIR = os.path.dirname(__file__)
+BUNDLE_NAME = "app_environment.zbundle"
+ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
+BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
+
+BUNDLE_PACKAGES = [
+    "enthought_edge",
+    "appdirs",
+    "packaging",
+    "pip",
+    "pyparsing",
+    "setuptools",
+    "six",
+    "click",
+]
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
+
+@cli.command("generate_bundle")
+def generate_bundle():
+    """Generate a bundle with Edge packages"""
+    _generate_bundle()
+
+def _generate_bundle():
+    """Build enthought_edge bundle"""
+    shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
+    os.mkdir(ARTIFACT_DIR)
+    env = os.environ.copy()
+    cmd = [
+        "edm",
+        "bundle",
+        "generate",
+        "--platform",
+        "rh7-x86_64",
+        "--version=3.8",
+        "-i",
+        "-f",
+        BUNDLE_PATH,
+    ] + BUNDLE_PACKAGES
+    subprocess.run(cmd, env=env, check=True)
 
 @cli.command("build")
 @click.option("--tag", default="latest", help="Docker tag to use.")
