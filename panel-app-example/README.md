@@ -1,9 +1,9 @@
-# Edge OAuth2 Native Base Image 
+# Panel App Example
 
-This folder contains the source for building the `quay.io/enthought/edge-oauth2-app` Docker
-image. This image is used as a base image for example native apps to implement
-authentication functionality.
-
+This folder contains a Panel application that showcases how to
+create a data visualization hosted by Edge native application. 
+The panel app is packaged as Docker image that will be consumed 
+by Edge's JupyterHub spawner system.
 
 ## Requirements
 
@@ -11,6 +11,8 @@ To build and run the example application you will need:
 - [Docker](https://docker.com)
 - [Node JS](https://nodejs.org)
 - [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+- The `quay.io/enthought/edge-oauth2-app:latest` example image,
+  built from the [`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository.
 
 ## Set up the development environment
 
@@ -21,10 +23,10 @@ To do this, use the "bootstrap.py" script:
 python bootstrap.py
 ```
 
-This will create the `edge-oauth2-dev` EDM environment.  You may activate it with:
+This will create the `edge-panel-dev` EDM environment.  You may activate it with:
 
 ```commandline
-edm shell -e edge-oauth2-dev
+edm shell -e edge-panel-dev
 ```
 
 You must also install the NodeJS version of `configurable-http-proxy`:
@@ -86,27 +88,28 @@ watch modes for automatic reloading. To start the application and watch changes:
 * When running from a local JupyterHub instance with `python -m ci start`, you
   can use Docker to get the logs from your container.  Use `docker ps` to find
   your app's container, and `docker logs` to view the log output.
+  
+## Requirements for a Edge native application
 
-## Extending the `quay.io/enthought/edge-oauth2-app` Base Image
+Edge's JupyterHub spawner will launch a native application's container and provide
+environment variables required for routing and authentication. The
+`quay.io/enthought/edge-oauth2-app:latest` image built from the 
+[`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository implements
+the necessary endpoints and workflow for authentication, using these provided
+environment variables.
 
-This base image is designed to run:
+## Requirements for a Edge native application
 
-* An `oauth2_proxy` component
-* A simple Hello World Flask application, with source files in `/opt/application` and
-  a [`startup-script.sh`](./startup-script.sh) file. The Flask application is internally 
-  served within the container at `http://localhost:9000`
-* An nginx proxy that serves the application and the `oauth2_proxy`
-* The `s6-overlay` process manager, with configuration files in the
-  [`container_config`](./container_config/) directory
+Edge's JupyterHub spawner will launch a native application's container and provide
+environment variables required for routing and authentication. The
+`quay.io/enthought/edge-oauth2-app:latest` image built from the 
+[`edge-oauth2-app`](../edge-oauth2-app/) directory in this repository implements
+the necessary endpoints and workflow for authentication, using these provided
+environment variables.
 
-When extending using this image as a base for an Edge native application,
-be sure to:
 
-* Have your Dockerfile install your EDM requirements to the `application` environment
-* Have your Dockerfile copy the application to `/opt/application`
-* Replace [`startup-script.sh`](./startup-script.sh) contents with a script that
-  launches your application within the `application` edm environment
-* The application should bind to the localhost port 9000 with a base URL of `/`. `nginx`
-  will proxy requests to `http://localhost:9000` within the application container
+## Registering the Application
 
-**Important**: Do not replace the `CMD` directive in your Dockerfile.
+Once the application has been tested locally, built using `python -m ci build` and
+published using `python -m ci publish`, it can be registered on Edge as an Application tile.
+Full instructions for registering the application can be found in [`REGISTER.md`](./REGISTER.md).
