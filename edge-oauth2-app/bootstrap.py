@@ -16,7 +16,8 @@ ENV_NAME = "edge-oauth2-dev"
 
 EDM_DEPS = [
     "click",
-    "flask>2"
+    "flask>2",
+    "enthought_edge"
 ]
 
 PIP_DEPS = [

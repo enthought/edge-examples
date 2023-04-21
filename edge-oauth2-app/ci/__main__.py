@@ -34,9 +34,21 @@ BUNDLE_PACKAGES = [
 ]
 
 @click.group()
-def cli():
+@click.option("--edge-api-url", default="https://edge.enthought.com/services/api", help="The API url for Edge")
+@click.option("--edge-org-name", default=None, help="Your Edge organization")
+@click.option("--edge-api-token", default=None, help="Your Edge API token")
+@click.pass_context
+def cli(ctx, edge_api_url, edge_org_name, edge_api_token):
     """All commands constituting continuous integration."""
-    pass
+    edge_env = {}
+    if edge_api_url is not None:
+        edge_env["EDGE_API_SERVICE_URL"] = edge_api_url
+    if edge_org_name is not None:
+        edge_env["EDGE_API_ORG"] = edge_org_name
+    if edge_api_token is not None:
+        edge_env["JUPYTERHUB_API_TOKEN"] = edge_api_token
+
+    ctx.obj = edge_env
 
 @cli.command("generate_bundle")
 def generate_bundle():
@@ -92,7 +104,8 @@ def publish(tag):
 
 @cli.command("start")
 @click.option("--tag", default="latest", help="Docker tag to use.")
-def start(tag):
+@click.pass_obj
+def start(obj, tag):
     """Start the OAuth2 example application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
@@ -104,7 +117,8 @@ def start(tag):
 
 @cli.command("standalone")
 @click.option("--tag", default="latest", help="Docker tag to use.")
-def start(tag):
+@click.pass_obj
+def start(obj, tag):
     """Start the OAuth2 example application in standalone mode"""
     env = os.environ.copy()
     remove_container_cmd = [
@@ -114,6 +128,8 @@ def start(tag):
         EDGE_OAUTH2_APP_CONTAINER
     ]
     subprocess.run(remove_container_cmd, env=env)
+    container_envs = [ f"{key}={value}" for key, value in obj.items() ]
+    container_envs.append("NO_OAUTH=1")
     cmd = [
         "docker",
         "run",
@@ -121,20 +137,23 @@ def start(tag):
         "8888:8888",
         "--name",
         EDGE_OAUTH2_APP_CONTAINER,
-        "-e",
-        "NO_OAUTH=1",
-        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"
     ]
+    for container_env in container_envs:
+        cmd.append("--env")
+        cmd.append(container_env)
+    cmd.append(f"{EDGE_OAUTH2_APP_IMAGE}:{tag}")
     subprocess.run(cmd, check=True, env=env)
 
 @cli.command("watch")
-def watch():
+@click.pass_obj
+def watch(obj):
     """Start the application and watch backend changes"""
 
     print(f"\nStart example application in files watching mode\n")
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"
+    env.update(obj)
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 if __name__ == "__main__":

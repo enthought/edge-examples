@@ -64,30 +64,11 @@ def create_app():
         if token:
             hub_user = AUTH.user_for_token(token)
             LOG.debug(f"Auth hub user {hub_user}")
-            return "OK", 202
+            return jsonify(hub_user), 202
         else:
             hub_user = None
             LOG.debug("Hub user unauthorized")
             return "Unauthorized", 401
-
-    @app.route("/edge_auth/")
-    def edge_auth():
-        """Service route for returning EdgeSession settings
-        
-        Returns
-        -------
-        flask.JsonResponse
-            A dictionary that can be passed to edge.api.EdgeSession
-            as kwargs
-        """
-        token = session.get("token")
-        if token is None:
-            return "Unauthorized", 401
-        return jsonify({
-            "api_token": token,
-            "service_url": EDGE_API_SERVICE_URL,
-            "organization": EDGE_API_ORG
-        })
     
     @app.route("/oauth_start/")
     def oauth_start():
