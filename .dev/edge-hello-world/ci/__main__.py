@@ -129,7 +129,7 @@ def start(obj, tag):
     ]
     subprocess.run(remove_container_cmd, env=env)
     container_envs = [ f"{key}={value}" for key, value in obj.items() ]
-    container_envs.append("NO_OAUTH=1")
+    container_envs.append("NATIVE_APP_MODE=container")
     cmd = [
         "docker",
         "run",
@@ -152,7 +152,7 @@ def watch(obj):
     print(f"\nStart {APP_NAME} in files watching mode\n")
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
-    env["FLASK_DEBUG"] = "1"
+    env["NATIVE_APP_MODE"] = "dev"
     env.update(obj)
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 

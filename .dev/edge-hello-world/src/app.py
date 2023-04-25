@@ -6,12 +6,14 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
+
 import logging
 import os
 import sys
 import requests
-from urllib.parse import urlparse
+from functools import wraps
 
+from datetime import datetime, timezone
 from flask import Flask
 from edge.api import EdgeSession
 
@@ -23,10 +25,14 @@ handler.setLevel(logging.DEBUG)
 LOG.addHandler(handler)
 LOG.setLevel(logging.INFO)
 
+JUPYTERHUB_ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
+JUPYTERHUB_SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
+JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
+
+NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
-JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
 _EDGE_SESSION = None
 
 
@@ -46,10 +52,40 @@ def get_edge_session():
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
 
+def track_activity(f):
+    """Decorator for reporting server activities with the Hub"""
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
+            return f(*args, **kwargs)
+        last_activity = datetime.now()
+        # Format this in a format that JupyterHub understands
+        if last_activity.tzinfo:
+            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
+        last_activity = last_activity.isoformat() + 'Z'
+        if JUPYTERHUB_ACTIVITY_URL:
+            try:
+                requests.post(
+                    JUPYTERHUB_ACTIVITY_URL,
+                    headers={
+                        "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
+                        "Content-Type": "application/json",
+                    },
+                    json={"servers": {JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}}},
+                )
+            except Exception:
+                pass
+        return f(*args, **kwargs)
+
+    return decorated
+
 
 def create_app():
     app = Flask(__name__)
+
     @app.route("/")
+    @track_activity
     def hello_world():
         """The main handle to serve the index page."""
         edge = get_edge_session()
