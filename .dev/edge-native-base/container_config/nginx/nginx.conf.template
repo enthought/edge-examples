@@ -1,7 +1,12 @@
 # Templated nginx.conf file. This will be unpacked into /etc/nginx.conf with the
 # JupyterHub service substituted for the required routes
 
+error_log /dev/stdout notice;
+pid       /tmp/nginx.pid;
+
 daemon off;
+
+
 
 events {
 }
@@ -13,8 +18,13 @@ http {
     server {
         absolute_redirect off;
         rewrite_log on;
-        error_log /dev/stdout notice;
+
         access_log /dev/stdout;
+        client_body_temp_path /tmp/client_body;
+        fastcgi_temp_path /tmp/fastcgi_temp;
+        proxy_temp_path /tmp/proxy_temp;
+        scgi_temp_path /tmp/scgi_temp;
+        uwsgi_temp_path /tmp/uwsgi_temp;        
         listen 8888;
 
 

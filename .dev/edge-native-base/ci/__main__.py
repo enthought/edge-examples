@@ -9,13 +9,10 @@
 import os
 import subprocess
 import shutil
-
 import click
 
-APP_NAME = "Edge Native Base"
-IMAGE_NAME = "quay.io/enthought/edge-native-base"
-IMAGE_VERSION = "1.0.0"
-CONTAINER_NAME = "edge-native-base"
+from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
+
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
@@ -76,7 +73,7 @@ def _generate_bundle():
     subprocess.run(cmd, env=env, check=True)
 
 @cli.command("build")
-@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
 def build(tag):
     """Build the application"""
     click.echo(f"Building {APP_NAME}...")
@@ -95,7 +92,7 @@ def build(tag):
 
 
 @cli.command("publish")
-@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
 def publish(tag):
     """Publish the application image"""
     click.echo(f"Publishing {APP_NAME}...")
@@ -105,20 +102,21 @@ def publish(tag):
 
 
 @cli.command("start")
-@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
 @click.pass_obj
 def start(obj, tag):
     """Start the application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     env = os.environ.copy()
+    env["IMAGE_NAME"] = IMAGE_NAME
     env["IMAGE_TAG"] = tag
     subprocess.run(cmd, check=True, env=env)
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
 
 @cli.command("standalone")
-@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
 @click.pass_obj
 def start(obj, tag):
     """Start the application in standalone mode"""

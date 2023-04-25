@@ -2,4 +2,4 @@
 exec 2>&1
 echo "Starting nginx"
 set -e
-exec nginx
+exec nginx -c /opt/nginx/nginx.conf

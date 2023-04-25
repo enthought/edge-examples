@@ -8,7 +8,6 @@ COPY $EDGE_BUNDLE /tmp/app_environment.zbundle
 
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
-RUN rm /tmp/app_environment.zbundle
 
 # Final image
 FROM edge_hello_world_stage 
@@ -17,6 +16,6 @@ FROM edge_hello_world_stage
 RUN edm install click "flask>2" gunicorn requests -y
 
 # Copy startup script and application
-COPY ./startup-script.sh /opt/startup-script.sh
-RUN chmod +x /opt/startup-script.sh
-COPY ./src /opt/application
+COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+RUN chmod +x /home/app/startup-script.sh
+COPY --chown=app ./src /home/app/application

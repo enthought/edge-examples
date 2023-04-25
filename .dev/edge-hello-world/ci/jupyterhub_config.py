@@ -27,7 +27,8 @@ def discover_ip():
     return ip
 
 
-IMAGE_TAG = os.environ.get("IMAGE_TAG", "latest")
+IMAGE_TAG = os.environ.get("IMAGE_TAG")
+IMAGE_NAME = os.environ.get("IMAGE_NAME")
 
 c = get_config()  # noqa
 temp = tempfile.gettempdir()
@@ -49,7 +50,7 @@ c.JupyterHub.redirect_to_server = False
 c.DockerSpawner.remove = False
 
 # docker image for the spawner
-c.DockerSpawner.image = f"quay.io/enthought/edge-oauth2-app:{IMAGE_TAG}"
+c.DockerSpawner.image = f"{IMAGE_NAME}:{IMAGE_TAG}"
 c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 
 # File in which to store the database and cookie secret.

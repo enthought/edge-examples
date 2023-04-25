@@ -3,5 +3,5 @@
 # Main application entrypoint
 
 exec 2>&1
-cd /opt
+cd /home/app
 exec ./startup-script.sh
