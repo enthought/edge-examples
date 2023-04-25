@@ -12,8 +12,10 @@ import shutil
 
 import click
 
-EDGE_OAUTH2_APP_IMAGE = "quay.io/enthought/edge-oauth2-app"
-EDGE_OAUTH2_APP_CONTAINER = "edge-oauth2-app"
+APP_NAME = "Edge Native Base"
+IMAGE_NAME = "quay.io/enthought/edge-native-base"
+IMAGE_VERSION = "1.0.0"
+CONTAINER_NAME = "edge-native-base"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
@@ -46,7 +48,7 @@ def cli(ctx, edge_api_url, edge_org_name, edge_api_token):
     if edge_org_name is not None:
         edge_env["EDGE_API_ORG"] = edge_org_name
     if edge_api_token is not None:
-        edge_env["JUPYTERHUB_API_TOKEN"] = edge_api_token
+        edge_env["EDGE_API_TOKEN"] = edge_api_token
 
     ctx.obj = edge_env
 
@@ -74,16 +76,16 @@ def _generate_bundle():
     subprocess.run(cmd, env=env, check=True)
 
 @cli.command("build")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
 def build(tag):
-    """Build the OAuth2 example app"""
-    click.echo("Building the OAuth2 Example App...")
+    """Build the application"""
+    click.echo(f"Building {APP_NAME}...")
 
     cmd = [
         "docker",
         "build",
         "-t",
-        f"{EDGE_OAUTH2_APP_IMAGE}:{tag}",
+        f"{IMAGE_NAME}:{tag}",
         "-f",
         "Dockerfile",
         MODULE_DIR,
@@ -93,20 +95,20 @@ def build(tag):
 
 
 @cli.command("publish")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
 def publish(tag):
-    """Publish the OAuth2 example app"""
-    click.echo("Publishing the OAuth2 Example App...")
-    cmd = ["docker", "push", f"{EDGE_OAUTH2_APP_IMAGE}:{tag}"]
+    """Publish the application image"""
+    click.echo(f"Publishing {APP_NAME}...")
+    cmd = ["docker", "push", f"{IMAGE_NAME}:{tag}"]
     subprocess.run(cmd, check=True)
     click.echo("Done")
 
 
 @cli.command("start")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
 @click.pass_obj
 def start(obj, tag):
-    """Start the OAuth2 example application"""
+    """Start the application"""
     click.echo("Starting the JupyterHub container...")
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     env = os.environ.copy()
@@ -116,16 +118,16 @@ def start(obj, tag):
 
 
 @cli.command("standalone")
-@click.option("--tag", default="latest", help="Docker tag to use.")
+@click.option("--tag", default=IMAGE_VERSION, help="Docker tag to use.")
 @click.pass_obj
 def start(obj, tag):
-    """Start the OAuth2 example application in standalone mode"""
+    """Start the application in standalone mode"""
     env = os.environ.copy()
     remove_container_cmd = [
         "docker",
         "container",
         "rm",
-        EDGE_OAUTH2_APP_CONTAINER
+        CONTAINER_NAME
     ]
     subprocess.run(remove_container_cmd, env=env)
     container_envs = [ f"{key}={value}" for key, value in obj.items() ]
@@ -136,12 +138,12 @@ def start(obj, tag):
         "-p",
         "8888:8888",
         "--name",
-        EDGE_OAUTH2_APP_CONTAINER,
+        CONTAINER_NAME,
     ]
     for container_env in container_envs:
         cmd.append("--env")
         cmd.append(container_env)
-    cmd.append(f"{EDGE_OAUTH2_APP_IMAGE}:{tag}")
+    cmd.append(f"{IMAGE_NAME}:{tag}")
     subprocess.run(cmd, check=True, env=env)
 
 @cli.command("watch")
@@ -149,7 +151,7 @@ def start(obj, tag):
 def watch(obj):
     """Start the application and watch backend changes"""
 
-    print(f"\nStart example application in files watching mode\n")
+    print(f"\nStart {APP_NAME} in files watching mode\n")
     cmd = ["flask", "--app", "app.py", "run"]
     env = os.environ.copy()
     env["FLASK_DEBUG"] = "1"

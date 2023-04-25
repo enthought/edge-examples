@@ -12,18 +12,16 @@
 
 import subprocess
 
-ENV_NAME = "edge-oauth2-dev"
+ENV_NAME = "edge-native-base"
 
 EDM_DEPS = [
     "click",
-    "flask>2",
-    "enthought_edge"
+    "flask>2"
 ]
 
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
-    "configurable-http-proxy",
     "dockerspawner",
 ]
 
