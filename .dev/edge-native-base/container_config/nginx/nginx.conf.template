@@ -1,5 +1,5 @@
-# Templated nginx.conf file. This will be unpacked into /etc/nginx.conf with the
-# JupyterHub service substituted for the required routes
+# Templated nginx.conf file. This will be unpacked into /opt/nginx/nginx.conf
+# with the JupyterHub service substituted for the required routes
 
 error_log /dev/stdout notice;
 pid       /tmp/nginx.pid;
@@ -52,14 +52,6 @@ http {
             proxy_redirect off;
         }
 
-        location ${JUPYTERHUB_SERVICE_PREFIX} { 
-            auth_request ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/;
-            error_page 401 = @error401;
-            proxy_pass http://localhost:9000/;
-            proxy_redirect off;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection $connection_upgrade;         
-        }        
+        include app.location.conf; 
     }
 }
