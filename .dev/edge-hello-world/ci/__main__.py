@@ -61,34 +61,6 @@ def _generate_bundle():
     ] + BUNDLE_PACKAGES
     subprocess.run(cmd, env=env, check=True)
 
-@cli.command("build")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-def build(tag):
-    """Build the application"""
-    click.echo(f"Building {APP_NAME}...")
-
-    cmd = [
-        "docker",
-        "build",
-        "-t",
-        f"{IMAGE_NAME}:{tag}",
-        "-f",
-        "Dockerfile",
-        MODULE_DIR,
-    ]
-    subprocess.run(cmd, check=True)
-    click.echo("Done")
-
-
-@cli.command("publish")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-def publish(tag):
-    """Publish the application image"""
-    click.echo(f"Publishing {APP_NAME}...")
-    cmd = ["docker", "push", f"{IMAGE_NAME}:{tag}"]
-    subprocess.run(cmd, check=True)
-    click.echo("Done")
-
 
 @cli.command("start")
 @click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
@@ -152,6 +124,35 @@ def container_run(context):
         cmd.append(container_env)
     cmd.append(f"{context.image_name}:{context.image_tag}")
     subprocess.run(cmd, check=True, env=env)
+
+
+@container.command("build")
+@click.pass_obj
+def build(context):
+    """Build the application"""
+    click.echo(f"Building {context.app_name}...")
+    cmd = [
+        "docker",
+        "build",
+        "-t",
+        f"{context.image_name}:{context.image_tag}",
+        "-f",
+        "Dockerfile",
+        MODULE_DIR
+    ]
+    subprocess.run(cmd, check=True)
+    click.echo("Done")
+
+
+@cli.command("publish")
+@click.pass_obj
+def publish(context):
+    """Publish the application image"""
+    click.echo(f"Publishing {context.app_name}...")
+    cmd = ["docker", "push", f"{context.image_name}:{context.image_tag}"]
+    subprocess.run(cmd, check=True)
+    click.echo("Done")
+
 
 @cli.group("dev")
 @click.option(

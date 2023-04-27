@@ -95,6 +95,11 @@ class ContainerBuildContext(BuildContext):
             The docker image tag to build
         container_name : str
             The name of the docker container when running in container mode
+        
+        Raises
+        ------
+        ValueError
+            Raised if the image_tag value is "latest"
         """
         super().__init__(*args, **kwargs)
         self._image_name = image_name
