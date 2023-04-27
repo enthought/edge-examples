@@ -7,7 +7,7 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the edge-oauth2-app example.
+    Bootstrap file for the edge-hello-world example.
 """
 
 import subprocess

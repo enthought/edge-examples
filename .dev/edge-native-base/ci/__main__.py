@@ -6,6 +6,7 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
+import json
 import os
 import subprocess
 import shutil
@@ -33,21 +34,9 @@ BUNDLE_PACKAGES = [
 ]
 
 @click.group()
-@click.option("--edge-api-url", default="https://edge.enthought.com/services/api", help="The API url for Edge")
-@click.option("--edge-org-name", default=None, help="Your Edge organization")
-@click.option("--edge-api-token", default=None, help="Your Edge API token")
-@click.pass_context
-def cli(ctx, edge_api_url, edge_org_name, edge_api_token):
+def cli():
     """All commands constituting continuous integration."""
-    edge_env = {}
-    if edge_api_url is not None:
-        edge_env["EDGE_API_SERVICE_URL"] = edge_api_url
-    if edge_org_name is not None:
-        edge_env["EDGE_API_ORG"] = edge_org_name
-    if edge_api_token is not None:
-        edge_env["EDGE_API_TOKEN"] = edge_api_token
-
-    ctx.obj = edge_env
+    pass
 
 @cli.command("generate_bundle")
 def generate_bundle():
@@ -103,22 +92,32 @@ def publish(tag):
 
 @cli.command("start")
 @click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-@click.pass_obj
-def start(obj, tag):
+@click.option(
+    "--edge-settings-file",
+    default=None,
+    help="A json file with E2E test settings",
+)
+def start(tag, edge_settings_file):
     """Start the application"""
     click.echo("Starting the JupyterHub container...")
+    edge_settings = _get_edge_settings(edge_settings_file)
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
     env = os.environ.copy()
     env["IMAGE_NAME"] = IMAGE_NAME
     env["IMAGE_TAG"] = tag
+    env.update(edge_settings)
     subprocess.run(cmd, check=True, env=env)
     click.echo("JupyterHub is running at: http://127.0.0.1:8888")
 
 
 @cli.command("standalone")
 @click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-@click.pass_obj
-def start(obj, tag):
+@click.option(
+    "--edge-settings-file",
+    default=None,
+    help="A json file with E2E test settings",
+)
+def standalone(tag, edge_settings_file):
     """Start the application in standalone mode"""
     env = os.environ.copy()
     remove_container_cmd = [
@@ -128,7 +127,8 @@ def start(obj, tag):
         CONTAINER_NAME
     ]
     subprocess.run(remove_container_cmd, env=env)
-    container_envs = [ f"{key}={value}" for key, value in obj.items() ]
+    edge_settings = _get_edge_settings(edge_settings_file)
+    container_envs = [f"{key}={value}" for key, value in edge_settings.items()]
     container_envs.append("NATIVE_APP_MODE=container")
     cmd = [
         "docker",
@@ -145,16 +145,52 @@ def start(obj, tag):
     subprocess.run(cmd, check=True, env=env)
 
 @cli.command("watch")
-@click.pass_obj
-def watch(obj):
+@click.option(
+    "--edge-settings-file",
+    default=None,
+    help="A json file with E2E test settings",
+)
+def watch(edge_settings_file):
     """Start the application and watch backend changes"""
 
     print(f"\nStart {APP_NAME} in files watching mode\n")
     cmd = ["flask", "--app", "app.py", "run"]
+    edge_settings = _get_edge_settings(edge_settings_file)
     env = os.environ.copy()
     env["NATIVE_APP_MODE"] = "dev"
-    env.update(obj)
+    env.update(edge_settings)
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+
+def _get_edge_settings(filename):
+    """Retrieve Edge environment variable settings from a file
+    
+    Parameters
+    ----------
+    filename : str or None
+        The filename of a json file containing EDGE_API_SERVICE_URL,
+        EDGE_API_ORG and EDGE_API_TOKEN
+
+    Returns
+    -------
+    dict
+        If filename is None, an empty dictionary is returned. Otherwise
+        a dictionary representing the contents of the json file
+        is returned
+
+    Raises
+    ------
+    ValueError
+        Raised if the json file does not contain all required environment
+        variables
+    """
+    if filename is None:
+        return {}
+    with open(filename, "r") as f:
+        settings = json.load(f)
+    for key in ["EDGE_API_SERVICE_URL", "EDGE_API_ORG", "EDGE_API_TOKEN"]:
+        if key not in settings:
+            raise ValueError(f"{key} not in settings file")
+    return settings
 
 if __name__ == "__main__":
     cli(prog_name="python -m ci")
