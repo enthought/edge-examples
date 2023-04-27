@@ -1,0 +1,2 @@
+with-contenv
+exec /bin/bash -c "if [ -z $JUPYTERHUB_SERVICE_PREFIX]; then export JUPYTERHUB_SERVICE_PREFIX='/'; fi && envsubst '${JUPYTERHUB_SERVICE_PREFIX}' < /opt/nginx/nginx.conf.template > /opt/nginx/nginx.conf"
