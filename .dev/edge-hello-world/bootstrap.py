@@ -17,7 +17,8 @@ ENV_NAME = "edge-hello-world"
 EDM_DEPS = [
     "click",
     "flask>2",
-    "enthought_edge"
+    "enthought_edge",
+    "pytest"
 ]
 
 PIP_DEPS = [

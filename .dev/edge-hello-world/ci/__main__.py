@@ -153,18 +153,26 @@ def standalone(tag, edge_settings_file):
 @click.pass_context
 def dev(ctx, edge_settings_file):
     """CLI group for dev commands"""
-    ctx.obj = _get_edge_settings(edge_settings_file)
+    env = os.environ.copy()
+    env.update(_get_edge_settings(edge_settings_file))
+    env["NATIVE_APP_MODE"] = "dev"
+    ctx.obj = env
 
 @dev.command("run")
 @click.pass_obj
-def dev_run(edge_settings):
+def dev_run(dev_environment):
     """Start the application and watch backend changes"""
     print(f"\nStart {APP_NAME} in files watching mode\n")
     cmd = ["flask", "--app", "app.py", "run"]
-    env = os.environ.copy()
-    env["NATIVE_APP_MODE"] = "dev"
-    env.update(edge_settings)
-    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+    subprocess.run(cmd, check=True, env=dev_environment, cwd=SRC_DIR)
+
+@dev.command("test")
+@click.pass_obj
+def dev_test(dev_environment):
+    """Run unit tests on the application"""
+    cmd = ["pytest"]
+    subprocess.run(cmd, check=True, env=dev_environment, cwd=SRC_DIR)
+
 
 def _get_edge_settings(filename):
     """Retrieve Edge environment variable settings from a file
