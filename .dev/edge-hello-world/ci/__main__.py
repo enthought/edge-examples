@@ -13,8 +13,8 @@ import click
 
 from subprocess import Popen
 from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
-from .builders import DevBuilder, ContainerBuilder
-from .contexts import BuildContext, ContainerBuildContext
+from .builders import DevBuilder, ContainerBuilder, PreflightBuilder
+from .contexts import BuildContext, ContainerBuildContext, PreflightBuildContext
 
 
 
@@ -63,25 +63,28 @@ def _generate_bundle():
     subprocess.run(cmd, env=env, check=True)
 
 
-@cli.command("start")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
+@cli.group("preflight")
 @click.option(
     "--edge-settings-file",
     default=None,
     help="A json file with E2E test settings",
 )
-def start(tag, edge_settings_file):
-    """Start the application"""
-    click.echo("Starting the JupyterHub container...")
-    edge_settings = _get_edge_settings(edge_settings_file)
-    cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
-    env = os.environ.copy()
-    env["IMAGE_NAME"] = IMAGE_NAME
-    env["IMAGE_TAG"] = tag
-    env.update(edge_settings)
-    subprocess.run(cmd, check=True, env=env)
-    click.echo("JupyterHub is running at: http://127.0.0.1:8888")
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
+@click.pass_context
+def preflight(ctx, edge_settings_file, tag):
+    """CLI group for container commands"""
+    ctx.obj = PreflightBuildContext(
+        edge_settings_file=edge_settings_file,
+        image_tag=tag
+    )
 
+@preflight.command("run")
+@click.pass_obj
+def preflight_run(context):
+    """Start the application"""
+    click.echo("Starting JupyterHub...")
+    builder = PreflightBuilder(context)
+    builder.run()
 
 @cli.group("container")
 @click.option(

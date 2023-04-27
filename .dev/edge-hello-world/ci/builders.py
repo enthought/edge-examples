@@ -54,9 +54,13 @@ class ContainerBuilder(Builder):
 
     def run(self):
         """Runs the container"""
-        self.stop_container()
-        self.remove_container()
-        self.start_container()
+        stop_container(self.context.container_name)
+        remove_container(self.context.container_name)
+        start_container(
+            self.context.image,
+            self.context.container_name,
+            self.context.env
+        )
 
     def build(self):    
         """Build the application's docker image"""
@@ -88,56 +92,92 @@ class ContainerBuilder(Builder):
         cmd = ["docker", "push", f"{self.context.image}"]
         subprocess.run(cmd, check=True)
 
-    def stop_container(self):
-        """Stops the application container"""
-        env = os.environ.copy()
-        remove_container_cmd = [
-            "docker",
-            "stop",
-            self.context.container_name
-        ]
-        subprocess.run(remove_container_cmd, env=env)
 
-    def remove_container(self):
-        """Removes any existing containers from container mode
+class PreflightBuilder(Builder):
+    """A builder class for native apps in preflight mode"""
         
-        Parameters
-        ----------
-        context : context.ContainerBuildContext
+    def __init__(self, context):
+        """Init function
+        
+        context : context.PreflightBuildContext
+            A context with preflight settings
         """
-        env = os.environ.copy()
-        remove_container_cmd = [
-            "docker",
-            "container",
-            "rm",
-            self.context.container_name
-        ]
-        subprocess.run(remove_container_cmd, env=env)
+        super().__init__(context)
 
-    def start_container(self, daemon=False):
-        """Starts the native app in container mode
-        
-        Parameters
-        ----------
-        context : context.ContainerBuildContext
-            The context containing container settings
-        daemon : boolean
-            Whether or not to run the container in Docker daemon mode
-        """
+    def run(self):
+        """Start the application"""
+        stop_container(self.context.container_name)
+        remove_container(self.context.container_name)
+        cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
         env = os.environ.copy()
-        container_envs = [f"{key}={value}" for key, value in self.context.env.items()]
-        cmd = [
-            "docker",
-            "run",
-            "-p",
-            "8888:8888",
-            "--name",
-            self.context.container_name
-        ]
-        if daemon:
-            cmd.append("-d")
-        for container_env in container_envs:
-            cmd.append("--env")
-            cmd.append(container_env)
-        cmd.append(f"{self.context.image}")
-        subprocess.run(cmd, check=True, env=env)        
+        env.update(self.context.env)
+        subprocess.run(cmd, check=True, env=env)
+
+    def test(self):
+        pass
+
+
+def stop_container(container_name):
+    """Stops a docker container
+    
+    Parameters
+    ----------
+    container_name : str
+        The name of the container to stop
+    """
+    env = os.environ.copy()
+    remove_container_cmd = [
+        "docker",
+        "stop",
+        container_name
+    ]
+    subprocess.run(remove_container_cmd, env=env)
+
+def remove_container(container_name):
+    """Removes any existing containers from container mode
+    
+    Parameters
+    ----------
+    container_name : str
+        The name of the container to remove
+    """
+    env = os.environ.copy()
+    remove_container_cmd = [
+        "docker",
+        "container",
+        "rm",
+        container_name
+    ]
+    subprocess.run(remove_container_cmd, env=env)
+
+def start_container(image, container_name, container_env={}, daemon=False):
+    """Starts the native app in container mode
+    
+    Parameters
+    ----------
+    image : str
+        The name of the docker image to start
+    container_name : str
+        The name of the docker container
+    container_env : dict
+        A dictionary of extra environment variables to pass to the container
+    daemon : boolean
+        Whether or not to run the container in Docker daemon mode
+    """
+    env = os.environ.copy()
+    container_env_strings = [f"{key}={value}" for key, value in container_env.items()]
+    cmd = [
+        "docker",
+        "run",
+        "-p",
+        "8888:8888",
+        "--name",
+        container_name
+    ]
+    if daemon:
+        cmd.append("-d")
+    for container_env in container_env_strings:
+        cmd.append("--env")
+        cmd.append(container_env)
+    cmd.append(image)
+    subprocess.run(cmd, check=True, env=env)

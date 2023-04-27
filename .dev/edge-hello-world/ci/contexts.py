@@ -101,6 +101,7 @@ class BuildContext:
                 raise ValueError(f"{key} not in settings file")
         return settings
 
+
 class ContainerBuildContext(BuildContext):
     """A class for containing container build options for a native app"""
     @property
@@ -142,6 +143,61 @@ class ContainerBuildContext(BuildContext):
             Raised if the image_tag value is "latest"
         """
         super().__init__(*args, mode="container", **kwargs)
+        self._image_name = image_name
+        if image_tag == "latest":
+            raise ValueError("Image tag cannot be latest")
+        self._image_tag = image_tag
+        self._container_name = container_name
+
+
+class PreflightBuildContext(BuildContext):
+    """A class for containing preflight build options for a native app"""
+    @property
+    def image_name(self):
+        return self._image_name
+
+    @property
+    def image_tag(self):
+        return self._image_tag
+
+    @property
+    def image(self):
+        return f"{self.image_name}:{self.image_tag}"
+
+    @property
+    def container_name(self):
+        return f"jupyterhub-{self._container_name}"
+
+    @property
+    def env(self):
+        result = super().env
+        result["IMAGE"] = self.image
+        result["CONTAINER_NAME"] = self.container_name
+        return result
+        
+    def __init__(
+        self,
+        *args,
+        image_name=IMAGE_NAME,
+        image_tag=IMAGE_TAG,
+        container_name=CONTAINER_NAME,
+        **kwargs
+    ):
+        """Init function
+        
+        image_name : str
+            The docker image name to build
+        image_tag : str
+            The docker image tag to build
+        container_name : str
+            The name of the docker container when running in container mode
+        
+        Raises
+        ------
+        ValueError
+            Raised if the image_tag value is "latest"
+        """
+        super().__init__(*args, mode=None, **kwargs)
         self._image_name = image_name
         if image_tag == "latest":
             raise ValueError("Image tag cannot be latest")

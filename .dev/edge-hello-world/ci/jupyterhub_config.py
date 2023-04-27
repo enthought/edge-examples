@@ -27,8 +27,17 @@ def discover_ip():
     return ip
 
 
-IMAGE_TAG = os.environ.get("IMAGE_TAG")
-IMAGE_NAME = os.environ.get("IMAGE_NAME")
+IMAGE = os.environ.get("IMAGE")
+CONTAINER_NAME = os.environ.get("CONTAINER_NAME")
+EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
+if EDGE_API_TOKEN is not None and \
+    EDGE_API_SERVICE_URL is not None and \
+    EDGE_API_ORG is not None:
+    container_env = {}
+else:
+    container_env = {}
 
 c = get_config()  # noqa
 temp = tempfile.gettempdir()
@@ -48,9 +57,12 @@ c.JupyterHub.redirect_to_server = False
 
 # Don't delete containers when the stop
 c.DockerSpawner.remove = False
+c.DockerSpawner.environment = container_env
 
 # docker image for the spawner
-c.DockerSpawner.image = f"{IMAGE_NAME}:{IMAGE_TAG}"
+c.DockerSpawner.image = IMAGE
+c.DockerSpawner.name_template = CONTAINER_NAME
+
 c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 
 # File in which to store the database and cookie secret.
