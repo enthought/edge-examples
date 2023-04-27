@@ -1,5 +1,13 @@
 import json
-from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
+from .config import (
+    APP_NAME,
+    IMAGE_NAME,
+    IMAGE_TAG,
+    CONTAINER_NAME,
+    SRC_DIR,
+    MODULE_DIR,
+    CI_DIR
+)
 
 class BuildContext:
     """A class for containing build options for a native app"""
@@ -11,12 +19,30 @@ class BuildContext:
     def app_name(self):
         return self._app_name
     
+    @property
+    def src_dir(self):
+        return self._src_dir
+    
+    @property
+    def module_dir(self):
+        return self._module_dir
+    
+    @property
+    def ci_dir(self):
+        return self._ci_dir
+
+    @property
+    def edge_settings_file(self):
+        return self._edge_settings_file
+
     def __init__(
         self,
         edge_settings_file=None,
         mode=None,
         app_name=APP_NAME,
-
+        src_dir=SRC_DIR,
+        module_dir=MODULE_DIR,
+        ci_dir=CI_DIR
     ):
         """Init function
         
@@ -28,11 +54,21 @@ class BuildContext:
             The development mode dev, container or preflight
         app_name : str
             The app name
+        src_dir : str
+            The path of the src directory for the application files
+        module_dir : str
+            The path of the application module directory
+        ci_dir : str
+            The path of the CI tools
         """
+        self._edge_settings_file = edge_settings_file
         self._env = self._get_edge_settings(edge_settings_file)
         if mode is not None:
             self._env["NATIVE_APP_MODE"] = mode
         self._app_name = app_name
+        self._src_dir = src_dir
+        self._module_dir = module_dir
+        self._ci_dir = ci_dir
 
     def _get_edge_settings(self, filename):
         """Retrieve Edge environment variable settings from a file
@@ -76,6 +112,10 @@ class ContainerBuildContext(BuildContext):
         return self._image_tag
 
     @property
+    def image(self):
+        return f"{self.image_name}:{self.image_tag}"
+
+    @property
     def container_name(self):
         return self._container_name
         
@@ -101,9 +141,9 @@ class ContainerBuildContext(BuildContext):
         ValueError
             Raised if the image_tag value is "latest"
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, mode="container", **kwargs)
         self._image_name = image_name
         if image_tag == "latest":
             raise ValueError("Image tag cannot be latest")
         self._image_tag = image_tag
-        self._container_name = container_name        
+        self._container_name = container_name

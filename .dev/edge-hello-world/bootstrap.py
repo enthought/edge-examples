@@ -18,7 +18,8 @@ EDM_DEPS = [
     "click",
     "flask>2",
     "enthought_edge",
-    "pytest"
+    "pytest",
+    "requests"
 ]
 
 PIP_DEPS = [

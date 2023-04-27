@@ -11,11 +11,12 @@ import subprocess
 import shutil
 import click
 
+from subprocess import Popen
 from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
-from .context import BuildContext, ContainerBuildContext
+from .builders import DevBuilder, ContainerBuilder
+from .contexts import BuildContext, ContainerBuildContext
 
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
-SRC_DIR = os.path.join(MODULE_DIR, "src")
+
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
@@ -94,7 +95,6 @@ def container(ctx, edge_settings_file, tag):
     """CLI group for container commands"""
     ctx.obj = ContainerBuildContext(
         edge_settings_file=edge_settings_file,
-        mode="container",
         image_tag=tag
     )
 
@@ -102,57 +102,40 @@ def container(ctx, edge_settings_file, tag):
 @click.pass_obj
 def container_run(context):
     """Start the application in container mode"""
-    env = os.environ.copy()
-    remove_container_cmd = [
-        "docker",
-        "container",
-        "rm",
-        context.container_name
-    ]
-    subprocess.run(remove_container_cmd, env=env)
-    container_envs = [f"{key}={value}" for key, value in context.env.items()]
-    cmd = [
-        "docker",
-        "run",
-        "-p",
-        "8888:8888",
-        "--name",
-        context.container_name
-    ]
-    for container_env in container_envs:
-        cmd.append("--env")
-        cmd.append(container_env)
-    cmd.append(f"{context.image_name}:{context.image_tag}")
-    subprocess.run(cmd, check=True, env=env)
+    click.echo(
+        f"Running {context.app_name} in container {context.container_name}..."
+    )
+    builder = ContainerBuilder(context)
+    builder.run()
 
+
+@container.command("test")
+@click.pass_obj
+def container_test(context):
+    """Test the application in container mode"""
+    click.echo(
+        f"Running tests on {context.app_name} using container {context.container_name}..."
+    )
+    builder = ContainerBuilder(context)
+    builder.test()
 
 @container.command("build")
 @click.pass_obj
 def build(context):
     """Build the application"""
     click.echo(f"Building {context.app_name}...")
-    cmd = [
-        "docker",
-        "build",
-        "-t",
-        f"{context.image_name}:{context.image_tag}",
-        "-f",
-        "Dockerfile",
-        MODULE_DIR
-    ]
-    subprocess.run(cmd, check=True)
+    builder = ContainerBuilder(context)
+    builder.build()
     click.echo("Done")
-
 
 @cli.command("publish")
 @click.pass_obj
 def publish(context):
     """Publish the application image"""
     click.echo(f"Publishing {context.app_name}...")
-    cmd = ["docker", "push", f"{context.image_name}:{context.image_tag}"]
-    subprocess.run(cmd, check=True)
+    builder = ContainerBuilder(context)
+    builder.publish()
     click.echo("Done")
-
 
 @cli.group("dev")
 @click.option(
@@ -169,20 +152,17 @@ def dev(ctx, edge_settings_file):
 @click.pass_obj
 def dev_run(context):
     """Start the application and watch backend changes"""
-    print(f"\nStart {APP_NAME} in files watching mode\n")
-    cmd = ["flask", "--app", "app.py", "run"]
-    env = os.environ.copy()
-    env.update(context.env)
-    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+    click.echo(f"Starting {context.app_name} in dev mode")
+    builder = DevBuilder(context)
+    builder.run()
 
 @dev.command("test")
 @click.pass_obj
 def dev_test(context):
     """Run unit tests on the application"""
-    cmd = ["pytest"]
-    env = os.environ.copy()
-    env.update(context.env)
-    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
+    click.echo(f"Running tests on {context.app_name}")
+    builder = DevBuilder(context)
+    builder.test()
 
 
 if __name__ == "__main__":

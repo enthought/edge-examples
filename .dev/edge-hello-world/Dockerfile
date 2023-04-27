@@ -18,4 +18,4 @@ RUN edm install click "flask>2" gunicorn requests -y
 # Copy startup script and application
 COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
-COPY --chown=app ./src /home/app/application
+COPY --chown=app ./src/application/ /home/app/application
