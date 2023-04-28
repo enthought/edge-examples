@@ -1,6 +1,8 @@
 import os
 import subprocess
-from .config import IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
+import requests
+import time
+from subprocess import Popen
 
 class Builder:
     """A base class for building and running native apps"""
@@ -43,7 +45,11 @@ class DevBuilder(Builder):
 
 class ContainerBuilder(Builder):
     """A builder class for native apps in container mode"""
-        
+    
+    @property
+    def _test_path(self):
+        return "ci/tests/test_container.py"
+
     def __init__(self, context):
         """Init function
         
@@ -54,13 +60,16 @@ class ContainerBuilder(Builder):
 
     def run(self):
         """Runs the container"""
-        stop_container(self.context.container_name)
-        remove_container(self.context.container_name)
+        self.cleanup()
         start_container(
             self.context.image,
             self.context.container_name,
             self.context.env
         )
+
+    def cleanup(self):
+        _docker_stop(self.context.container_name)
+        _docker_remove(self.context.container_name)
 
     def build(self):    
         """Build the application's docker image"""
@@ -75,12 +84,14 @@ class ContainerBuilder(Builder):
         ]
         subprocess.run(cmd, check=True)
     
-    def test(self):
+    def test(self, verbose=False):
         """Test the application container"""
         cmd = [
-            "pytest",
-            "ci/tests/test_container.py"
+            "pytest"
         ]
+        if (verbose):
+            cmd.append("-vvvs")
+        cmd.append(self._test_path)
         env = os.environ.copy()
         env["PYTHONPATH"] = self.context.module_dir
         if self.context.edge_settings_file is not None:
@@ -93,9 +104,13 @@ class ContainerBuilder(Builder):
         subprocess.run(cmd, check=True)
 
 
-class PreflightBuilder(Builder):
+class PreflightBuilder(ContainerBuilder):
     """A builder class for native apps in preflight mode"""
-        
+
+    @property
+    def _test_path(self):
+        return "ci/tests/test_preflight.py"
+
     def __init__(self, context):
         """Init function
         
@@ -103,21 +118,28 @@ class PreflightBuilder(Builder):
             A context with preflight settings
         """
         super().__init__(context)
+    
+    def publish(self):
+        raise NotImplemented
+    
+    def build(self):
+        raise NotImplemented
 
     def run(self):
         """Start the application"""
-        stop_container(self.context.container_name)
-        remove_container(self.context.container_name)
+        process = self.start_jupyterhub()
+        process.wait()
+    
+    def start_jupyterhub(self):
+        self.cleanup() 
         cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
         env = os.environ.copy()
         env.update(self.context.env)
-        subprocess.run(cmd, check=True, env=env)
-
-    def test(self):
-        pass
+        process = Popen(cmd, env=env)
+        return process
 
 
-def stop_container(container_name):
+def _docker_stop(container_name):
     """Stops a docker container
     
     Parameters
@@ -133,7 +155,7 @@ def stop_container(container_name):
     ]
     subprocess.run(remove_container_cmd, env=env)
 
-def remove_container(container_name):
+def _docker_remove(container_name):
     """Removes any existing containers from container mode
     
     Parameters

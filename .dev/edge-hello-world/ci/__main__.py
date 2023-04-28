@@ -86,6 +86,15 @@ def preflight_run(context):
     builder = PreflightBuilder(context)
     builder.run()
 
+@preflight.command("test")
+@click.option("--verbose", is_flag=True, default=False, help="Verbose test output")
+@click.pass_obj
+def preflight_test(context, verbose):
+    """Start the application"""
+    click.echo("Running preflight checks...")
+    builder = PreflightBuilder(context)
+    builder.test(verbose)
+
 @cli.group("container")
 @click.option(
     "--edge-settings-file",
@@ -113,14 +122,15 @@ def container_run(context):
 
 
 @container.command("test")
+@click.option("--verbose", is_flag=True, default=False, help="Verbose test output")
 @click.pass_obj
-def container_test(context):
+def container_test(context, verbose):
     """Test the application in container mode"""
     click.echo(
         f"Running tests on {context.app_name} using container {context.container_name}..."
     )
     builder = ContainerBuilder(context)
-    builder.test()
+    builder.test(verbose)
 
 @container.command("build")
 @click.pass_obj

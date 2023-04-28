@@ -13,7 +13,10 @@ class BuildContext:
     """A class for containing build options for a native app"""
     @property
     def env(self):
-        return self._env
+        _env = self._get_edge_settings(self.edge_settings_file)
+        if self.mode is not None:
+            self._env["NATIVE_APP_MODE"] = self.mode
+        return _env
 
     @property
     def app_name(self):
@@ -35,10 +38,13 @@ class BuildContext:
     def edge_settings_file(self):
         return self._edge_settings_file
 
+    @property
+    def mode(self):
+        return None
+
     def __init__(
         self,
         edge_settings_file=None,
-        mode=None,
         app_name=APP_NAME,
         src_dir=SRC_DIR,
         module_dir=MODULE_DIR,
@@ -62,9 +68,6 @@ class BuildContext:
             The path of the CI tools
         """
         self._edge_settings_file = edge_settings_file
-        self._env = self._get_edge_settings(edge_settings_file)
-        if mode is not None:
-            self._env["NATIVE_APP_MODE"] = mode
         self._app_name = app_name
         self._src_dir = src_dir
         self._module_dir = module_dir
@@ -105,6 +108,10 @@ class BuildContext:
 class ContainerBuildContext(BuildContext):
     """A class for containing container build options for a native app"""
     @property
+    def mode(self):
+        return "container"
+
+    @property
     def image_name(self):
         return self._image_name
 
@@ -142,7 +149,7 @@ class ContainerBuildContext(BuildContext):
         ValueError
             Raised if the image_tag value is "latest"
         """
-        super().__init__(*args, mode="container", **kwargs)
+        super().__init__(*args, **kwargs)
         self._image_name = image_name
         if image_tag == "latest":
             raise ValueError("Image tag cannot be latest")
@@ -150,19 +157,11 @@ class ContainerBuildContext(BuildContext):
         self._container_name = container_name
 
 
-class PreflightBuildContext(BuildContext):
+class PreflightBuildContext(ContainerBuildContext):
     """A class for containing preflight build options for a native app"""
     @property
-    def image_name(self):
-        return self._image_name
-
-    @property
-    def image_tag(self):
-        return self._image_tag
-
-    @property
-    def image(self):
-        return f"{self.image_name}:{self.image_tag}"
+    def mode(self):
+        return None
 
     @property
     def container_name(self):
@@ -197,7 +196,7 @@ class PreflightBuildContext(BuildContext):
         ValueError
             Raised if the image_tag value is "latest"
         """
-        super().__init__(*args, mode=None, **kwargs)
+        super().__init__(*args, **kwargs)
         self._image_name = image_name
         if image_tag == "latest":
             raise ValueError("Image tag cannot be latest")

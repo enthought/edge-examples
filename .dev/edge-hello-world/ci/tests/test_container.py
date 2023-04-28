@@ -29,13 +29,11 @@ class ContainerTestCase(TestCase):
             edge_settings_file=EDGE_SETTINGS_FILE
         )
         self.builder = ContainerBuilder(self.context)
-        self.builder.stop_container()
-        self.builder.remove_container()
+        self.builder.cleanup()
         self.builder.start_container(daemon=True)
     
     def tearDown(self):
-        self.builder.stop_container()
-        self.builder.remove_container()
+        self.builder.cleanup()
 
     def test_container_application(self):
         for retry in range(RETRIES):
