@@ -18,7 +18,7 @@ class BuildContext:
     def env(self):
         _env = self._get_edge_settings(self.edge_settings_file)
         if self.mode is not None:
-            self._env["NATIVE_APP_MODE"] = self.mode
+            _env["NATIVE_APP_MODE"] = self.mode
         return _env
 
     @property
@@ -106,6 +106,12 @@ class BuildContext:
             if key not in settings:
                 raise ValueError(f"{key} not in settings file")
         return settings
+
+
+class DevBuildContext(BuildContext):
+    @property
+    def mode(self):
+        return "dev"
 
 
 class ContainerBuildContext(BuildContext):

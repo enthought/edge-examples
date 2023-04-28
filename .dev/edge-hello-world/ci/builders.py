@@ -30,6 +30,14 @@ class Builder:
 class DevBuilder(Builder):
     """A builder class for native apps in dev mode"""
 
+    def __init__(self, *args, **kwargs):
+        """Init function
+
+        context : context.DevBuildContext
+            A context with development build settings
+        """
+        super().__init__(*args, **kwargs)
+
     def run(self):
         cmd = ["flask", "--app", "application/app.py", "run"]
         env = os.environ.copy()
@@ -62,8 +70,11 @@ class ContainerBuilder(Builder):
     def run(self):
         """Runs the container"""
         self.cleanup()
-        start_container(
-            self.context.image, self.context.container_name, self.context.env
+        self.start()
+
+    def start(self, daemon=False):
+        _docker_run(
+            self.context.image, self.context.container_name, self.context.env, daemon
         )
 
     def cleanup(self):
@@ -162,7 +173,7 @@ def _docker_remove(container_name):
     subprocess.run(remove_container_cmd, env=env)
 
 
-def start_container(image, container_name, container_env={}, daemon=False):
+def _docker_run(image, container_name, container_env={}, daemon=False):
     """Starts the native app in container mode
 
     Parameters

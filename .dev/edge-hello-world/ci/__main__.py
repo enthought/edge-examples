@@ -14,7 +14,7 @@ import click
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 from .config import IMAGE_TAG, LINT_ENV_NAME
-from .contexts import BuildContext, ContainerBuildContext, PreflightBuildContext
+from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
@@ -217,7 +217,7 @@ def publish(context):
 @click.pass_context
 def dev(ctx, edge_settings_file):
     """CLI group for dev commands"""
-    ctx.obj = BuildContext(edge_settings_file=edge_settings_file, mode="dev")
+    ctx.obj = DevBuildContext(edge_settings_file=edge_settings_file)
 
 
 @dev.command("run")

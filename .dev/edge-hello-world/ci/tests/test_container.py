@@ -30,7 +30,7 @@ class ContainerTestCase(TestCase):
         self.context = ContainerBuildContext(edge_settings_file=EDGE_SETTINGS_FILE)
         self.builder = ContainerBuilder(self.context)
         self.builder.cleanup()
-        self.builder.start_container(daemon=True)
+        self.builder.start(daemon=True)
 
     def tearDown(self):
         self.builder.cleanup()
