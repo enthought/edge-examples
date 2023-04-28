@@ -59,8 +59,6 @@ class BuildContext:
         ----------
         edge_settings_file : str or None
             A path to an edge settings json file
-        mode : str or None
-            The development mode dev, container or preflight
         app_name : str
             The app name
         src_dir : str
