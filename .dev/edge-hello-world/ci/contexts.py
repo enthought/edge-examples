@@ -1,16 +1,19 @@
 import json
+
 from .config import (
     APP_NAME,
+    CI_DIR,
+    CONTAINER_NAME,
     IMAGE_NAME,
     IMAGE_TAG,
-    CONTAINER_NAME,
-    SRC_DIR,
     MODULE_DIR,
-    CI_DIR
+    SRC_DIR,
 )
+
 
 class BuildContext:
     """A class for containing build options for a native app"""
+
     @property
     def env(self):
         _env = self._get_edge_settings(self.edge_settings_file)
@@ -21,15 +24,15 @@ class BuildContext:
     @property
     def app_name(self):
         return self._app_name
-    
+
     @property
     def src_dir(self):
         return self._src_dir
-    
+
     @property
     def module_dir(self):
         return self._module_dir
-    
+
     @property
     def ci_dir(self):
         return self._ci_dir
@@ -48,10 +51,10 @@ class BuildContext:
         app_name=APP_NAME,
         src_dir=SRC_DIR,
         module_dir=MODULE_DIR,
-        ci_dir=CI_DIR
+        ci_dir=CI_DIR,
     ):
         """Init function
-        
+
         Parameters
         ----------
         edge_settings_file : str or None
@@ -75,7 +78,7 @@ class BuildContext:
 
     def _get_edge_settings(self, filename):
         """Retrieve Edge environment variable settings from a file
-        
+
         Parameters
         ----------
         filename : str or None
@@ -107,6 +110,7 @@ class BuildContext:
 
 class ContainerBuildContext(BuildContext):
     """A class for containing container build options for a native app"""
+
     @property
     def mode(self):
         return "container"
@@ -126,24 +130,24 @@ class ContainerBuildContext(BuildContext):
     @property
     def container_name(self):
         return self._container_name
-        
+
     def __init__(
         self,
         *args,
         image_name=IMAGE_NAME,
         image_tag=IMAGE_TAG,
         container_name=CONTAINER_NAME,
-        **kwargs
+        **kwargs,
     ):
         """Init function
-        
+
         image_name : str
             The docker image name to build
         image_tag : str
             The docker image tag to build
         container_name : str
             The name of the docker container when running in container mode
-        
+
         Raises
         ------
         ValueError
@@ -159,6 +163,7 @@ class ContainerBuildContext(BuildContext):
 
 class PreflightBuildContext(ContainerBuildContext):
     """A class for containing preflight build options for a native app"""
+
     @property
     def mode(self):
         return None
@@ -173,24 +178,24 @@ class PreflightBuildContext(ContainerBuildContext):
         result["IMAGE"] = self.image
         result["CONTAINER_NAME"] = self.container_name
         return result
-        
+
     def __init__(
         self,
         *args,
         image_name=IMAGE_NAME,
         image_tag=IMAGE_TAG,
         container_name=CONTAINER_NAME,
-        **kwargs
+        **kwargs,
     ):
         """Init function
-        
+
         image_name : str
             The docker image name to build
         image_tag : str
             The docker image tag to build
         container_name : str
             The name of the docker container when running in container mode
-        
+
         Raises
         ------
         ValueError

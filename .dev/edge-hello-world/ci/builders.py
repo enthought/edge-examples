@@ -1,24 +1,24 @@
 import os
 import subprocess
-import requests
-import time
 from subprocess import Popen
+
 
 class Builder:
     """A base class for building and running native apps"""
+
     @property
     def context(self):
         return self._context
 
     def run(self):
-        raise NotImplemented
-  
+        raise NotImplementedError
+
     def test(self):
-        raise NotImplemented
-    
+        raise NotImplementedError
+
     def __init__(self, context):
         """Init function
-        
+
         Parameters
         ----------
         context : context.BuildContext
@@ -29,6 +29,7 @@ class Builder:
 
 class DevBuilder(Builder):
     """A builder class for native apps in dev mode"""
+
     def run(self):
         cmd = ["flask", "--app", "application/app.py", "run"]
         env = os.environ.copy()
@@ -45,14 +46,14 @@ class DevBuilder(Builder):
 
 class ContainerBuilder(Builder):
     """A builder class for native apps in container mode"""
-    
+
     @property
     def _test_path(self):
         return "ci/tests/test_container.py"
 
     def __init__(self, context):
         """Init function
-        
+
         context : context.ContainerBuildContext
             A context with container build settings
         """
@@ -62,16 +63,14 @@ class ContainerBuilder(Builder):
         """Runs the container"""
         self.cleanup()
         start_container(
-            self.context.image,
-            self.context.container_name,
-            self.context.env
+            self.context.image, self.context.container_name, self.context.env
         )
 
     def cleanup(self):
         _docker_stop(self.context.container_name)
         _docker_remove(self.context.container_name)
 
-    def build(self):    
+    def build(self):
         """Build the application's docker image"""
         cmd = [
             "docker",
@@ -80,16 +79,14 @@ class ContainerBuilder(Builder):
             f"{self.context.image}",
             "-f",
             "Dockerfile",
-            self.context.module_dir
+            self.context.module_dir,
         ]
         subprocess.run(cmd, check=True)
-    
+
     def test(self, verbose=False):
         """Test the application container"""
-        cmd = [
-            "pytest"
-        ]
-        if (verbose):
+        cmd = ["pytest"]
+        if verbose:
             cmd.append("-vvvs")
         cmd.append(self._test_path)
         env = os.environ.copy()
@@ -113,25 +110,25 @@ class PreflightBuilder(ContainerBuilder):
 
     def __init__(self, context):
         """Init function
-        
+
         context : context.PreflightBuildContext
             A context with preflight settings
         """
         super().__init__(context)
-    
+
     def publish(self):
-        raise NotImplemented
-    
+        raise NotImplementedError
+
     def build(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def run(self):
         """Start the application"""
         process = self.start_jupyterhub()
         process.wait()
-    
+
     def start_jupyterhub(self):
-        self.cleanup() 
+        self.cleanup()
         cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
         env = os.environ.copy()
         env.update(self.context.env)
@@ -141,40 +138,33 @@ class PreflightBuilder(ContainerBuilder):
 
 def _docker_stop(container_name):
     """Stops a docker container
-    
+
     Parameters
     ----------
     container_name : str
         The name of the container to stop
     """
     env = os.environ.copy()
-    remove_container_cmd = [
-        "docker",
-        "stop",
-        container_name
-    ]
+    remove_container_cmd = ["docker", "stop", container_name]
     subprocess.run(remove_container_cmd, env=env)
+
 
 def _docker_remove(container_name):
     """Removes any existing containers from container mode
-    
+
     Parameters
     ----------
     container_name : str
         The name of the container to remove
     """
     env = os.environ.copy()
-    remove_container_cmd = [
-        "docker",
-        "container",
-        "rm",
-        container_name
-    ]
+    remove_container_cmd = ["docker", "container", "rm", container_name]
     subprocess.run(remove_container_cmd, env=env)
+
 
 def start_container(image, container_name, container_env={}, daemon=False):
     """Starts the native app in container mode
-    
+
     Parameters
     ----------
     image : str
@@ -187,15 +177,8 @@ def start_container(image, container_name, container_env={}, daemon=False):
         Whether or not to run the container in Docker daemon mode
     """
     env = os.environ.copy()
-    container_env_strings = [f"{key}={value}" for key, value in container_env.items()]
-    cmd = [
-        "docker",
-        "run",
-        "-p",
-        "8888:8888",
-        "--name",
-        container_name
-    ]
+    container_env_strings = [f"{k}={v}" for k, v in container_env.items()]
+    cmd = ["docker", "run", "-p", "8888:8888", "--name", container_name]
     if daemon:
         cmd.append("-d")
     for container_env in container_env_strings:

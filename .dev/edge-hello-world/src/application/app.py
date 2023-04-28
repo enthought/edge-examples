@@ -10,12 +10,12 @@
 import logging
 import os
 import sys
-import requests
+from datetime import datetime, timezone
 from functools import wraps
 
-from datetime import datetime, timezone
-from flask import Flask
+import requests
 from edge.api import EdgeSession
+from flask import Flask
 
 LOG = logging.getLogger(__name__)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -38,7 +38,7 @@ _EDGE_SESSION = None
 
 def get_edge_session():
     """Helper function to get an EdgeSession object
-    
+
     Returns:
         An EdgeSession object, if the environment has
         the EDGE_API_SERVICE_URL, EDGE_API_ORG and JUPYTERHUB_API_TOKEN
@@ -47,10 +47,15 @@ def get_edge_session():
     """
     global _EDGE_SESSION
 
-    if _EDGE_SESSION is None and \
-       EDGE_API_SERVICE_URL and EDGE_API_ORG and JUPYTERHUB_API_TOKEN:
+    if (
+        _EDGE_SESSION is None
+        and EDGE_API_SERVICE_URL
+        and EDGE_API_ORG
+        and JUPYTERHUB_API_TOKEN
+    ):
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
+
 
 def track_activity(f):
     """Decorator for reporting server activities with the Hub"""
@@ -63,7 +68,7 @@ def track_activity(f):
         # Format this in a format that JupyterHub understands
         if last_activity.tzinfo:
             last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
-        last_activity = last_activity.isoformat() + 'Z'
+        last_activity = last_activity.isoformat() + "Z"
         if JUPYTERHUB_ACTIVITY_URL:
             try:
                 requests.post(
@@ -72,7 +77,11 @@ def track_activity(f):
                         "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
-                    json={"servers": {JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}}},
+                    json={
+                        "servers": {
+                            JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}
+                        }
+                    },
                 )
             except Exception:
                 pass

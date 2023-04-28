@@ -7,16 +7,14 @@
 # Distribution is prohibited.
 
 import os
-import subprocess
 import shutil
+import subprocess
+
 import click
 
-from subprocess import Popen
-from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
-from .builders import DevBuilder, ContainerBuilder, PreflightBuilder
+from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
+from .config import IMAGE_TAG, LINT_ENV_NAME
 from .contexts import BuildContext, ContainerBuildContext, PreflightBuildContext
-
-
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
@@ -34,15 +32,18 @@ BUNDLE_PACKAGES = [
     "click",
 ]
 
+
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
 
+
 @cli.command("generate_bundle")
 def generate_bundle():
     """Generate a bundle with Edge packages"""
     _generate_bundle()
+
 
 def _generate_bundle():
     """Build enthought_edge bundle"""
@@ -63,6 +64,59 @@ def _generate_bundle():
     subprocess.run(cmd, env=env, check=True)
 
 
+@cli.command()
+@click.option(
+    "--apply",
+    is_flag=True,
+    default=False,
+    help="Whether or not to apply isort and black formatting.",
+)
+@click.option(
+    "--rebuild", is_flag=True, default=False, help="Force-rebuild style checking env"
+)
+def style(apply, rebuild):
+    """Run formatting checks"""
+
+    cmd = ["edm", "envs", "list"]
+    proc = subprocess.run(cmd, check=True, capture_output=True)
+
+    # Build env if needed
+    if rebuild or (LINT_ENV_NAME not in proc.stdout.decode("utf8")):
+        cmd = ["edm", "envs", "create", LINT_ENV_NAME, "--force", "--version", "3.8"]
+        subprocess.run(cmd, check=True)
+
+        cmd = [
+            "edm",
+            "install",
+            "-e",
+            LINT_ENV_NAME,
+            "-y",
+            "black",
+            "click",
+            "flake8",
+            "isort",
+            "pyyaml",
+        ]
+        subprocess.run(cmd, check=True)
+
+    # Then run checking commands
+    commands = [
+        (["isort", "."], ["--check", "--diff"], "isort check failed"),
+        (["black", "."], ["--check"], "Black check failed"),
+        (["python", "-m", "flake8"], [], "Flake8 check failed"),
+    ]
+
+    for cmd, options, fail_message in commands:
+        if not apply:
+            cmd = cmd + options
+        cproc = subprocess.run(["edm", "run", "-e", LINT_ENV_NAME, "--"] + cmd)
+        rc = cproc.returncode
+        if rc is not None and rc != 0:
+            # Ensure user can see why the check failed
+            click.echo(cproc.stderr)
+            raise click.ClickException(fail_message)
+
+
 @cli.group("preflight")
 @click.option(
     "--edge-settings-file",
@@ -74,9 +128,9 @@ def _generate_bundle():
 def preflight(ctx, edge_settings_file, tag):
     """CLI group for container commands"""
     ctx.obj = PreflightBuildContext(
-        edge_settings_file=edge_settings_file,
-        image_tag=tag
+        edge_settings_file=edge_settings_file, image_tag=tag
     )
+
 
 @preflight.command("run")
 @click.pass_obj
@@ -86,6 +140,7 @@ def preflight_run(context):
     builder = PreflightBuilder(context)
     builder.run()
 
+
 @preflight.command("test")
 @click.option("--verbose", is_flag=True, default=False, help="Verbose test output")
 @click.pass_obj
@@ -94,6 +149,7 @@ def preflight_test(context, verbose):
     click.echo("Running preflight checks...")
     builder = PreflightBuilder(context)
     builder.test(verbose)
+
 
 @cli.group("container")
 @click.option(
@@ -106,17 +162,15 @@ def preflight_test(context, verbose):
 def container(ctx, edge_settings_file, tag):
     """CLI group for container commands"""
     ctx.obj = ContainerBuildContext(
-        edge_settings_file=edge_settings_file,
-        image_tag=tag
+        edge_settings_file=edge_settings_file, image_tag=tag
     )
+
 
 @container.command("run")
 @click.pass_obj
 def container_run(context):
     """Start the application in container mode"""
-    click.echo(
-        f"Running {context.app_name} in container {context.container_name}..."
-    )
+    click.echo(f"Running {context.app_name} in container {context.container_name}...")
     builder = ContainerBuilder(context)
     builder.run()
 
@@ -127,10 +181,12 @@ def container_run(context):
 def container_test(context, verbose):
     """Test the application in container mode"""
     click.echo(
-        f"Running tests on {context.app_name} using container {context.container_name}..."
+        f"Running tests on {context.app_name} "
+        + f"using container {context.container_name}..."
     )
     builder = ContainerBuilder(context)
     builder.test(verbose)
+
 
 @container.command("build")
 @click.pass_obj
@@ -141,6 +197,7 @@ def build(context):
     builder.build()
     click.echo("Done")
 
+
 @cli.command("publish")
 @click.pass_obj
 def publish(context):
@@ -149,6 +206,7 @@ def publish(context):
     builder = ContainerBuilder(context)
     builder.publish()
     click.echo("Done")
+
 
 @cli.group("dev")
 @click.option(
@@ -161,6 +219,7 @@ def dev(ctx, edge_settings_file):
     """CLI group for dev commands"""
     ctx.obj = BuildContext(edge_settings_file=edge_settings_file, mode="dev")
 
+
 @dev.command("run")
 @click.pass_obj
 def dev_run(context):
@@ -168,6 +227,7 @@ def dev_run(context):
     click.echo(f"Starting {context.app_name} in dev mode")
     builder = DevBuilder(context)
     builder.run()
+
 
 @dev.command("test")
 @click.pass_obj

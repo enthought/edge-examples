@@ -1,11 +1,11 @@
 import logging
 import os
-import requests
 import sys
 import time
 from unittest import TestCase
-from requests.exceptions import ConnectionError
 from urllib.parse import urlparse
+
+import requests
 
 from ci.builders import PreflightBuilder
 from ci.contexts import PreflightBuildContext
@@ -24,11 +24,10 @@ EDGE_SETTINGS_FILE = os.environ.get("EDGE_SETTINGS_FILE")
 RETRIES = 5
 BACKOFF = 5
 
+
 class PreflightTestCase(TestCase):
     def setUp(self):
-        self.context = PreflightBuildContext(
-            edge_settings_file=EDGE_SETTINGS_FILE
-        )
+        self.context = PreflightBuildContext(edge_settings_file=EDGE_SETTINGS_FILE)
         self.builder = PreflightBuilder(self.context)
         self.builder.cleanup()
         self.process = self.builder.start_jupyterhub()
@@ -52,29 +51,20 @@ class PreflightTestCase(TestCase):
             # Perform a login
             response = s.post(
                 "http://localhost:8000/hub/login",
-                data={
-                    "username": "edgeuser",
-                    "password": "password"
-                },
-                allow_redirects=True
+                data={"username": "edgeuser", "password": "password"},
+                allow_redirects=True,
             )
             # Start the spawner
-            response = s.get(
-                "http://localhost:8000/hub/spawn/edgeuser"
-            )
+            response = s.get("http://localhost:8000/hub/spawn/edgeuser")
             # Collate all redirects
             redirects = []
             for _ in range(RETRIES):
-                response = s.get(
-                    "http://localhost:8000/user/edgeuser"
-                )
+                response = s.get("http://localhost:8000/user/edgeuser")
                 redirects = redirects + [urlparse(r.url).path for r in response.history]
                 if "spawn-pending" in response.url:
                     LOG.info("Waiting for single user server to spawn")
                     time.sleep(BACKOFF)
-            response = s.get(
-                "http://localhost:8000/user/edgeuser"
-            )
+            response = s.get("http://localhost:8000/user/edgeuser")
             redirects = redirects + [urlparse(r.url).path for r in response.history]
 
             # Assert that the authentication flow redirects are present
@@ -86,5 +76,7 @@ class PreflightTestCase(TestCase):
 
         # Perform a second test after the hub has spawned to validate
         # that unauthenticated users cannot access the server
-        response = requests.get("http://localhost:8000/user/edgeuser/", allow_redirects=True)
+        response = requests.get(
+            "http://localhost:8000/user/edgeuser/", allow_redirects=True
+        )
         self.assertNotEqual(response.url, "http://localhost:8000/user/edgeuser/")

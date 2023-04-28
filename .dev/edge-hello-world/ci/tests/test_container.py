@@ -1,9 +1,10 @@
 import logging
 import os
-import requests
 import sys
 import time
 from unittest import TestCase
+
+import requests
 from requests.exceptions import ConnectionError
 
 from ci.builders import ContainerBuilder
@@ -23,15 +24,14 @@ EDGE_SETTINGS_FILE = os.environ.get("EDGE_SETTINGS_FILE")
 RETRIES = 5
 BACKOFF = 5
 
+
 class ContainerTestCase(TestCase):
     def setUp(self):
-        self.context = ContainerBuildContext(
-            edge_settings_file=EDGE_SETTINGS_FILE
-        )
+        self.context = ContainerBuildContext(edge_settings_file=EDGE_SETTINGS_FILE)
         self.builder = ContainerBuilder(self.context)
         self.builder.cleanup()
         self.builder.start_container(daemon=True)
-    
+
     def tearDown(self):
         self.builder.cleanup()
 

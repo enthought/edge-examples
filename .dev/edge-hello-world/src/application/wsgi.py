@@ -8,8 +8,6 @@
 
 """ Helper module for Gunicorn. """
 
-import os
-from urllib.parse import urlparse
 
 import gunicorn.app.base
 
