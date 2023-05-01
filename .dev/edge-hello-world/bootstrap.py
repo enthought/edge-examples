@@ -12,19 +12,16 @@
 
 import subprocess
 
-ENV_NAME = "edge-hello-world"
+from ci.config import ENV_NAME
 
-EDM_DEPS = [
-    "click",
-    "flask>2",
-    "enthought_edge"
-]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
 
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
     "dockerspawner",
 ]
+
 
 def bootstrap():
     """Create and populate dev env"""

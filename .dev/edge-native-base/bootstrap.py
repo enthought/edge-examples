@@ -7,23 +7,21 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the edge-oauth2-app example.
+    Bootstrap file for the edge-hello-world example.
 """
 
 import subprocess
 
-ENV_NAME = "edge-native-base"
+from ci.config import ENV_NAME
 
-EDM_DEPS = [
-    "click",
-    "flask>2"
-]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
 
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
     "dockerspawner",
 ]
+
 
 def bootstrap():
     """Create and populate dev env"""

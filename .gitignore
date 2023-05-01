@@ -6,3 +6,5 @@ __pycache__/
 .parcel-cache/
 flask_session/
 *.zbundle
+.hypothesis/
+.pytest_cache/

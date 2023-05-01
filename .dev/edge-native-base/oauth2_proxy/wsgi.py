@@ -8,9 +8,6 @@
 
 """ Helper module for Gunicorn. """
 
-import os
-from urllib.parse import urlparse
-
 import gunicorn.app.base
 
 from .app import create_app
@@ -42,6 +39,6 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
 
 if __name__ == "__main__":
-    options = {"bind": f"0.0.0.0:5000", "workers": 1, "threads": 1}
+    options = {"bind": "0.0.0.0:5000", "workers": 1, "threads": 1}
     application = create_app()
     StandaloneApplication(application, options).run()
