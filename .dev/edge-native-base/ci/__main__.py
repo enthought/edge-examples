@@ -6,16 +6,15 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-import json
 import os
-import subprocess
 import shutil
+import subprocess
+
 import click
 
-from .config import APP_NAME, IMAGE_NAME, IMAGE_TAG, CONTAINER_NAME
-
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
-SRC_DIR = os.path.join(MODULE_DIR, "src")
+from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
+from .config import IMAGE_TAG, LINT_ENV_NAME
+from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
@@ -33,15 +32,18 @@ BUNDLE_PACKAGES = [
     "click",
 ]
 
+
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
 
+
 @cli.command("generate_bundle")
 def generate_bundle():
     """Generate a bundle with Edge packages"""
     _generate_bundle()
+
 
 def _generate_bundle():
     """Build enthought_edge bundle"""
@@ -61,136 +63,180 @@ def _generate_bundle():
     ] + BUNDLE_PACKAGES
     subprocess.run(cmd, env=env, check=True)
 
-@cli.command("build")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-def build(tag):
-    """Build the application"""
-    click.echo(f"Building {APP_NAME}...")
 
-    cmd = [
-        "docker",
-        "build",
-        "-t",
-        f"{IMAGE_NAME}:{tag}",
-        "-f",
-        "Dockerfile",
-        MODULE_DIR,
+@cli.command()
+@click.option(
+    "--apply",
+    is_flag=True,
+    default=False,
+    help="Whether or not to apply isort and black formatting.",
+)
+@click.option(
+    "--rebuild", is_flag=True, default=False, help="Force-rebuild style checking env"
+)
+def style(apply, rebuild):
+    """Run formatting checks"""
+
+    cmd = ["edm", "envs", "list"]
+    proc = subprocess.run(cmd, check=True, capture_output=True)
+
+    # Build env if needed
+    if rebuild or (LINT_ENV_NAME not in proc.stdout.decode("utf8")):
+        cmd = ["edm", "envs", "create", LINT_ENV_NAME, "--force", "--version", "3.8"]
+        subprocess.run(cmd, check=True)
+
+        cmd = [
+            "edm",
+            "install",
+            "-e",
+            LINT_ENV_NAME,
+            "-y",
+            "black",
+            "click",
+            "flake8",
+            "isort",
+            "pyyaml",
+        ]
+        subprocess.run(cmd, check=True)
+
+    # Then run checking commands
+    commands = [
+        (["isort", "."], ["--check", "--diff"], "isort check failed"),
+        (["black", "."], ["--check"], "Black check failed"),
+        (["python", "-m", "flake8"], [], "Flake8 check failed"),
     ]
-    subprocess.run(cmd, check=True)
+
+    for cmd, options, fail_message in commands:
+        if not apply:
+            cmd = cmd + options
+        cproc = subprocess.run(["edm", "run", "-e", LINT_ENV_NAME, "--"] + cmd)
+        rc = cproc.returncode
+        if rc is not None and rc != 0:
+            # Ensure user can see why the check failed
+            click.echo(cproc.stderr)
+            raise click.ClickException(fail_message)
+
+
+@cli.group("preflight")
+@click.option(
+    "--edge-settings-file",
+    default=None,
+    help="A json file with E2E test settings",
+)
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
+@click.pass_context
+def preflight(ctx, edge_settings_file, tag):
+    """CLI group for container commands"""
+    ctx.obj = PreflightBuildContext(
+        edge_settings_file=edge_settings_file, image_tag=tag
+    )
+
+
+@preflight.command("run")
+@click.pass_obj
+def preflight_run(context):
+    """Start the application"""
+    click.echo("Starting JupyterHub...")
+    builder = PreflightBuilder(context)
+    builder.run()
+
+
+@preflight.command("test")
+@click.option("--verbose", is_flag=True, default=False, help="Verbose test output")
+@click.pass_obj
+def preflight_test(context, verbose):
+    """Start the application"""
+    click.echo("Running preflight checks...")
+    builder = PreflightBuilder(context)
+    builder.test(verbose)
+
+
+@cli.group("container")
+@click.option(
+    "--edge-settings-file",
+    default=None,
+    help="A json file with E2E test settings",
+)
+@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
+@click.pass_context
+def container(ctx, edge_settings_file, tag):
+    """CLI group for container commands"""
+    ctx.obj = ContainerBuildContext(
+        edge_settings_file=edge_settings_file, image_tag=tag
+    )
+
+
+@container.command("run")
+@click.pass_obj
+def container_run(context):
+    """Start the application in container mode"""
+    click.echo(f"Running {context.app_name} in container {context.container_name}...")
+    builder = ContainerBuilder(context)
+    builder.run()
+
+
+@container.command("test")
+@click.option("--verbose", is_flag=True, default=False, help="Verbose test output")
+@click.pass_obj
+def container_test(context, verbose):
+    """Test the application in container mode"""
+    click.echo(
+        f"Running tests on {context.app_name} "
+        + f"using container {context.container_name}..."
+    )
+    builder = ContainerBuilder(context)
+    builder.test(verbose)
+
+
+@container.command("build")
+@click.pass_obj
+def build(context):
+    """Build the application"""
+    click.echo(f"Building {context.app_name}...")
+    builder = ContainerBuilder(context)
+    builder.build()
     click.echo("Done")
 
 
 @cli.command("publish")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-def publish(tag):
+@click.pass_obj
+def publish(context):
     """Publish the application image"""
-    click.echo(f"Publishing {APP_NAME}...")
-    cmd = ["docker", "push", f"{IMAGE_NAME}:{tag}"]
-    subprocess.run(cmd, check=True)
+    click.echo(f"Publishing {context.app_name}...")
+    builder = ContainerBuilder(context)
+    builder.publish()
     click.echo("Done")
 
 
-@cli.command("start")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
+@cli.group("dev")
 @click.option(
     "--edge-settings-file",
     default=None,
     help="A json file with E2E test settings",
 )
-def start(tag, edge_settings_file):
-    """Start the application"""
-    click.echo("Starting the JupyterHub container...")
-    edge_settings = _get_edge_settings(edge_settings_file)
-    cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
-    env = os.environ.copy()
-    env["IMAGE_NAME"] = IMAGE_NAME
-    env["IMAGE_TAG"] = tag
-    env.update(edge_settings)
-    subprocess.run(cmd, check=True, env=env)
-    click.echo("JupyterHub is running at: http://127.0.0.1:8888")
+@click.pass_context
+def dev(ctx, edge_settings_file):
+    """CLI group for dev commands"""
+    ctx.obj = DevBuildContext(edge_settings_file=edge_settings_file)
 
 
-@cli.command("standalone")
-@click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
-@click.option(
-    "--edge-settings-file",
-    default=None,
-    help="A json file with E2E test settings",
-)
-def standalone(tag, edge_settings_file):
-    """Start the application in standalone mode"""
-    env = os.environ.copy()
-    remove_container_cmd = [
-        "docker",
-        "container",
-        "rm",
-        CONTAINER_NAME
-    ]
-    subprocess.run(remove_container_cmd, env=env)
-    edge_settings = _get_edge_settings(edge_settings_file)
-    container_envs = [f"{key}={value}" for key, value in edge_settings.items()]
-    container_envs.append("NATIVE_APP_MODE=container")
-    cmd = [
-        "docker",
-        "run",
-        "-p",
-        "8888:8888",
-        "--name",
-        CONTAINER_NAME,
-    ]
-    for container_env in container_envs:
-        cmd.append("--env")
-        cmd.append(container_env)
-    cmd.append(f"{IMAGE_NAME}:{tag}")
-    subprocess.run(cmd, check=True, env=env)
-
-@cli.command("watch")
-@click.option(
-    "--edge-settings-file",
-    default=None,
-    help="A json file with E2E test settings",
-)
-def watch(edge_settings_file):
+@dev.command("run")
+@click.pass_obj
+def dev_run(context):
     """Start the application and watch backend changes"""
+    click.echo(f"Starting {context.app_name} in dev mode")
+    builder = DevBuilder(context)
+    builder.run()
 
-    print(f"\nStart {APP_NAME} in files watching mode\n")
-    cmd = ["flask", "--app", "app.py", "run"]
-    edge_settings = _get_edge_settings(edge_settings_file)
-    env = os.environ.copy()
-    env["NATIVE_APP_MODE"] = "dev"
-    env.update(edge_settings)
-    subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
-def _get_edge_settings(filename):
-    """Retrieve Edge environment variable settings from a file
-    
-    Parameters
-    ----------
-    filename : str or None
-        The filename of a json file containing EDGE_API_SERVICE_URL,
-        EDGE_API_ORG and EDGE_API_TOKEN
+@dev.command("test")
+@click.pass_obj
+def dev_test(context):
+    """Run unit tests on the application"""
+    click.echo(f"Running tests on {context.app_name}")
+    builder = DevBuilder(context)
+    builder.test()
 
-    Returns
-    -------
-    dict
-        If filename is None, an empty dictionary is returned. Otherwise
-        a dictionary representing the contents of the json file
-        is returned
-
-    Raises
-    ------
-    ValueError
-        Raised if the json file does not contain all required environment
-        variables
-    """
-    if filename is None:
-        return {}
-    with open(filename, "r") as f:
-        settings = json.load(f)
-    for key in ["EDGE_API_SERVICE_URL", "EDGE_API_ORG", "EDGE_API_TOKEN"]:
-        if key not in settings:
-            raise ValueError(f"{key} not in settings file")
-    return settings
 
 if __name__ == "__main__":
     cli(prog_name="python -m ci")

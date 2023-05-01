@@ -10,10 +10,9 @@ import logging
 import os
 import sys
 
-from flask import Flask, make_response, redirect, request, session, jsonify
+from flask import Flask, jsonify, make_response, redirect, request, session
 from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
-
 
 LOG = logging.getLogger(__name__)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -37,9 +36,9 @@ if API_TOKEN is not None and API_URL is not None:
 else:
     AUTH = None
 
+
 def create_app():
-    """Creates the Flask app with routes for facilitating OAuth
-    """
+    """Creates the Flask app with routes for facilitating OAuth"""
     app = Flask(
         __name__,
     )
@@ -51,7 +50,7 @@ def create_app():
     @app.route("/oauth_status/")
     def oauth_status():
         """Internal route for determining auth status
-        
+
         Returns
         -------
         flask.Response
@@ -69,11 +68,11 @@ def create_app():
             hub_user = None
             LOG.debug("Hub user unauthorized")
             return "Unauthorized", 401
-    
+
     @app.route("/oauth_start/")
     def oauth_start():
         """Starts the OAuth flow by creating an OAuth redirect
-        
+
         Returns
         -------
         flask.Response
@@ -92,7 +91,7 @@ def create_app():
     @app.route("/oauth_callback/")
     def oauth_callback():
         """An OAuth Callback route
-        
+
         Returns
         -------
         flask.Response

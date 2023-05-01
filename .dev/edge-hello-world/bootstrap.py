@@ -12,7 +12,7 @@
 
 import subprocess
 
-ENV_NAME = "edge-hello-world"
+from ci.config import ENV_NAME
 
 EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
 
