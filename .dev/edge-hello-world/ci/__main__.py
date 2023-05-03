@@ -198,7 +198,7 @@ def build(context):
     click.echo("Done")
 
 
-@cli.command("publish")
+@container.command("publish")
 @click.pass_obj
 def publish(context):
     """Publish the application image"""
