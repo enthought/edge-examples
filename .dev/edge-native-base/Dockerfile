@@ -22,10 +22,13 @@ RUN edm -r /opt/_edm_oauth2_proxy install --version 3.8 click flask requests gun
 RUN edm -r /opt/_edm_oauth2_proxy run -- python -m pip install "jupyterhub==2.2.2" Flask-Session supervisor
 
 COPY --chown=app ./container_config/supervisor /opt/supervisor/
+RUN chmod +x /opt/supervisor/scripts/*.sh
 COPY --chown=app ./container_config/nginx /opt/nginx/
 COPY --chown=app ./oauth2_proxy /opt/oauth2_proxy/
 COPY --chown=app ./default /home/app/default/
 COPY --chown=app ./startup-script.sh /home/app
+
+RUN chmod +x /home/app/startup-script.sh
 
 WORKDIR /home/app
 
