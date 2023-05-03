@@ -21,6 +21,7 @@ USER app
 
 RUN edm -r /opt/_edm_oauth2_proxy install --version 3.8 click flask requests gunicorn -y
 RUN edm -r /opt/_edm_oauth2_proxy run -- python -m pip install "jupyterhub==2.2.2" Flask-Session
+RUN edm -r /opt/_edm_oauth2_proxy cache purge --yes
 
 COPY --chown=app ./container_config/supervisor /opt/supervisor/
 RUN chmod +x /opt/supervisor/scripts/*.sh
