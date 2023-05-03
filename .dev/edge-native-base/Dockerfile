@@ -24,6 +24,8 @@ RUN edm -r /opt/_edm_oauth2_proxy run -- python -m pip install "jupyterhub==2.2.
 COPY --chown=app ./container_config/supervisor /opt/supervisor/
 COPY --chown=app ./container_config/nginx /opt/nginx/
 COPY --chown=app ./oauth2_proxy /opt/oauth2_proxy/
+COPY --chown=app ./default /home/app/default/
+COPY --chown=app ./startup-script.sh /home/app
 
 WORKDIR /home/app
 

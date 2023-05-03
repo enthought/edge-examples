@@ -1,3 +1,4 @@
 #!/bin/bash
 set -e
-exec edm run -- python -m application.wsgi
+cd /home/app/default
+exec edm run -- python -m http.server 9000

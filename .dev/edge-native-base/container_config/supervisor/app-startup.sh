@@ -1,7 +1,7 @@
-#!/command/with-contenv sh
+#!/bin/bash
 
 # Main application entrypoint
 
 exec 2>&1
 cd /home/app
-exec ./startup-script.sh
+./startup-script.sh
