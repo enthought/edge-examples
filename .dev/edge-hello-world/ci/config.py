@@ -5,6 +5,16 @@ IMAGE_NAME = "quay.io/enthought/edge-hello-world"
 IMAGE_TAG = "1.0.0"
 CONTAINER_NAME = "edge-hello-world"
 ENV_NAME = "edge-hello-world"
+
+# Dependencies for bootstrap.py development environment
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
+PIP_DEPS = [
+    "jupyterhub==2.2.2",
+    "sqlalchemy<2",
+    "dockerspawner",
+]
+
+# Development command for running the application in watch mode
 DEV_CMD = ["flask", "--app", "application/app.py", "run"]
 
 LINT_ENV_NAME = f"lint-{ENV_NAME}"

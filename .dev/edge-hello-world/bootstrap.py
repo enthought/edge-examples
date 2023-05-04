@@ -12,15 +12,7 @@
 
 import subprocess
 
-from ci.config import ENV_NAME
-
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
-
-PIP_DEPS = [
-    "jupyterhub==2.2.2",
-    "sqlalchemy<2",
-    "dockerspawner",
-]
+from ci.config import ENV_NAME, EDM_DEPS, PIP_DEPS
 
 
 def bootstrap():
