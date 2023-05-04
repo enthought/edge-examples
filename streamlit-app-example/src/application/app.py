@@ -10,11 +10,9 @@
 # https://docs.streamlit.io/library/get-started/create-an-app
 
 import logging
-import os
 import streamlit as st
 import pandas as pd
 import numpy as np
-from jupyterhub.services.auth import HubOAuth
 
 LOG = logging.getLogger(__name__)
 

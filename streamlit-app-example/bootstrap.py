@@ -7,25 +7,13 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the dashboard example.
+    Bootstrap file for the edge-hello-world example.
 """
 
 import subprocess
 
-ENV_NAME = "edge-streamlit-dev"
+from ci.config import ENV_NAME, EDM_DEPS, PIP_DEPS
 
-EDM_DEPS = [
-    "click",
-    "jupyterhub",
-]
-
-PIP_DEPS = [
-    "sqlalchemy<2",
-    "dockerspawner",
-    "streamlit",
-    "streamlit-javascript",
-    "streamlit-extras"
-]
 
 def bootstrap():
     """Create and populate dev env"""
