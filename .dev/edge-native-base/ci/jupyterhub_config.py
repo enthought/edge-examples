@@ -69,7 +69,6 @@ c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
-c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")
 c.ConfigurableHTTPProxy.debug = True
 c.ConfigurableHTTPProxy.autoRewrite = True
