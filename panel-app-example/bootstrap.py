@@ -7,26 +7,12 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the dashboard example.
+    Bootstrap file for the edge-hello-world example.
 """
 
 import subprocess
 
-ENV_NAME = "edge-panel-dev"
-
-EDM_DEPS = [
-    "click",
-    "panel",
-    "pandas",
-    "numpy",
-    "matplotlib"
-]
-
-PIP_DEPS = [
-    "jupyterhub==2.2.2",
-    "sqlalchemy<2",
-    "dockerspawner",
-]
+from ci.config import ENV_NAME, EDM_DEPS, PIP_DEPS
 
 
 def bootstrap():

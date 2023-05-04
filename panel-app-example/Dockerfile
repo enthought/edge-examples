@@ -1,11 +1,11 @@
-FROM quay.io/enthought/edge-oauth2-app:latest 
+FROM quay.io/enthought/edge-native-base:1.0.0
 
 # Install panel dependencies
 RUN edm install click panel pandas numpy matplotlib -y
 
-COPY ./nginx.conf.template /etc/nginx/nginx.conf.template
+COPY ./app.location.conf.template /opt/nginx/app.location.conf.template
 
 # Copy startup script and application
-COPY ./startup-script.sh /opt/startup-script.sh
-RUN chmod +x /opt/startup-script.sh
-COPY ./src /opt/application
+COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+RUN chmod +x /home/app/startup-script.sh
+COPY --chown=app ./src/application/ /home/app/application

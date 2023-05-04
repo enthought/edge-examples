@@ -39,10 +39,15 @@ class ContainerTestCase(TestCase):
         for retry in range(RETRIES):
             try:
                 response = requests.get("http://localhost:8888/")
-                break
+                if response.status_code != 200:
+                    LOG.info(f"Retry #{retry}") 
+                    time.sleep(BACKOFF)
+                else:
+                    break
             except ConnectionError:
                 LOG.info(f"Retry #{retry}")
                 time.sleep(BACKOFF)
+
         self.assertEqual(response.status_code, 200)
         response = requests.get("http://localhost:8888/oauth_start/")
         self.assertEqual(response.status_code, 501)
