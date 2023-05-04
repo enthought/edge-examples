@@ -1,6 +1,7 @@
 import os
 import subprocess
 from subprocess import Popen
+from .config import DEV_CMD
 
 
 class Builder:
@@ -39,10 +40,9 @@ class DevBuilder(Builder):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        cmd = ["flask", "--app", "application/app.py", "run"]
         env = os.environ.copy()
         env.update(self.context.env)
-        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
+        subprocess.run(DEV_CMD, check=True, env=env, cwd=self.context.src_dir)
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]
