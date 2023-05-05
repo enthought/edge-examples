@@ -1,4 +1,6 @@
 import os
+import subprocess
+from .hook import BuilderHook
 
 APP_NAME = "Edge Flask App"
 IMAGE_NAME = "quay.io/enthought/edge-flask-app"
@@ -23,3 +25,32 @@ LINT_ENV_NAME = f"lint-{ENV_NAME}"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 CI_DIR = os.path.join(MODULE_DIR, "ci")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
+
+class NpmHook(BuilderHook):
+    def npm_build(self, env):
+        cwd = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "src",
+                "application",
+                "frontend"
+            )
+        )
+        cmd = [
+            "npm",
+            "install"
+        ]
+        subprocess.run(cmd, env=env, cwd=cwd, check=True)
+        cmd = [
+            "npm",
+            "run",
+            "build"
+        ]
+
+    def pre(self, env, mode, action):
+        action = f"{mode} {action}"
+        if action == "dev test" or action == "container build":
+            self.npm_build(env)
+
+BUILDER_HOOK = NpmHook()
