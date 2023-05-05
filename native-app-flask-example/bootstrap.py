@@ -7,28 +7,12 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the dashboard example.
+    Bootstrap file for the edge-hello-world example.
 """
 
 import subprocess
 
-ENV_NAME = "edge-native-dev"
-
-EDM_DEPS = [
-    "click",
-    "requests",
-    "opencv_python",
-    "enthought_edge",
-    "flask>2",
-]
-
-PIP_DEPS = [
-    "jupyterhub==2.2.2",
-    "sqlalchemy<2",
-    "configurable-http-proxy",
-    "dockerspawner",
-    "Flask-Session",
-]
+from ci.config import ENV_NAME, EDM_DEPS, PIP_DEPS
 
 
 def bootstrap():

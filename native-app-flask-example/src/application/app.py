@@ -18,7 +18,6 @@ from urllib.parse import unquote
 import requests
 from flask import Flask, make_response, redirect, render_template, request, session
 from flask_session import Session
-from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
 from edge.api import EdgeSession
 
@@ -40,19 +39,17 @@ if FLASK_DEBUG:
 
 # When run from Edge, these environment variables will be provided
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
-ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
-SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
+ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
+SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
-EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL", None)
-EDGE_API_ORG = os.environ.get("EDGE_API_ORG", None)
 
-AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
+NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 
-LOG.debug(f"JUPYTERHUB_SERVER_NAME {SERVER_NAME}")
-LOG.debug(f"JUPYTERHUB_SERVICE_PREFIX {PREFIX}")
-LOG.debug(f"JUPYTERHUB_ACTIVITY_URL {ACTIVITY_URL}")
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
+EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
+JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
 
 
 _EDGE_SESSION = None
@@ -68,7 +65,7 @@ def get_edge_session():
     """
     global _EDGE_SESSION
     if _EDGE_SESSION is None and \
-       EDGE_API_SERVICE_URL and EDGE_API_ORG and API_TOKEN:
+       EDGE_API_SERVICE_URL and EDGE_API_ORG and (EDGE_API_TOKEN or JUPYTERHUB_API_TOKEN):
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
 
@@ -78,7 +75,7 @@ def track_activity(f):
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if FLASK_DEBUG == 1:
+        if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
             return f(*args, **kwargs)
         last_activity = isoformat(datetime.datetime.now())
         if ACTIVITY_URL:
@@ -86,7 +83,7 @@ def track_activity(f):
                 requests.post(
                     ACTIVITY_URL,
                     headers={
-                        "Authorization": f"token {API_TOKEN}",
+                        "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
                     json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
@@ -97,31 +94,6 @@ def track_activity(f):
 
     return decorated
 
-
-def authenticated(f):
-    """Decorator for authenticating with the Hub via OAuth"""
-
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if FLASK_DEBUG == 1:
-            return f(*args, **kwargs)
-        token = session.get("token")
-        if token:
-            hub_user = AUTH.user_for_token(token)
-        else:
-            hub_user = None
-
-        if hub_user:
-            return f(*args, hub_user=hub_user, **kwargs)
-        else:
-            # redirect to login url on failed auth
-            state = AUTH.generate_state(next_url=request.path)
-            LOG.info(f"Redirecting to login url {AUTH.login_url}")
-            response = make_response(redirect(AUTH.login_url + "&state=%s" % state))
-            response.set_cookie(AUTH.state_cookie_name, state)
-            return response
-
-    return decorated
 
 
 def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
@@ -162,7 +134,6 @@ def create_app():
 
     @app.route(ROOT_PATH)
     @track_activity
-    @authenticated
     def serve(**kwargs):
         """The main handle to serve the index page."""
         hub_user = kwargs.get("hub_user", {"name": "No user"})
@@ -177,7 +148,6 @@ def create_app():
 
     @app.route(PREFIX + "job", methods=["GET", "POST"])
     @track_activity
-    @authenticated
     def job(**kwargs):
         """A job endpoint for receiving images and returning job results"""
         if request.method == "GET":
@@ -200,27 +170,5 @@ def create_app():
             p.start()
 
             return {"id": id}
-
-    @app.route(PREFIX + "oauth_callback")
-    def oauth_callback():
-        """The OAuth callback handler, this handler is required for the
-        authentication process with Hub.
-        """
-
-        code = request.args.get("code", None)
-        if code is None:
-            return "Forbidden", 403
-
-        arg_state = request.args.get("state", None)
-        cookie_state = request.cookies.get(AUTH.state_cookie_name)
-        if arg_state is None or arg_state != cookie_state:
-            return "Forbidden", 403
-
-        session["token"] = AUTH.token_for_code(code)
-
-        next_url = AUTH.get_next_url(cookie_state) or PREFIX
-        LOG.info(f"OAuth Callback redirecting to {next_url}")
-        response = make_response(redirect(next_url))
-        return response
 
     return app
