@@ -6,7 +6,7 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-import datetime
+from datetime import datetime, timezone
 import os
 import random
 from functools import wraps
@@ -52,7 +52,11 @@ def track_activity(f):
     def decorated(*args, **kwargs):
         if FLASK_DEBUG == 1:
             return f(*args, **kwargs)
-        last_activity = isoformat(datetime.datetime.now())
+        last_activity = datetime.now()
+        # Format this in a format that JupyterHub understands
+        if last_activity.tzinfo:
+            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
+        last_activity = last_activity.isoformat() + "Z"
         if ACTIVITY_URL:
             try:
                 requests.post(

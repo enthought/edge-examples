@@ -8,8 +8,6 @@
 
 """ Helper module for Gunicorn. """
 
-import os
-from urllib.parse import urlparse
 
 import gunicorn.app.base
 
@@ -42,18 +40,9 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
 
 if __name__ == "__main__":
-    """Application main, which looks for JUPYTERHUB_SERVICE_URL provided
-    by Edge and binds Flask to the provided endpoint
-    """
-    service_url = os.environ.get("JUPYTERHUB_SERVICE_URL", None)
-    # The default binding is any interface, on port 8888
-    port = 8888
+    # Bind to port 9000
+    port = 9000
     host = "0.0.0.0"
-    if service_url:
-        # Get the hostname and port where the container is being served
-        url = urlparse(service_url)
-        port = url.port
-        host = url.hostname
     options = {"bind": f"{host}:{port}", "workers": 1, "threads": 1}
     application = create_app()
     StandaloneApplication(application, options).run()

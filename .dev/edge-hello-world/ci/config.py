@@ -13,6 +13,16 @@ PIP_DEPS = [
     "sqlalchemy<2",
     "dockerspawner",
 ]
+BUNDLE_PACKAGES = [
+    "enthought_edge",
+    "appdirs",
+    "packaging",
+    "pip",
+    "pyparsing",
+    "setuptools",
+    "six",
+    "click",
+]
 
 # Development command for running the application in watch mode
 DEV_CMD = ["flask", "--app", "application/app.py", "run"]
