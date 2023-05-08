@@ -59,7 +59,7 @@ jobs:
       - name: Bootstrap
         shell: bash
         run: |
-          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install --version 3.8 -y click pyyaml
+          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install --version 3.8 -y click pyyaml enthought_edge
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run pip install dirhash graphlib-backport
 
       - name: Build and test example 

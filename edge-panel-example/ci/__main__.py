@@ -46,11 +46,13 @@ def _generate_bundle():
     CI_EDM_TOKEN = os.environ.get("EDM_TOKEN")
     base_cmd = ["edm"]
     if CI_EDM_CONFIG is not None:
+        print(f"Discovered edm.yml from CI environment variables {CI_EDM_CONFIG}")
         base_cmd.append("-c")
         base_cmd.append(CI_EDM_CONFIG)
     if CI_EDM_TOKEN is not None:
+        print("Discovered EDM token from CI environment variable")
         base_cmd.append("-t")
-        base_cmd.append(CI_EDM_TOKEN)    
+        base_cmd.append(CI_EDM_TOKEN)
     cmd = base_cmd + [
         "bundle",
         "generate",
