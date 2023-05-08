@@ -32,18 +32,36 @@ def cli():
 
 
 @cli.command("generate_bundle")
-def generate_bundle():
+@click.option(
+    "--edm-config",
+    default=None,
+    help="EDM configuration path"
+)
+@click.option(
+    "--edm-token",
+    default=None,
+    help="EDM token"
+)
+def generate_bundle(edm_config, edm_token):
     """Generate a bundle with Edge packages"""
-    _generate_bundle()
+    _generate_bundle(edm_config=edm_config, edm_token=edm_token)
 
 
-def _generate_bundle():
+def _generate_bundle(edm_config=None, edm_token=None):
     """Build enthought_edge bundle"""
     shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
     os.mkdir(ARTIFACT_DIR)
     env = os.environ.copy()
-    cmd = [
-        "edm",
+    base_cmd = ["edm"]
+    if edm_config is not None:
+        print(f"Using edm configuration {edm_config}")
+        base_cmd.append("-c")
+        base_cmd.append(edm_config)
+    if edm_token is not None:
+        print("Using edm token ***")
+        base_cmd.append("-t")
+        base_cmd.append(edm_token)
+    cmd = base_cmd + [
         "bundle",
         "generate",
         "--platform",
@@ -184,7 +202,7 @@ def container_test(context, verbose):
 @click.pass_obj
 def build(context):
     """Build the application"""
-    click.echo(f"Building {context.app_name}...")
+    click.echo(f"Building {context.image} image for {context.app_name}...")
     builder = ContainerBuilder(context)
     builder.build()
     click.echo("Done")
