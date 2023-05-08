@@ -33,12 +33,12 @@ def cli():
 
 @cli.command("generate_bundle")
 @click.option(
-    "-c",
+    "--edm-config",
     default=None,
     help="EDM configuration path"
 )
 @click.option(
-    "-t",
+    "--edm-token",
     default=None,
     help="EDM token"
 )
