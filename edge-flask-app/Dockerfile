@@ -13,7 +13,6 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 FROM edge_flask_app_stage
 
 # Install dependencies for Flask Hello World in the default EDM environment
-RUN edm install click "flask>2" gunicorn requests opencv_python -y
 RUN edm run -- pip install Flask-Session
 
 # Copy location template

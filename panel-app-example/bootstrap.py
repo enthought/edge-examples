@@ -12,7 +12,7 @@
 
 import subprocess
 
-from ci.config import ENV_NAME, EDM_DEPS, PIP_DEPS
+from ci.config import EDM_DEPS, ENV_NAME, PIP_DEPS
 
 
 def bootstrap():

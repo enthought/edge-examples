@@ -12,29 +12,17 @@ import subprocess
 
 import click
 
-from .config import IMAGE_TAG, LINT_ENV_NAME
-from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
-
-from .config import DEV_BUILDER_CLS as DevBuilder
+from .config import BUNDLE_PACKAGES
 from .config import CONTAINER_BUILDER_CLS as ContainerBuilder
+from .config import DEV_BUILDER_CLS as DevBuilder
+from .config import IMAGE_TAG, LINT_ENV_NAME
 from .config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
-
+from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
 ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
-
-BUNDLE_PACKAGES = [
-    "enthought_edge",
-    "appdirs",
-    "packaging",
-    "pip",
-    "pyparsing",
-    "setuptools",
-    "six",
-    "click",
-]
 
 
 @click.group()

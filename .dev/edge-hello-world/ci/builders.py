@@ -1,7 +1,6 @@
 import os
 import subprocess
 from subprocess import Popen
-from .config import DEV_CMD
 
 
 class Builder:
@@ -40,9 +39,7 @@ class DevBuilder(Builder):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        env = os.environ.copy()
-        env.update(self.context.env)
-        subprocess.run(DEV_CMD, check=True, env=env, cwd=self.context.src_dir)
+        raise NotImplementedError
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]
@@ -69,6 +66,8 @@ class ContainerBuilder(Builder):
 
     def run(self):
         """Runs the container"""
+        env = os.environ.copy()
+        env.update(self.context.env)
         self.cleanup()
         self.start()
 
@@ -92,6 +91,8 @@ class ContainerBuilder(Builder):
             "Dockerfile",
             self.context.module_dir,
         ]
+        env = os.environ.copy()
+        env.update(self.context.env)
         subprocess.run(cmd, check=True)
 
     def test(self, verbose=False):
@@ -109,7 +110,8 @@ class ContainerBuilder(Builder):
     def publish(self):
         """Publishes the application's docker image"""
         cmd = ["docker", "push", f"{self.context.image}"]
-        subprocess.run(cmd, check=True)
+        env = os.environ.copy()
+        subprocess.run(cmd, env=env, check=True)
 
 
 class PreflightBuilder(ContainerBuilder):
@@ -137,6 +139,18 @@ class PreflightBuilder(ContainerBuilder):
         """Start the application"""
         process = self.start_jupyterhub()
         process.wait()
+
+    def test(self, verbose=False):
+        """Test the application container"""
+        cmd = ["pytest"]
+        if verbose:
+            cmd.append("-vvvs")
+        cmd.append(self._test_path)
+        env = os.environ.copy()
+        env["PYTHONPATH"] = self.context.module_dir
+        if self.context.edge_settings_file is not None:
+            env["EDGE_SETTINGS_FILE"] = self.context.edge_settings_file
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
 
     def start_jupyterhub(self):
         self.cleanup()

@@ -39,7 +39,10 @@ class DevBuilder(Builder):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        raise NotImplementedError
+        env = os.environ.copy()
+        env.update(self.context.env)
+        cmd = ["python", "-m", "http.server", "9000", "--directory", "default"]
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]

@@ -10,3 +10,4 @@ flask_session/
 .pytest_cache/
 supervisord.log
 supervisord.pid
+jupyterhub.sqlite

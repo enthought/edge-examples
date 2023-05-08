@@ -4,13 +4,13 @@ import subprocess
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Flask App"
-IMAGE_NAME = "quay.io/enthought/edge-flask-app"
+IMAGE_NAME = "quay.io/enthought/edge-dashboard-app"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-flask-app"
-ENV_NAME = "edge-flask-app"
+CONTAINER_NAME = "edge-dashboard-app"
+ENV_NAME = "edge-dashboard-app"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests", "opencv_python"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -18,6 +18,21 @@ PIP_DEPS = [
     "Flask-Session",
     "supervisor@git+https://github.com/Supervisor/supervisor",
 ]
+
+# EDM dependencies that will be packaged into the Docker container
+BUNDLE_PACKAGES = [
+    "enthought_edge",
+    "appdirs",
+    "packaging",
+    "pip",
+    "pyparsing",
+    "setuptools",
+    "six",
+    "click",
+    "flask>2",
+    "requests"
+]
+
 
 LINT_ENV_NAME = f"lint-{ENV_NAME}"
 MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
@@ -37,7 +52,7 @@ def _npm_build(context):
     subprocess.run(cmd, env=env, cwd=cwd, check=True)
 
 
-class NativeFlaskDevBuilder(DevBuilder):
+class DashboardDevBuilder(DevBuilder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
@@ -49,7 +64,7 @@ class NativeFlaskDevBuilder(DevBuilder):
         super().test()
 
 
-class NativeFlaskContainerBuilder(ContainerBuilder):
+class DashboardContainerBuilder(ContainerBuilder):
     def build(self):
         _npm_build(self.context)
         cmd = [
@@ -68,6 +83,6 @@ class NativeFlaskContainerBuilder(ContainerBuilder):
         subprocess.run(cmd, check=True)
 
 
-DEV_BUILDER_CLS = NativeFlaskDevBuilder
-CONTAINER_BUILDER_CLS = NativeFlaskContainerBuilder
+DEV_BUILDER_CLS = DashboardDevBuilder
+CONTAINER_BUILDER_CLS = DashboardContainerBuilder
 PREFLIGHT_BUILDER_CLS = PreflightBuilder

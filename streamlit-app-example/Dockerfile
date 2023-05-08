@@ -1,6 +1,3 @@
-# Multi-stage build
-
-# Intermediate image with enthought_edge package included via bundle
 FROM quay.io/enthought/edge-native-base:1.0.0 as edge_streamlit_stage 
 
 ARG EDGE_BUNDLE=ci/artifacts/app_environment.zbundle
