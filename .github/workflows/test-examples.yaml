@@ -28,6 +28,29 @@ jobs:
         with:
           fetch-depth: 0
 
+    - name: Setup NodeJS 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
+        cache-dependency-path: |
+          **/package-lock.json
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: |
+          /tmp/.buildx-cache
+        key:  ${{ runner.os }}-${{ matrix.examples.component }}-${{ hashFiles(matrix.examples.component) }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.examples.component }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      id: buildx
+      with:
+        install: true
+
       - name: Set up EDM
         uses: enthought/setup-edm-action@v2
         with:
@@ -40,11 +63,16 @@ jobs:
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
 
-      - name: Build and Test Examples
-        uses: ./.github/actions/build-example
-        with:
-          component: ${{ matrix.example.component }}
-          hatcher_token: ${{ secrets.HATCHER_TOKEN }}
+    - name: Build and test example 
+      shell: bash
+      run: |
+        set -e
+        cd ${{ matrix.example.component }}
+        edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap -- python bootstrap.py
+        edm run -e ${{ matrix.example.component }} -- python -m ci generate_bundle
+        edm run -e ${{ matrix.example.component }} -- python -m ci container build
+        edm run -e ${{ matrix.example.component }} -- python -m ci container test
+        edm run -e ${{ matrix.example.component }} -- python -m ci preflight test
 
 
   comment:
