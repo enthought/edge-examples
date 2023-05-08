@@ -21,7 +21,7 @@ runs:
       with:
         path: |
           /tmp/.buildx-cache
-        key:  ${{ runner.os }}-${{ inputs.component }}-${{ hashFiles(inputs.source_dir) }}
+        key:  ${{ runner.os }}-${{ inputs.component }}-${{ hashFiles(inputs.component) }}
         restore-keys: |
           ${{ runner.os }}-${{ inputs.component }}
 
@@ -35,12 +35,12 @@ runs:
       shell: bash
       run: |
         set -e
-        cd ${{ input.component }}
+        cd ${{ inputs.component }}
         edm run -e bootstrap -- python bootstrap.py
-        edm run -e ${{ input.component }} -- python -m ci generate_bundle
-        edm run -e ${{ input.component }} -- python -m ci container build
-        edm run -e ${{ input.compponent }} -- python -m ci container test
-        edm run -e ${{ input.component }} -- python -m ci preflight test
+        edm run -e ${{ inputs.component }} -- python -m ci generate_bundle
+        edm run -e ${{ inputs.component }} -- python -m ci container build
+        edm run -e ${{ inputs.component }} -- python -m ci container test
+        edm run -e ${{ inputs.component }} -- python -m ci preflight test
 
     # Temp fix
     # https://github.com/docker/build-push-action/issues/252
