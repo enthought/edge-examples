@@ -32,27 +32,35 @@ def cli():
 
 
 @cli.command("generate_bundle")
-def generate_bundle():
+@click.option(
+    "-c",
+    default=None,
+    help="EDM configuration path"
+)
+@click.option(
+    "-t",
+    default=None,
+    help="EDM token"
+)
+def generate_bundle(edm_config, edm_token):
     """Generate a bundle with Edge packages"""
-    _generate_bundle()
+    _generate_bundle(edm_config=edm_config, edm_token=edm_token)
 
 
-def _generate_bundle():
+def _generate_bundle(edm_config=None, edm_token=None):
     """Build enthought_edge bundle"""
     shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
     os.mkdir(ARTIFACT_DIR)
     env = os.environ.copy()
-    CI_EDM_CONFIG = os.environ.get("EDM_CONFIG")
-    CI_EDM_TOKEN = os.environ.get("EDM_TOKEN")
     base_cmd = ["edm"]
-    if CI_EDM_CONFIG is not None:
-        print(f"Discovered edm.yml from CI environment variables {CI_EDM_CONFIG}")
+    if edm_config is not None:
+        print(f"Using edm configuration {edm_config}")
         base_cmd.append("-c")
-        base_cmd.append(CI_EDM_CONFIG)
-    if CI_EDM_TOKEN is not None:
-        print("Discovered EDM token from CI environment variable")
+        base_cmd.append(edm_config)
+    if edm_token is not None:
+        print("Using edm token ***")
         base_cmd.append("-t")
-        base_cmd.append(CI_EDM_TOKEN)
+        base_cmd.append(edm_token)
     cmd = base_cmd + [
         "bundle",
         "generate",
