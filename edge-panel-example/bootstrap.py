@@ -10,24 +10,35 @@
     Bootstrap file for the edge-hello-world example.
 """
 
+import os
 import subprocess
 
 from ci.config import EDM_DEPS, ENV_NAME, PIP_DEPS
 
 
+EDM_CONFIG = os.environ.get("EDM_CONFIG")
+EDM_TOKEN = os.environ.get("EDM_TOKEN")
+base_cmd = ["edm"]
+if EDM_CONFIG is not None:
+    base_cmd.append("-c")
+    base_cmd.append(EDM_CONFIG)
+if EDM_TOKEN is not None:
+    base_cmd.append("-t")
+    base_cmd.append(EDM_TOKEN)
+
 def bootstrap():
     """Create and populate dev env"""
 
     print("Creating EDM Python environment...")
-    cmd = ["edm", "envs", "create", ENV_NAME, "--version", "3.8", "--force"]
+    cmd = base_cmd + ["envs", "create", ENV_NAME, "--version", "3.8", "--force"]
     subprocess.run(cmd, check=True)
 
     print("Installing EDM dependencies...")
-    cmd = ["edm", "install", "-e", ENV_NAME, "-y"] + EDM_DEPS
+    cmd = base_cmd + ["install", "-e", ENV_NAME, "-y"] + EDM_DEPS
     subprocess.run(cmd, check=True)
 
     print("Installing pip dependencies...")
-    cmd = ["edm", "run", "-e", ENV_NAME, "--", "pip", "install"] + PIP_DEPS
+    cmd = base_cmd + ["run", "-e", ENV_NAME, "--", "pip", "install"] + PIP_DEPS
     subprocess.run(cmd, check=True)
 
     print("Bootstrap complete.")

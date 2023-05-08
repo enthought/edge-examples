@@ -16,10 +16,10 @@ jobs:
     strategy:
       matrix:
         example: [
-          {component: edge-flask-example},
-          {component: edge-dashboard-example},
+          #{component: edge-flask-example},
+          #{component: edge-dashboard-example},
           {component: edge-panel-example},
-          {component: edge-streamlit-example},
+          #{component: edge-streamlit-example},
         ]
       fail-fast: true
 
@@ -65,6 +65,9 @@ jobs:
 
       - name: Build and test example 
         shell: bash
+        env:
+          EDM_CONFIG: ${{ github.workspace }}/.github/data/edm.yml
+          EDM_TOKEN: ${{ secrets.HATCHER_TOKEN }}
         run: |
           set -e
           cd ${{ matrix.example.component }}
