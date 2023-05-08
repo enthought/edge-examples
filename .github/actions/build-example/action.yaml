@@ -36,7 +36,7 @@ runs:
       run: |
         set -e
         cd ${{ inputs.component }}
-        edm run -c ./.github/data/edm.yml -e bootstrap -- python bootstrap.py
+        edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap -- python bootstrap.py
         edm run -e ${{ inputs.component }} -- python -m ci generate_bundle
         edm run -e ${{ inputs.component }} -- python -m ci container build
         edm run -e ${{ inputs.component }} -- python -m ci container test
