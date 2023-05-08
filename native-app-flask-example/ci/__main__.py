@@ -15,23 +15,9 @@ import click
 from .config import IMAGE_TAG, LINT_ENV_NAME
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
-"""
-Try importing custom builders
-"""
-try:
-    from .config import DEV_BUILDER_CLS as DevBuilder
-except ImportError:
-    from .builders import DevBuilder
-
-try:
-    from .config import CONTAINER_BUILDER_CLS as ContainerBuilder
-except ImportError:
-    from .builders import ContainerBuilder
-
-try:
-    from .config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
-except ImportError:
-    from .builders import PreflightBuilder
+from .config import DEV_BUILDER_CLS as DevBuilder
+from .config import CONTAINER_BUILDER_CLS as ContainerBuilder
+from .config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
 
 
 CI_DIR = os.path.dirname(__file__)

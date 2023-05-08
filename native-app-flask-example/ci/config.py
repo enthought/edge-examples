@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from .builders import ContainerBuilder, DevBuilder
+from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Flask App"
 IMAGE_NAME = "quay.io/enthought/edge-flask-app"
@@ -70,3 +70,4 @@ class NativeFlaskContainerBuilder(ContainerBuilder):
 
 DEV_BUILDER_CLS = NativeFlaskDevBuilder
 CONTAINER_BUILDER_CLS = NativeFlaskContainerBuilder
+PREFLIGHT_BUILDER_CLS = PreflightBuilder
