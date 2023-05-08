@@ -59,6 +59,7 @@ jobs:
       - name: Bootstrap
         shell: bash
         run: |
+          export PATH="$HOME/edm/bin:$PATH"        
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install --version 3.8 -y click pyyaml
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run pip install dirhash graphlib-backport
 
@@ -66,9 +67,10 @@ jobs:
         shell: bash
         run: |
           export PATH="$HOME/edm/bin:$PATH"
-          export CI_EDM_CONFIG="${{ github.workspace }}/.github/data/edm.yml"
-          export CI_EDM_TOKEN="${{ secrets.HATCHER_TOKEN }}"
           set -e
+          edm shell -e edm
+          export CI_EDM_CONFIG="${{ github.workspace }}/.github/data/edm.yml"
+          export CI_EDM_TOKEN="${{ secrets.HATCHER_TOKEN }}"          
           cd ${{ matrix.example.component }}
           edm run -- python bootstrap.py
           edm run -e ${{ matrix.example.component }} -- python -m ci generate_bundle
