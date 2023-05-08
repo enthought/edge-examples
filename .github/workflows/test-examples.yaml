@@ -56,6 +56,12 @@ jobs:
         with:
           edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
 
+      - name: Bootstrap
+        shell: bash
+        run: |
+          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install --version 3.8 -y click pyyaml
+          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run pip install dirhash graphlib-backport
+
       - name: Build and test example 
         shell: bash
         env:
