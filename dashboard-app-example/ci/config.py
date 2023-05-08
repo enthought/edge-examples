@@ -3,7 +3,7 @@ import subprocess
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
-APP_NAME = "Edge Flask App"
+APP_NAME = "Edge Dashboard App"
 IMAGE_NAME = "quay.io/enthought/edge-dashboard-demo"
 IMAGE_TAG = "1.0.0"
 CONTAINER_NAME = "edge-dashboard-demo"
@@ -31,6 +31,7 @@ BUNDLE_PACKAGES = [
     "click",
     "flask>2",
     "requests",
+    "gunicorn"
 ]
 
 

@@ -3,7 +3,7 @@ import subprocess
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
-APP_NAME = "Edge Dashboard App"
+APP_NAME = "Edge Native Flask App"
 IMAGE_NAME = "quay.io/enthought/edge-native-app-flask-demo"
 IMAGE_TAG = "1.0.0"
 CONTAINER_NAME = "edge-native-app-flask"

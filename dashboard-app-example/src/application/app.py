@@ -6,19 +6,17 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-import datetime
 import logging
 import os
 import random
 import sys
+from datetime import datetime, timezone
 from functools import wraps
 from urllib.parse import unquote
 
 import requests
-from flask import Flask, make_response, redirect, render_template, request, session
+from flask import Flask, render_template
 from flask_session import Session
-from jupyterhub.services.auth import HubOAuth
-from jupyterhub.utils import isoformat
 
 # Flag to deactivate the `authenticated` and `track_activity` decorator.
 # It is used to develop the app outside of JupyterHub environment.
@@ -34,30 +32,33 @@ LOG.setLevel(logging.INFO)
 if FLASK_DEBUG:
     LOG.setLevel(logging.DEBUG)
 
-PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
+JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
+
+NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
+
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 APP_VERSION = os.environ.get("APP_VERSION", "dashboard-app-example")
-
-
-AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60)
-
 
 def track_activity(f):
     """Decorator for reporting server activities with the Hub"""
 
     @wraps(f)
     def decorated(*args, **kwargs):
-        if FLASK_DEBUG == 1:
+        if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
             return f(*args, **kwargs)
-        last_activity = isoformat(datetime.datetime.now())
+        last_activity = datetime.now()
+        # Format this in  format that JupyterHub understands
+        if last_activity.tzinfo:
+            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
+        last_activity = last_activity.isoformat() + "Z"
         if ACTIVITY_URL:
             try:
                 requests.post(
                     ACTIVITY_URL,
                     headers={
-                        "Authorization": f"token {API_TOKEN}",
+                        "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
                     json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
@@ -69,37 +70,15 @@ def track_activity(f):
     return decorated
 
 
-def authenticated(f):
-    """Decorator for authenticating with the Hub via OAuth"""
-
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if FLASK_DEBUG == 1:
-            return f(*args, **kwargs)
-        token = session.get("token")
-        if token:
-            hub_user = AUTH.user_for_token(token)
-        else:
-            hub_user = None
-
-        if hub_user:
-            return f(*args, hub_user=hub_user, **kwargs)
-        else:
-            # redirect to login url on failed auth
-            state = AUTH.generate_state(next_url=request.path)
-            response = make_response(redirect(AUTH.login_url + "&state=%s" % state))
-            response.set_cookie(AUTH.state_cookie_name, state)
-            return response
-
-    return decorated
-
 
 def create_app():
+    """Creates the Flask app with routes for serving the React application
+    """
     app = Flask(
         __name__,
         template_folder="frontend/templates",
         static_folder="frontend/dist",
-        static_url_path=PREFIX + "static",
+        static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
     )
     app.config["SESSION_TYPE"] = "filesystem"
     app.config["SECRET_KEY"] = "super secret key"
@@ -107,17 +86,8 @@ def create_app():
     sess.init_app(app)
     app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
-    # When running with ci start, preserve the trailing slash in the prefix
-    # When launching from jupyterhub, strip the trailing slash in the prefix
-    ROOT_PATH = PREFIX
-    if SERVER_NAME is not None and len(SERVER_NAME) > 0:
-        ROOT_PATH = ROOT_PATH[:-1]
-
-    LOG.info(f"Root path at {ROOT_PATH}")
-
-    @app.route(ROOT_PATH)
+    @app.route(JUPYTERHUB_SERVICE_PREFIX)
     @track_activity
-    @authenticated
     def serve(**kwargs):
         """The main handle to serve the index page."""
         hub_user = kwargs.get("hub_user", None)
@@ -126,7 +96,7 @@ def create_app():
             "index.html",
             **{
                 "dashboard": dashboard,
-                "url_prefix": PREFIX,
+                "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
                 "app_version": APP_VERSION,
             },
         )
@@ -230,25 +200,3 @@ def create_app():
             "user": hub_user,
         }
 
-    @app.route(PREFIX + "oauth_callback")
-    def oauth_callback():
-        """The OAuth callback handle, this handle is required for the
-        authentication process with Hub.
-        """
-
-        code = request.args.get("code", None)
-        if code is None:
-            return "Forbidden", 403
-
-        arg_state = request.args.get("state", None)
-        cookie_state = request.cookies.get(AUTH.state_cookie_name)
-        if arg_state is None or arg_state != cookie_state:
-            return "Forbidden", 403
-
-        session["token"] = AUTH.token_for_code(code)
-
-        next_url = AUTH.get_next_url(cookie_state) or PREFIX
-        response = make_response(redirect(next_url))
-        return response
-
-    return app
