@@ -3,11 +3,11 @@ import subprocess
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
-APP_NAME = "Edge Flask App"
-IMAGE_NAME = "quay.io/enthought/edge-dashboard-app"
+APP_NAME = "Edge Dashboard App"
+IMAGE_NAME = "quay.io/enthought/edge-native-app-flask-demo"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-dashboard-app"
-ENV_NAME = "edge-dashboard-app"
+CONTAINER_NAME = "edge-native-app-flask"
+ENV_NAME = "edge-native-app-flask"
 
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
@@ -30,7 +30,8 @@ BUNDLE_PACKAGES = [
     "six",
     "click",
     "flask>2",
-    "requests"
+    "requests",
+    "gunicorn"
 ]
 
 
@@ -52,7 +53,7 @@ def _npm_build(context):
     subprocess.run(cmd, env=env, cwd=cwd, check=True)
 
 
-class DashboardDevBuilder(DevBuilder):
+class NativeFlaskDevBuilder(DevBuilder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
@@ -64,7 +65,7 @@ class DashboardDevBuilder(DevBuilder):
         super().test()
 
 
-class DashboardContainerBuilder(ContainerBuilder):
+class NativeFlaskContainerBuilder(ContainerBuilder):
     def build(self):
         _npm_build(self.context)
         cmd = [
@@ -83,6 +84,6 @@ class DashboardContainerBuilder(ContainerBuilder):
         subprocess.run(cmd, check=True)
 
 
-DEV_BUILDER_CLS = DashboardDevBuilder
-CONTAINER_BUILDER_CLS = DashboardContainerBuilder
+DEV_BUILDER_CLS = NativeFlaskDevBuilder
+CONTAINER_BUILDER_CLS = NativeFlaskContainerBuilder
 PREFLIGHT_BUILDER_CLS = PreflightBuilder

@@ -16,10 +16,36 @@ jobs:
     strategy:
       matrix:
         example: [
-          {component: edge-flask-example},
-          {component: edge-dashboard-example},
-          {component: edge-panel-example},
-          {component: edge-streamlit-example},
+          {
+            component: edge-native-base,
+            directory: .dev/edge-native-base,
+            environment: edge-native-base
+          },
+          {
+            component: edge-hello-world,
+            directory: .dev/edge-hello-world,
+            environment: edge-hello-world
+          },
+          {
+            component: native-app-flask-example,
+            directory: native-app-flask-example,
+            environment: edge-flask-example
+          },
+          {
+            component: dashboard-app-example,
+            directory: dashboard-app-example,
+            environment: edge-dashboard-demo
+          },
+          {
+            component: edge-panel-example,
+            directory: edge-panel-example,
+            environment: edge-panel-example
+          },
+          {
+            component: edge-streamlit-example,
+            directory: edge-streamlit-example,
+            environment: edge-streamlit-example
+          },
         ]
       fail-fast: false
 
@@ -72,12 +98,12 @@ jobs:
         run: |
           export PATH="$HOME/edm/bin:$PATH"
           set -e
-          cd ${{ matrix.example.component }}
+          cd ${{ matrix.example.directory }}
           edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
-          edm run -e ${{ matrix.example.component }} -- python -m ci generate_bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
-          edm run -e ${{ matrix.example.component }} -- python -m ci container build
-          edm run -e ${{ matrix.example.component }} -- python -m ci container test
-          edm run -e ${{ matrix.example.component }} -- python -m ci preflight test
+          edm run -e ${{ matrix.example.environment }} -- python -m ci generate_bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
+          edm run -e ${{ matrix.example.environment }} -- python -m ci container build
+          edm run -e ${{ matrix.example.environment }} -- python -m ci container test
+          edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test
 
 
   comment:
