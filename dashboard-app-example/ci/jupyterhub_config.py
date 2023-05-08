@@ -53,4 +53,5 @@ c.DockerSpawner.image = f"quay.io/enthought/edge-dashboard-demo:{IMAGE_TAG}"
 
 # File in which to store the database and cookie secret.
 c.JupyterHub.cookie_secret_file = path.join(temp, "jupyterhub_cookie_secret")
+c.JupyterHub.db_url = path.join(temp, "jupyterhub.sqlite")
 c.ConfigurableHTTPProxy.pid_file = path.join(temp, "jupyterhub-proxy.pid")

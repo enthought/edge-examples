@@ -17,20 +17,6 @@ PIP_DEPS = [
     "Flask-Session",
     "supervisor@git+https://github.com/Supervisor/supervisor"
 ]
-BUNDLE_PACKAGES = [
-    "enthought_edge",
-    "appdirs",
-    "packaging",
-    "pip",
-    "pyparsing",
-    "setuptools",
-    "six",
-    "click",
-    "requests",
-    "opencv_python",
-    "flask>2",
-    "gunicorn"
-]
 
 # Development command for running the application in watch mode
 DEV_CMD = ["python", "./dev/run.py"]
@@ -61,7 +47,6 @@ class NpmHook(BuilderHook):
             "run",
             "build"
         ]
-        subprocess.run(cmd, env=env, cwd=cwd, check=True)
 
     def pre(self, env, mode, action):
         action = f"{mode} {action}"

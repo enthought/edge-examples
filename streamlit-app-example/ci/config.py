@@ -16,16 +16,6 @@ PIP_DEPS = [
     "streamlit-javascript",
     "streamlit-extras"
 ]
-BUNDLE_PACKAGES = [
-    "enthought_edge",
-    "appdirs",
-    "packaging",
-    "pip",
-    "pyparsing",
-    "setuptools",
-    "six",
-    "click",
-]
 
 DEV_CMD = ["streamlit", "run", "application/app.py", "--server.headless", "true", "--server.port", "9000"]
 

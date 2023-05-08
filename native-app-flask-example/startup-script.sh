@@ -2,4 +2,4 @@
 
 set -e
 
-exec edm run -- python -m application.wsgi
+exec edm run -- python -m native-app-flask-example.wsgi

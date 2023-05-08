@@ -6,7 +6,7 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-from datetime import datetime, timezone
+import datetime
 import logging
 import multiprocessing as mp
 import os
@@ -16,8 +16,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 
 import requests
-from flask import Flask, render_template, request
+from flask import Flask, make_response, redirect, render_template, request, session
 from flask_session import Session
+from jupyterhub.utils import isoformat
 from edge.api import EdgeSession
 
 from .opencv_model.model import detect_face
@@ -37,10 +38,10 @@ if FLASK_DEBUG:
     LOG.setLevel(logging.DEBUG)
 
 # When run from Edge, these environment variables will be provided
-JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
-JUPYTERHUB_SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
-
+SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
+API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
 APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
 
 NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
@@ -76,11 +77,7 @@ def track_activity(f):
     def decorated(*args, **kwargs):
         if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
             return f(*args, **kwargs)
-        last_activity = datetime.now()
-        # Format this in a format that JupyterHub understands
-        if last_activity.tzinfo:
-            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
-        last_activity = last_activity.isoformat() + "Z"
+        last_activity = isoformat(datetime.datetime.now())
         if ACTIVITY_URL:
             try:
                 requests.post(
@@ -89,7 +86,7 @@ def track_activity(f):
                         "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
-                    json={"servers": {JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}}},
+                    json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
                 )
             except Exception:
                 pass
@@ -119,7 +116,7 @@ def create_app():
         __name__,
         template_folder="frontend/templates",
         static_folder="frontend/dist",
-        static_url_path=f"{JUPYTERHUB_SERVICE_PREFIX}static",
+        static_url_path=PREFIX + "static",
     )
     app.config["SESSION_TYPE"] = "filesystem"
     app.config["SECRET_KEY"] = "super secret key"
@@ -127,8 +124,15 @@ def create_app():
     sess.init_app(app)
     app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
+    # When running with ci start, preserve the trailing slash in the prefix
+    # When launching from jupyterhub, strip the trailing slash in the prefix
+    ROOT_PATH = PREFIX
+    if SERVER_NAME is not None and len(SERVER_NAME) > 0:
+        ROOT_PATH = ROOT_PATH[:-1]
 
-    @app.route(JUPYTERHUB_SERVICE_PREFIX)
+    LOG.info(f"Root path at {ROOT_PATH}")
+
+    @app.route(ROOT_PATH)
     @track_activity
     def serve(**kwargs):
         """The main handle to serve the index page."""
@@ -137,12 +141,12 @@ def create_app():
             "index.html",
             **{
                 "user": hub_user["name"],
-                "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
+                "url_prefix": PREFIX,
                 "app_version": APP_VERSION,
             },
         )
 
-    @app.route(f"{JUPYTERHUB_SERVICE_PREFIX}job", methods=["GET", "POST"])
+    @app.route(PREFIX + "job", methods=["GET", "POST"])
     @track_activity
     def job(**kwargs):
         """A job endpoint for receiving images and returning job results"""

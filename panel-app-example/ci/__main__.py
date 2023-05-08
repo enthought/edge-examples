@@ -13,13 +13,25 @@ import subprocess
 import click
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
-from .config import IMAGE_TAG, LINT_ENV_NAME, BUNDLE_PACKAGES
+from .config import IMAGE_TAG, LINT_ENV_NAME
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
 CI_DIR = os.path.dirname(__file__)
 BUNDLE_NAME = "app_environment.zbundle"
 ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
+
+BUNDLE_PACKAGES = [
+    "enthought_edge",
+    "appdirs",
+    "packaging",
+    "pip",
+    "pyparsing",
+    "setuptools",
+    "six",
+    "click",
+]
+
 
 @click.group()
 def cli():

@@ -17,8 +17,7 @@ def hook_context(env, mode, action):
     try:
         yield
     finally:
-        if _builder_hook is not None:
-            _builder_hook.post(env, mode, action)
+        _builder_hook.post(env, mode, action)
 
 class Builder:
     """A base class for building and running native apps"""
