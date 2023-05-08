@@ -3,14 +3,14 @@ import subprocess
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
-APP_NAME = "Edge Flask App"
-IMAGE_NAME = "quay.io/enthought/edge-flask-app"
+APP_NAME = "Edge Dashboard App"
+IMAGE_NAME = "quay.io/enthought/edge-dashboard-example"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-flask-app"
-ENV_NAME = "edge-flask-app"
+CONTAINER_NAME = "edge-dashboard-example"
+ENV_NAME = "edge-dashboard-example"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests", "opencv_python"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -31,8 +31,7 @@ BUNDLE_PACKAGES = [
     "click",
     "flask>2",
     "requests",
-    "gunicorn",
-    "opencv_python"
+    "gunicorn"
 ]
 
 

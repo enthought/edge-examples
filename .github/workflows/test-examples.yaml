@@ -1,0 +1,161 @@
+name: Test Native Examples
+
+on:
+  pull_request:
+
+jobs:
+  test-examples:
+    name: Test Examples
+    runs-on: ubuntu-latest
+
+    env:
+      SHELL: /bin/bash
+      INSTALLED_EDM_VERSION: "3.4.0"
+      HATCHER_TOKEN: ${{ secrets.HATCHER_TOKEN }}
+
+    strategy:
+      matrix:
+        example: [
+          {component: edge-flask-example},
+          {component: edge-dashboard-example},
+          {component: edge-panel-example},
+          {component: edge-streamlit-example},
+        ]
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up EDM
+        uses: enthought/setup-edm-action@v2
+        with:
+          edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
+
+      - name: Bootstrap
+        shell: bash
+        run: |
+          export PATH="$HOME/edm/bin:$PATH"
+          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk
+          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
+
+      - name: Build and Test Examples
+        uses: ./.github/actions/build-example
+        with:
+          component: ${{ matrix.example.component }}
+
+
+  publish-eggs:
+    name: Publish Eggs
+    runs-on: ubuntu-latest
+
+    env:
+      SHELL: /bin/bash
+      INSTALLED_EDM_VERSION: "3.4.0"
+      HATCHER_TOKEN: ${{ secrets.HATCHER_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up EDM
+        uses: enthought/setup-edm-action@v2
+        with:
+          edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
+
+      - name: Bootstrap
+        shell: bash
+        run: |
+          export PATH="$HOME/edm/bin:$PATH"
+          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk hatcher
+          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
+
+      - name: Build and Publish eggs
+        uses: ./.github/actions/build-publish-eggs
+        with:
+          hatcher_token: ${{ secrets.HATCHER_TOKEN_DEPLOYMENT }}
+
+
+  deploy:
+    needs: [build-and-push-ci2]
+    runs-on: ubuntu-latest
+
+    env:
+      INSTALLED_EDM_VERSION: "3.4.0"
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up EDM
+        uses: enthought/setup-edm-action@v2
+        with:
+          edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
+
+      - name: Bootstrap
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF##*/}" = "main" ]
+          then
+            export PATH="$HOME/edm/bin:$PATH"
+            edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk
+            edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
+          fi
+
+      - name: Get Docker Tag
+        id: vars
+        run: |
+          export PATH="$HOME/edm/bin:$PATH"
+          if [ "${GITHUB_REF##*/}" = "main" ]
+          then
+            echo "::set-output name=docker_tag::$(edm run -e bootstrap -- python -m ci2 version)"
+          else
+            tmp="$(git log -2 --pretty=format:"%H")"
+            readarray -t tmp <<<$tmp
+            echo "::set-output name=docker_tag::${tmp[1]:0:7}"
+          fi
+
+      - name: Set up Terraform and kubectl
+        uses: ./.github/actions/setup-terraform-kubectl
+        with:
+          terraform_version: 1.3.7
+          aws_access_key_id: ${{ secrets.TERRAFORM_CI_AWS_ACCESS_KEY_ID_2 }} # edge-dev-github-actions IAM user
+          aws_secret_access_key: ${{ secrets.TERRAFORM_CI_AWS_SECRET_ACCESS_KEY_2 }}
+
+      - name: terraform apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TERRAFORM_CI_AWS_ACCESS_KEY_ID_2 }} # edge-dev-github-actions IAM user
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TERRAFORM_CI_AWS_SECRET_ACCESS_KEY_2 }}
+          AWS_DEFAULT_REGION: us-east-1
+          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+          TF_VAR_edge_jupyter_hub_tag: ${{  steps.vars.outputs.docker_tag }}
+        working-directory: .github/data/terraform
+        run: |
+          if [ -z "${GITHUB_EVENT_NUMBER}" ]
+          then
+            export TF_VAR_deployment_name="edge-dev-${GITHUB_REF_NAME}" # edge-dev-<branch>
+          else
+            export TF_VAR_deployment_name="edge-dev-${GITHUB_EVENT_NUMBER}" # edge-dev-<PR number>
+          fi
+
+          # Delete database and apply will recreate it
+          kubectl config set-context --current --namespace=${TF_VAR_deployment_name}
+          kubectl delete deploy edge-api-db-local --ignore-not-found=true
+          kubectl delete pvc edge-api-db-local-data --ignore-not-found=true
+
+          terraform apply -input=false -auto-approve
+
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        if: github.ref_name != 'main'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Deployment available at: https://edge-dev-${{ github.event.number }}.edge-dev.enthought.com'
+            })
