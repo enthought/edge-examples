@@ -42,8 +42,16 @@ def _generate_bundle():
     shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
     os.mkdir(ARTIFACT_DIR)
     env = os.environ.copy()
-    cmd = [
-        "edm",
+    CI_EDM_CONFIG = os.environ.get("EDM_CONFIG")
+    CI_EDM_TOKEN = os.environ.get("EDM_TOKEN")
+    base_cmd = ["edm"]
+    if CI_EDM_CONFIG is not None:
+        base_cmd.append("-c")
+        base_cmd.append(CI_EDM_CONFIG)
+    if CI_EDM_TOKEN is not None:
+        base_cmd.append("-t")
+        base_cmd.append(CI_EDM_TOKEN)    
+    cmd = base_cmd + [
         "bundle",
         "generate",
         "--platform",

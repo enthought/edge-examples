@@ -16,15 +16,15 @@ import subprocess
 from ci.config import EDM_DEPS, ENV_NAME, PIP_DEPS
 
 
-EDM_CONFIG = os.environ.get("EDM_CONFIG")
-EDM_TOKEN = os.environ.get("EDM_TOKEN")
+CI_EDM_CONFIG = os.environ.get("EDM_CONFIG")
+CI_EDM_TOKEN = os.environ.get("EDM_TOKEN")
 base_cmd = ["edm"]
-if EDM_CONFIG is not None:
+if CI_EDM_CONFIG is not None:
     base_cmd.append("-c")
-    base_cmd.append(EDM_CONFIG)
-if EDM_TOKEN is not None:
+    base_cmd.append(CI_EDM_CONFIG)
+if CI_EDM_TOKEN is not None:
     base_cmd.append("-t")
-    base_cmd.append(EDM_TOKEN)
+    base_cmd.append(CI_EDM_TOKEN)
 
 def bootstrap():
     """Create and populate dev env"""
