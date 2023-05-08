@@ -1,23 +1,7 @@
 import os
 import subprocess
 from subprocess import Popen
-from contextlib import contextmanager
-from .config import DEV_CMD
 
-try:
-    from .config import BUILDER_HOOK
-    _builder_hook = BUILDER_HOOK
-except ImportError:
-    _builder_hook = None
-
-@contextmanager
-def hook_context(env, mode, action):
-    if _builder_hook is not None:
-        _builder_hook.pre(env, mode, action)
-    try:
-        yield
-    finally:
-        _builder_hook.post(env, mode, action)
 
 class Builder:
     """A base class for building and running native apps"""
@@ -57,16 +41,15 @@ class DevBuilder(Builder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
-        with hook_context(env, "dev", "run"):
-            subprocess.run(DEV_CMD, check=True, env=env, cwd=self.context.src_dir)
+        cmd = ["python", "-m", "http.server", "9000", "--directory", "default"]
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]
         env = os.environ.copy()
         env.update(self.context.env)
         env["PYTHONPATH"] = self._context.src_dir
-        with hook_context(env, "dev", "test"):
-            subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
 
 
 class ContainerBuilder(Builder):
@@ -88,9 +71,8 @@ class ContainerBuilder(Builder):
         """Runs the container"""
         env = os.environ.copy()
         env.update(self.context.env)
-        with hook_context(env, "container", "run"):
-            self.cleanup()
-            self.start()
+        self.cleanup()
+        self.start()
 
     def start(self, daemon=False):
         _docker_run(
@@ -113,9 +95,8 @@ class ContainerBuilder(Builder):
             self.context.module_dir,
         ]
         env = os.environ.copy()
-        env.update(self.context.env)        
-        with hook_context(env, "container", "build"):
-            subprocess.run(cmd, check=True)
+        env.update(self.context.env)
+        subprocess.run(cmd, check=True)
 
     def test(self, verbose=False):
         """Test the application container"""
@@ -127,15 +108,13 @@ class ContainerBuilder(Builder):
         env["PYTHONPATH"] = self.context.module_dir
         if self.context.edge_settings_file is not None:
             env["EDGE_SETTINGS_FILE"] = self.context.edge_settings_file
-        with hook_context(env, "container", "test"):
-            subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
 
     def publish(self):
         """Publishes the application's docker image"""
         cmd = ["docker", "push", f"{self.context.image}"]
-        env = os.environ.copy()        
-        with hook_context(env, "container", "publish"):
-            subprocess.run(cmd, check=True)
+        env = os.environ.copy()
+        subprocess.run(cmd, env=env, check=True)
 
 
 class PreflightBuilder(ContainerBuilder):
@@ -161,10 +140,8 @@ class PreflightBuilder(ContainerBuilder):
 
     def run(self):
         """Start the application"""
-        env = os.environ.copy()
-        with hook_context(env, "preflight", "run"):
-            process = self.start_jupyterhub()
-            process.wait()
+        process = self.start_jupyterhub()
+        process.wait()
 
     def test(self, verbose=False):
         """Test the application container"""
@@ -176,8 +153,7 @@ class PreflightBuilder(ContainerBuilder):
         env["PYTHONPATH"] = self.context.module_dir
         if self.context.edge_settings_file is not None:
             env["EDGE_SETTINGS_FILE"] = self.context.edge_settings_file
-        with hook_context(env, "preflight", "test"):
-            subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
 
     def start_jupyterhub(self):
         self.cleanup()

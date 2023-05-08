@@ -6,20 +6,20 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-import datetime
 import logging
 import multiprocessing as mp
 import os
 import sys
+from datetime import datetime, timezone
 from functools import wraps
-from uuid import uuid4
 from urllib.parse import unquote
+from uuid import uuid4
 
 import requests
-from flask import Flask, make_response, redirect, render_template, request, session
-from flask_session import Session
-from jupyterhub.utils import isoformat
 from edge.api import EdgeSession
+from flask import Flask, render_template, request
+
+from flask_session import Session
 
 from .opencv_model.model import detect_face
 
@@ -38,7 +38,7 @@ if FLASK_DEBUG:
     LOG.setLevel(logging.DEBUG)
 
 # When run from Edge, these environment variables will be provided
-PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
@@ -54,9 +54,10 @@ JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
 
 _EDGE_SESSION = None
 
+
 def get_edge_session():
     """Helper function to get an EdgeSession object
-    
+
     Returns:
         An EdgeSession object, if the container environment has
         the EDGE_API_SERVICE_URL, EDGE_API_ORG and API_TOKEN
@@ -64,8 +65,12 @@ def get_edge_session():
         then None is returned
     """
     global _EDGE_SESSION
-    if _EDGE_SESSION is None and \
-       EDGE_API_SERVICE_URL and EDGE_API_ORG and (EDGE_API_TOKEN or JUPYTERHUB_API_TOKEN):
+    if (
+        _EDGE_SESSION is None
+        and EDGE_API_SERVICE_URL
+        and EDGE_API_ORG
+        and (EDGE_API_TOKEN or JUPYTERHUB_API_TOKEN)
+    ):
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
 
@@ -77,7 +82,11 @@ def track_activity(f):
     def decorated(*args, **kwargs):
         if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
             return f(*args, **kwargs)
-        last_activity = isoformat(datetime.datetime.now())
+        last_activity = datetime.now()
+        # Format this in  format that JupyterHub understands
+        if last_activity.tzinfo:
+            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
+        last_activity = last_activity.isoformat() + "Z"
         if ACTIVITY_URL:
             try:
                 requests.post(
@@ -93,7 +102,6 @@ def track_activity(f):
         return f(*args, **kwargs)
 
     return decorated
-
 
 
 def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
@@ -116,7 +124,7 @@ def create_app():
         __name__,
         template_folder="frontend/templates",
         static_folder="frontend/dist",
-        static_url_path=PREFIX + "static",
+        static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
     )
     app.config["SESSION_TYPE"] = "filesystem"
     app.config["SECRET_KEY"] = "super secret key"
@@ -124,15 +132,7 @@ def create_app():
     sess.init_app(app)
     app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
-    # When running with ci start, preserve the trailing slash in the prefix
-    # When launching from jupyterhub, strip the trailing slash in the prefix
-    ROOT_PATH = PREFIX
-    if SERVER_NAME is not None and len(SERVER_NAME) > 0:
-        ROOT_PATH = ROOT_PATH[:-1]
-
-    LOG.info(f"Root path at {ROOT_PATH}")
-
-    @app.route(ROOT_PATH)
+    @app.route(JUPYTERHUB_SERVICE_PREFIX)
     @track_activity
     def serve(**kwargs):
         """The main handle to serve the index page."""
@@ -141,12 +141,12 @@ def create_app():
             "index.html",
             **{
                 "user": hub_user["name"],
-                "url_prefix": PREFIX,
+                "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
                 "app_version": APP_VERSION,
             },
         )
 
-    @app.route(PREFIX + "job", methods=["GET", "POST"])
+    @app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
     @track_activity
     def job(**kwargs):
         """A job endpoint for receiving images and returning job results"""

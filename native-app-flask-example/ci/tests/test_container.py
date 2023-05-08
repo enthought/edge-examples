@@ -40,7 +40,7 @@ class ContainerTestCase(TestCase):
             try:
                 response = requests.get("http://localhost:8888/")
                 if response.status_code != 200:
-                    LOG.info(f"Retry #{retry}") 
+                    LOG.info(f"Retry #{retry}")
                     time.sleep(BACKOFF)
                 else:
                     break
