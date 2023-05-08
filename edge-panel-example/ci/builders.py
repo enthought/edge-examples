@@ -88,6 +88,7 @@ class ContainerBuilder(Builder):
             "build",
             "-t",
             f"{self.context.image}",
+            "--load",
             "-f",
             "Dockerfile",
             self.context.module_dir,
