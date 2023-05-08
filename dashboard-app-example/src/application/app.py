@@ -7,19 +7,18 @@
 # Distribution is prohibited.
 
 import datetime
+import logging
 import os
 import random
+import sys
 from functools import wraps
+from urllib.parse import unquote
 
 import requests
 from flask import Flask, make_response, redirect, render_template, request, session
 from flask_session import Session
 from jupyterhub.services.auth import HubOAuth
 from jupyterhub.utils import isoformat
-from urllib.parse import unquote
-import logging
-import sys
-
 
 # Flag to deactivate the `authenticated` and `track_activity` decorator.
 # It is used to develop the app outside of JupyterHub environment.

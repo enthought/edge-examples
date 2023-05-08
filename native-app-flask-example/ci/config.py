@@ -31,7 +31,7 @@ BUNDLE_PACKAGES = [
     "click",
     "flask>2",
     "requests",
-    "gunicorn"
+    "gunicorn",
 ]
 
 

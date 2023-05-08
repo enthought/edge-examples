@@ -29,9 +29,8 @@ BUNDLE_PACKAGES = [
     "pyparsing",
     "setuptools",
     "six",
-    "requests" 
+    "requests",
 ]
-
 
 
 LINT_ENV_NAME = f"lint-{ENV_NAME}"

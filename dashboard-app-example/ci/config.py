@@ -30,7 +30,7 @@ BUNDLE_PACKAGES = [
     "six",
     "click",
     "flask>2",
-    "requests"
+    "requests",
 ]
 
 

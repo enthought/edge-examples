@@ -29,7 +29,7 @@ BUNDLE_PACKAGES = [
     "click",
     "gunicorn",
     "flask>2",
-    "requests"
+    "requests",
 ]
 
 LINT_ENV_NAME = f"lint-{ENV_NAME}"

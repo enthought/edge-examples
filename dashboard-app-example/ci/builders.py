@@ -39,10 +39,7 @@ class DevBuilder(Builder):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        env = os.environ.copy()
-        env.update(self.context.env)
-        cmd = ["python", "-m", "http.server", "9000", "--directory", "default"]
-        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
+        raise NotImplementedError
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]
@@ -87,9 +84,11 @@ class ContainerBuilder(Builder):
         """Build the application's docker image"""
         cmd = [
             "docker",
+            "buildx",
             "build",
             "-t",
             f"{self.context.image}",
+            "--load",
             "-f",
             "Dockerfile",
             self.context.module_dir,

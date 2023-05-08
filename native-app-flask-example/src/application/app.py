@@ -18,7 +18,6 @@ from uuid import uuid4
 import requests
 from edge.api import EdgeSession
 from flask import Flask, render_template, request
-
 from flask_session import Session
 
 from .opencv_model.model import detect_face

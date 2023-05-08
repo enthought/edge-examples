@@ -32,16 +32,8 @@ def cli():
 
 
 @cli.command("generate_bundle")
-@click.option(
-    "--edm-config",
-    default=None,
-    help="EDM configuration path"
-)
-@click.option(
-    "--edm-token",
-    default=None,
-    help="EDM token"
-)
+@click.option("--edm-config", default=None, help="EDM configuration path")
+@click.option("--edm-token", default=None, help="EDM token")
 def generate_bundle(edm_config, edm_token):
     """Generate a bundle with Edge packages"""
     _generate_bundle(edm_config=edm_config, edm_token=edm_token)
@@ -61,16 +53,20 @@ def _generate_bundle(edm_config=None, edm_token=None):
         print("Using edm token ***")
         base_cmd.append("-t")
         base_cmd.append(edm_token)
-    cmd = base_cmd + [
-        "bundle",
-        "generate",
-        "--platform",
-        "rh7-x86_64",
-        "--version=3.8",
-        "-i",
-        "-f",
-        BUNDLE_PATH,
-    ] + BUNDLE_PACKAGES
+    cmd = (
+        base_cmd
+        + [
+            "bundle",
+            "generate",
+            "--platform",
+            "rh7-x86_64",
+            "--version=3.8",
+            "-i",
+            "-f",
+            BUNDLE_PATH,
+        ]
+        + BUNDLE_PACKAGES
+    )
     subprocess.run(cmd, env=env, check=True)
 
 
