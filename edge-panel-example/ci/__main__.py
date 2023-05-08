@@ -202,7 +202,7 @@ def container_test(context, verbose):
 @click.pass_obj
 def build(context):
     """Build the application"""
-    click.echo(f"Building {context.app_name}...")
+    click.echo(f"Building {context.image} image for {context.app_name}...")
     builder = ContainerBuilder(context)
     builder.build()
     click.echo("Done")
