@@ -44,6 +44,7 @@ jobs:
         uses: ./.github/actions/build-example
         with:
           component: ${{ matrix.example.component }}
+          hatcher_token: ${{ secrets.HATCHER_TOKEN }}
 
 
   comment:
