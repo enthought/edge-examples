@@ -37,8 +37,8 @@ jobs:
         shell: bash
         run: |
           export PATH="$HOME/edm/bin:$PATH"
-          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk
-          edm -c ci2/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
+          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install -e bootstrap --version 3.8 -y click pyyaml enthought_sdk
+          edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run -e bootstrap pip install dirhash graphlib-backport
 
       - name: Build and Test Examples
         uses: ./.github/actions/build-example
