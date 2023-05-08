@@ -10,26 +10,24 @@
     Bootstrap file for the edge-hello-world example.
 """
 
-import os
+import getopt
 import subprocess
+import sys
 
 from ci.config import EDM_DEPS, ENV_NAME, PIP_DEPS
 
 
-CI_EDM_CONFIG = os.environ.get("EDM_CONFIG")
-CI_EDM_TOKEN = os.environ.get("EDM_TOKEN")
-base_cmd = ["edm"]
-if CI_EDM_CONFIG is not None:
-    print(f"Discovered edm.yml from CI environment variables {CI_EDM_CONFIG}")
-    base_cmd.append("-c")
-    base_cmd.append(CI_EDM_CONFIG)
-if CI_EDM_TOKEN is not None:
-    print("Discovered EDM token from CI environment variable")
-    base_cmd.append("-t")
-    base_cmd.append(CI_EDM_TOKEN)
-
-def bootstrap():
+def bootstrap(edm_config=None, edm_token=None):
     """Create and populate dev env"""
+    base_cmd = ["edm"]
+    if edm_config is not None:
+        print(f"Using edm configuration {edm_config}")
+        base_cmd.append("-c")
+        base_cmd.append(edm_config)
+    if edm_token is not None:
+        print("Using edm token ***")
+        base_cmd.append("-t")
+        base_cmd.append(edm_token)
 
     print("Creating EDM Python environment...")
     cmd = base_cmd + ["envs", "create", ENV_NAME, "--version", "3.8", "--force"]
@@ -48,4 +46,12 @@ def bootstrap():
 
 
 if __name__ == "__main__":
-    bootstrap()
+    opts, args = getopt.getopt(sys.argv[1:], "c:t:")
+    edm_config = None
+    edm_token = None
+    for o, a in opts:
+        if o == "-c":
+            edm_config = a
+        if o == "-t":
+            edm_token = a
+    bootstrap(edm_config=edm_config, edm_token=edm_token)

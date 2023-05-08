@@ -65,14 +65,14 @@ jobs:
 
       - name: Build and test example 
         shell: bash
+        env:
+          CI_EDM_CONFIG: ${{ github.workspace }}/.github/data/edm.yml
+          CI_EDM_TOKEN: ${{ secrets.HATCHER_TOKEN }}
         run: |
           export PATH="$HOME/edm/bin:$PATH"
           set -e
-          edm shell -e edm
-          export CI_EDM_CONFIG="${{ github.workspace }}/.github/data/edm.yml"
-          export CI_EDM_TOKEN="${{ secrets.HATCHER_TOKEN }}"          
           cd ${{ matrix.example.component }}
-          edm run -- python bootstrap.py
+          edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
           edm run -e ${{ matrix.example.component }} -- python -m ci generate_bundle
           edm run -e ${{ matrix.example.component }} -- python -m ci container build
           edm run -e ${{ matrix.example.component }} -- python -m ci container test
