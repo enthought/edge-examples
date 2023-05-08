@@ -84,6 +84,7 @@ class ContainerBuilder(Builder):
         """Build the application's docker image"""
         cmd = [
             "docker",
+            "buildx",
             "build",
             "-t",
             f"{self.context.image}",
