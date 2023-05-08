@@ -16,12 +16,12 @@ jobs:
     strategy:
       matrix:
         example: [
-          #{component: edge-flask-example},
-          #{component: edge-dashboard-example},
+          {component: edge-flask-example},
+          {component: edge-dashboard-example},
           {component: edge-panel-example},
-          #{component: edge-streamlit-example},
+          {component: edge-streamlit-example},
         ]
-      fail-fast: true
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
@@ -62,6 +62,7 @@ jobs:
           export PATH="$HOME/edm/bin:$PATH"        
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} install --version 3.8 -y click pyyaml
           edm -c ./.github/data/edm.yml -t ${{ secrets.HATCHER_TOKEN }} run pip install dirhash graphlib-backport
+          npm install -g configurable-http-proxy
 
       - name: Build and test example 
         shell: bash
