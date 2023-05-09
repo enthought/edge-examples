@@ -46,6 +46,11 @@ jobs:
             directory: edge-streamlit-example,
             environment: edge-streamlit-example
           },
+          {
+            component: edge-plotly-dash-example,
+            directory: edge-plotly-dash-example,
+            environment: edge-plotly-dash
+          }
         ]
       fail-fast: false
 

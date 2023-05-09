@@ -12,7 +12,6 @@ ENV_NAME = "edge-plotly-dash"
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = [
     "click",
-    "flask>2",
     "enthought_edge",
     "pytest",
     "requests",
