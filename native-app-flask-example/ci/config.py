@@ -10,7 +10,7 @@ CONTAINER_NAME = "edge-native-app-flask"
 ENV_NAME = "edge-native-app-flask"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests", "opencv_python"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -32,6 +32,7 @@ BUNDLE_PACKAGES = [
     "flask>2",
     "requests",
     "gunicorn",
+    "opencv_python"
 ]
 
 
