@@ -79,4 +79,4 @@ class PreflightTestCase(TestCase):
         response = requests.get(
             "http://localhost:8000/user/edgeuser/", allow_redirects=True
         )
-        self.assertNotEqual(response.url, "http://localhost:8000/user/edgeuser")
+        self.assertNotEqual(response.url, "http://localhost:8000/user/edgeuser/")

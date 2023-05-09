@@ -31,13 +31,12 @@ BUNDLE_PACKAGES = [
     "six",
     "requests",
 ]
-
-
-LINT_ENV_NAME = f"lint-{ENV_NAME}"
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
+BUNDLE_NAME = "app_environment.zbundle"
+MODULE_DIR = os.path.join(os.path.dirname(__file__))
 CI_DIR = os.path.join(MODULE_DIR, "ci")
+ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
+LINT_ENV_NAME = f"lint-{ENV_NAME}"
 SRC_DIR = os.path.join(MODULE_DIR, "src")
-
 
 class StreamlitDevBuilder(DevBuilder):
     def run(self):

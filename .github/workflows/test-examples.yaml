@@ -100,8 +100,7 @@ jobs:
           set -e
           cd ${{ matrix.example.directory }}
           edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
-          edm run -e ${{ matrix.example.environment }} -- python -m ci generate_bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
-          edm run -e ${{ matrix.example.environment }} -- python -m ci container build
+          edm run -e ${{ matrix.example.environment }} -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
           edm run -e ${{ matrix.example.environment }} -- python -m ci container test
           edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test
 

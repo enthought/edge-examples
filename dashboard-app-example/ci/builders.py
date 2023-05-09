@@ -1,6 +1,9 @@
 import os
+import shutil
 import subprocess
 from subprocess import Popen
+
+import click
 
 
 class Builder:
@@ -80,8 +83,42 @@ class ContainerBuilder(Builder):
         _docker_stop(self.context.container_name)
         _docker_remove(self.context.container_name)
 
-    def build(self):
+    def generate_bundle(self, edm_config=None, edm_token=None):
+        """Build enthought_edge bundle"""
+        click.echo(f"Generating bundle at {self.context.bundle_path}")
+        shutil.rmtree(self.context.artifact_dir, ignore_errors=True)
+        os.mkdir(self.context.artifact_dir)
+        env = os.environ.copy()
+        base_cmd = ["edm"]
+        if edm_config is not None:
+            click.echo(f"Using edm configuration {edm_config}")
+            base_cmd.append("-c")
+            base_cmd.append(edm_config)
+        if edm_token is not None:
+            click.echo("Using edm token ***")
+            base_cmd.append("-t")
+            base_cmd.append(edm_token)
+        cmd = (
+            base_cmd
+            + [
+                "bundle",
+                "generate",
+                "--platform",
+                "rh7-x86_64",
+                "--version=3.8",
+                "-i",
+                "-f",
+                self.context.bundle_path,
+            ]
+            + self.context.bundle_packages
+        )
+        subprocess.run(cmd, env=env, check=True)
+
+    def build(self, generate_bundle=False, edm_config=None, edm_token=None):
         """Build the application's docker image"""
+        if generate_bundle or not os.path.isfile(self.context.bundle_path):
+            self.generate_bundle(edm_config=edm_config, edm_token=edm_token)
+
         cmd = [
             "docker",
             "buildx",

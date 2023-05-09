@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
+from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Native Base"
 IMAGE_NAME = "quay.io/enthought/edge-native-base"
@@ -28,11 +28,11 @@ BUNDLE_PACKAGES = [
     "six",
     "click",
 ]
-
-
-LINT_ENV_NAME = f"lint-{ENV_NAME}"
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
+BUNDLE_NAME = "app_environment.zbundle"
+MODULE_DIR = os.path.join(os.path.dirname(__file__))
 CI_DIR = os.path.join(MODULE_DIR, "ci")
+ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
+LINT_ENV_NAME = f"lint-{ENV_NAME}"
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 

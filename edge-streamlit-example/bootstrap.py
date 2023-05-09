@@ -14,7 +14,7 @@ import getopt
 import subprocess
 import sys
 
-from ci.config import EDM_DEPS, ENV_NAME, PIP_DEPS
+from config import EDM_DEPS, ENV_NAME, PIP_DEPS
 
 
 def bootstrap(edm_config=None, edm_token=None):

@@ -3,14 +3,14 @@ import subprocess
 
 from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
-APP_NAME = "Edge Dashboard App"
-IMAGE_NAME = "quay.io/enthought/edge-dashboard-demo"
+APP_NAME = "Edge Native Flask App"
+IMAGE_NAME = "quay.io/enthought/edge-native-app-flask-demo"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-dashboard-demo"
-ENV_NAME = "edge-dashboard-demo"
+CONTAINER_NAME = "edge-native-app-flask"
+ENV_NAME = "edge-native-app-flask"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests", "opencv_python"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -31,13 +31,14 @@ BUNDLE_PACKAGES = [
     "click",
     "flask>2",
     "requests",
-    "gunicorn"
+    "gunicorn",
+    "opencv_python"
 ]
-
-
-LINT_ENV_NAME = f"lint-{ENV_NAME}"
-MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
+BUNDLE_NAME = "app_environment.zbundle"
+MODULE_DIR = os.path.join(os.path.dirname(__file__))
 CI_DIR = os.path.join(MODULE_DIR, "ci")
+ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
+LINT_ENV_NAME = f"lint-{ENV_NAME}"
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
@@ -53,7 +54,7 @@ def _npm_build(context):
     subprocess.run(cmd, env=env, cwd=cwd, check=True)
 
 
-class DashboardDevBuilder(DevBuilder):
+class NativeFlaskDevBuilder(DevBuilder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
@@ -65,7 +66,7 @@ class DashboardDevBuilder(DevBuilder):
         super().test()
 
 
-class DashboardContainerBuilder(ContainerBuilder):
+class NativeFlaskContainerBuilder(ContainerBuilder):
     def build(self):
         _npm_build(self.context)
         cmd = [
@@ -84,6 +85,6 @@ class DashboardContainerBuilder(ContainerBuilder):
         subprocess.run(cmd, check=True)
 
 
-DEV_BUILDER_CLS = DashboardDevBuilder
-CONTAINER_BUILDER_CLS = DashboardContainerBuilder
+DEV_BUILDER_CLS = NativeFlaskDevBuilder
+CONTAINER_BUILDER_CLS = NativeFlaskContainerBuilder
 PREFLIGHT_BUILDER_CLS = PreflightBuilder

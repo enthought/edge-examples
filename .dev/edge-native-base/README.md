@@ -33,9 +33,19 @@ You must also install the NodeJS version of `configurable-http-proxy`:
 npm install -g configurable-http-proxy
 ```
 
+## Copying CI Tools
+
+When creating a new example based on `edge-native-base`, you must:
+
+- Copy [the `ci` directory](./ci) to the root of the new example
+- Copy [`./bootstrap.py`](./bootstrap.py) to the root of the new example
+- Copy [`./config.py'](./config.py) to the root of the new example and configure it
+
+Application files should reside in [`src/application`] in the new example.
+
 ## Configuring CI
 
-[`./ci/config.py`](./ci/config.py) contains CI settings, including the image name
+[`./config.py`](./config.py) contains CI settings, including the image name
 and tag for CI commands. *It is critical to set the `IMAGE_TAG` value before
 building or pushing a new image to prevent overwriting a published image that
 might break compatibility for downstream consumers of `edge-native-base`.* It should

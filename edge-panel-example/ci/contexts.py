@@ -1,7 +1,11 @@
 import json
+import os
 
-from .config import (
+from config import (
     APP_NAME,
+    ARTIFACT_DIR,
+    BUNDLE_NAME,
+    BUNDLE_PACKAGES,
     CI_DIR,
     CONTAINER_NAME,
     IMAGE_NAME,
@@ -135,12 +139,31 @@ class ContainerBuildContext(BuildContext):
     def container_name(self):
         return self._container_name
 
+    @property
+    def bundle_packages(self):
+        return self._bundle_packages
+
+    @property
+    def bundle_name(self):
+        return self._bundle_name
+
+    @property
+    def bundle_path(self):
+        return os.path.join(self.artifact_dir, self.bundle_name)
+
+    @property
+    def artifact_dir(self):
+        return self._artifact_dir
+
     def __init__(
         self,
         *args,
         image_name=IMAGE_NAME,
         image_tag=IMAGE_TAG,
         container_name=CONTAINER_NAME,
+        bundle_packages=BUNDLE_PACKAGES,
+        bundle_name=BUNDLE_NAME,
+        artifact_dir=ARTIFACT_DIR,
         **kwargs,
     ):
         """Init function
@@ -151,6 +174,8 @@ class ContainerBuildContext(BuildContext):
             The docker image tag to build
         container_name : str
             The name of the docker container when running in container mode
+        bundle_packages : List[str]
+            A list of packages to include in the bundle for this container
 
         Raises
         ------
@@ -163,6 +188,9 @@ class ContainerBuildContext(BuildContext):
             raise ValueError("Image tag cannot be latest")
         self._image_tag = image_tag
         self._container_name = container_name
+        self._bundle_packages = bundle_packages
+        self._bundle_name = bundle_name
+        self._artifact_dir = artifact_dir
 
 
 class PreflightBuildContext(ContainerBuildContext):

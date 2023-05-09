@@ -72,11 +72,11 @@ class PreflightTestCase(TestCase):
             self.assertIn("/hub/api/oauth2/authorize", redirects)
             self.assertIn("/user/edgeuser/oauth_callback/", redirects)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.url, "http://localhost:8000/user/edgeuser/app")
+            self.assertEqual(response.url, "http://localhost:8000/user/edgeuser/")
 
         # Perform a second test after the hub has spawned to validate
         # that unauthenticated users cannot access the server
         response = requests.get(
             "http://localhost:8000/user/edgeuser/", allow_redirects=True
         )
-        self.assertNotEqual(response.url, "http://localhost:8000/user/edgeuser/app")
+        self.assertNotEqual(response.url, "http://localhost:8000/user/edgeuser/")
