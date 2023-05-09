@@ -45,7 +45,7 @@ def _npm_build(context):
     env = os.environ.copy()
     env.update(context.env)
     cwd = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "src", "application", "frontend")
+        os.path.join(SRC_DIR, "application", "frontend")
     )
     cmd = ["npm", "install"]
     subprocess.run(cmd, env=env, cwd=cwd, check=True)
