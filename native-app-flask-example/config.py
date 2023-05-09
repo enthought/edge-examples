@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
+from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Native Flask App"
 IMAGE_NAME = "quay.io/enthought/edge-native-app-flask-demo"
@@ -67,22 +67,9 @@ class NativeFlaskDevBuilder(DevBuilder):
 
 
 class NativeFlaskContainerBuilder(ContainerBuilder):
-    def build(self):
+    def build(self, *args, **kwargs):
         _npm_build(self.context)
-        cmd = [
-            "docker",
-            "build",
-            "--build-arg",
-            f"CI_IMAGE={self.context.image}",
-            "-t",
-            f"{self.context.image}",
-            "-f",
-            "Dockerfile",
-            self.context.module_dir,
-        ]
-        env = os.environ.copy()
-        env.update(self.context.env)
-        subprocess.run(cmd, check=True)
+        super().build(*args, **kwargs)
 
 
 DEV_BUILDER_CLS = NativeFlaskDevBuilder

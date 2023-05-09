@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
+from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Streamlit Example"
 IMAGE_NAME = "quay.io/enthought/edge-streamlit-example"

@@ -66,22 +66,9 @@ class DashboardDevBuilder(DevBuilder):
 
 
 class DashboardContainerBuilder(ContainerBuilder):
-    def build(self):
+    def build(self, *args, **kwargs):
         _npm_build(self.context)
-        cmd = [
-            "docker",
-            "build",
-            "--build-arg",
-            f"CI_IMAGE={self.context.image}",
-            "-t",
-            f"{self.context.image}",
-            "-f",
-            "Dockerfile",
-            self.context.module_dir,
-        ]
-        env = os.environ.copy()
-        env.update(self.context.env)
-        subprocess.run(cmd, check=True)
+        super().build(*args, **kwargs)
 
 
 DEV_BUILDER_CLS = DashboardDevBuilder
