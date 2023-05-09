@@ -66,6 +66,12 @@ class PanelDevBuilder(DevBuilder):
         raise NotImplementedError
 
 
+class PanelPreflightBuilder(PreflightBuilder):
+    @property
+    def _test_path(self):
+        return "preflight/test_panel_preflight.py"
+
+
 DEV_BUILDER_CLS = PanelDevBuilder
 CONTAINER_BUILDER_CLS = ContainerBuilder
-PREFLIGHT_BUILDER_CLS = PreflightBuilder
+PREFLIGHT_BUILDER_CLS = PanelPreflightBuilder
