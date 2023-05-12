@@ -1,3 +1,3 @@
 #!/bin/bash
 cd application
-flask --app app.py run
+flask --app app.py --debug run

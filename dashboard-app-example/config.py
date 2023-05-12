@@ -31,7 +31,7 @@ BUNDLE_PACKAGES = [
     "click",
     "flask>2",
     "requests",
-    "gunicorn"
+    "gunicorn",
 ]
 BUNDLE_NAME = "app_environment.zbundle"
 MODULE_DIR = os.path.join(os.path.dirname(__file__))
@@ -44,9 +44,7 @@ SRC_DIR = os.path.join(MODULE_DIR, "src")
 def _npm_build(context):
     env = os.environ.copy()
     env.update(context.env)
-    cwd = os.path.abspath(
-        os.path.join(SRC_DIR, "application", "frontend")
-    )
+    cwd = os.path.abspath(os.path.join(SRC_DIR, "application", "frontend"))
     cmd = ["npm", "install"]
     subprocess.run(cmd, env=env, cwd=cwd, check=True)
     cmd = ["npm", "run", "build"]

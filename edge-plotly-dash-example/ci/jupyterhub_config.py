@@ -37,7 +37,11 @@ if (
     and EDGE_API_SERVICE_URL is not None
     and EDGE_API_ORG is not None
 ):
-    container_env = {}
+    container_env = {
+        "EDGE_API_TOKEN": EDGE_API_TOKEN,
+        "EDGE_API_ORG": EDGE_API_ORG,
+        "EDGE_API_SERVICE_URL": EDGE_API_SERVICE_URL,
+    }
 else:
     container_env = {}
 

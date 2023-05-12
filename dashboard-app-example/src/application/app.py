@@ -15,9 +15,10 @@ from functools import wraps
 from urllib.parse import unquote
 
 import requests
+from edge.api import EdgeSession
 from flask import Flask, render_template
-from flask_session import Session
 
+from flask_session import Session
 
 LOG = logging.getLogger(__name__)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -34,6 +35,34 @@ JUPYTERHUB_SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 
 NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 APP_VERSION = os.environ.get("APP_VERSION", "dashboard-app-example")
+
+
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
+EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
+_EDGE_SESSION = None
+
+
+def get_edge_session():
+    """Helper function to get an EdgeSession object
+
+    Returns:
+        An EdgeSession object, if the environment has
+        the EDGE_API_SERVICE_URL, EDGE_API_ORG and JUPYTERHUB_API_TOKEN
+        environment variables. If these variables are not set,
+        then None is returned
+    """
+    global _EDGE_SESSION
+
+    if (
+        _EDGE_SESSION is None
+        and EDGE_API_SERVICE_URL
+        and EDGE_API_ORG
+        and (JUPYTERHUB_API_TOKEN or EDGE_API_TOKEN)
+    ):
+        _EDGE_SESSION = EdgeSession()
+    return _EDGE_SESSION
+
 
 def track_activity(f):
     """Decorator for reporting server activities with the Hub"""
@@ -55,7 +84,11 @@ def track_activity(f):
                         "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
-                    json={"servers": {JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}}},
+                    json={
+                        "servers": {
+                            JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}
+                        }
+                    },
                 )
             except Exception:
                 pass
@@ -65,8 +98,7 @@ def track_activity(f):
 
 
 def create_app():
-    """Creates the Flask app with routes for serving the React application
-    """
+    """Creates the Flask app with routes for serving the React application"""
     app = Flask(
         __name__,
         template_folder="frontend/templates",
@@ -83,8 +115,12 @@ def create_app():
     @track_activity
     def serve(**kwargs):
         """The main handle to serve the index page."""
-        hub_user = kwargs.get("hub_user", None)
-        dashboard = get_dashboard(hub_user)
+        user_name = None
+        edge = get_edge_session()
+        if edge is not None:
+            whoami = edge.whoami()
+            user_name = whoami.user_name
+        dashboard = get_dashboard(user_name)
         return render_template(
             "index.html",
             **{
@@ -113,6 +149,7 @@ def get_scatterplot():
         "style": {"width": "400px", "height": "400px"},
     }
 
+
 def get_piechart():
     return {
         "id": "piechart",
@@ -126,6 +163,7 @@ def get_piechart():
         "layout": {"title": "Pie Chart"},
         "style": {"width": "400px", "height": "400px"},
     }
+
 
 def get_sunburst():
     return {
@@ -162,6 +200,7 @@ def get_sunburst():
         "style": {"width": "400px", "height": "400px"},
     }
 
+
 def get_choropleth():
     locations = ["United States", "Switzerland", "Japan", "United Kingdom"]
     z = [random.random() * 10 for n in range(len(locations))]
@@ -184,7 +223,8 @@ def get_choropleth():
         "style": {"width": "1220px", "height": "400px"},
     }
 
-def get_dashboard(hub_user):
+
+def get_dashboard(user_name):
     """Get dashboard for this hub user"""
     return {
         "plots": [
@@ -193,5 +233,5 @@ def get_dashboard(hub_user):
             get_sunburst(),
             get_choropleth(),
         ],
-        "user": hub_user,
+        "user_name": user_name,
     }

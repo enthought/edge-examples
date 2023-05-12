@@ -12,7 +12,7 @@ ENV_NAME = "edge-panel-example"
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = [
     "click",
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "pytest",
     "requests",
     "panel",
@@ -27,7 +27,7 @@ PIP_DEPS = [
 
 # EDM dependencies that will be packaged into the Docker container
 BUNDLE_PACKAGES = [
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "appdirs",
     "packaging",
     "pip",

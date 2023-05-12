@@ -102,12 +102,16 @@ class BuildContext:
         """
         if filename is None:
             return {}
-        with open(filename, "r") as f:
-            settings = json.load(f)
-        for key in ["EDGE_API_SERVICE_URL", "EDGE_API_ORG", "EDGE_API_TOKEN"]:
-            if key not in settings:
-                raise ValueError(f"{key} not in settings file")
-        return settings
+        try:
+            with open(filename, "r") as f:
+                settings = json.load(f)
+            for key in ["EDGE_API_SERVICE_URL", "EDGE_API_ORG", "EDGE_API_TOKEN"]:
+                if key not in settings:
+                    raise ValueError(f"{key} not in settings file")
+            return settings
+        except FileNotFoundError:
+            print(f"Could not find settings file {filename}")
+            return {}
 
 
 class DevBuildContext(BuildContext):
