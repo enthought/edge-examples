@@ -15,13 +15,9 @@ interface IPlot {
   config?: Config;
 }
 
-interface IUser {
-  name: string;
-}
-
 export interface IDashboard {
   plots?: Array<IPlot>;
-  user?: IUser;
+  user_name?: string;
 }
 
 interface IState {
@@ -44,7 +40,7 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
   }
   
   render(): React.ReactNode {
-    const { user, plots } = this.state.dashboard ?? { user: undefined, plots: [] };
+    const { user_name, plots } = this.state.dashboard ?? { plots: [] };
     console.log(this.state.dashboard);
     if (!plots?.length) {
       return (
@@ -59,7 +55,7 @@ export class Main extends Component<{ urlPrefix: string, dashboard?: IDashboard 
         </Row>
         <Row style={{backgroundColor: "#eee"}}>
           <Col id="sidebar" md={3}>
-            <h5>{user ? `Welcome ${user.name}` : "User not logged in"}</h5>
+            <h5>{user_name ? `Welcome ${user_name}` : "User not logged in"}</h5>
             <div>
               Plots
             </div>

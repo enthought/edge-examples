@@ -69,8 +69,6 @@ class ContainerBuilder(Builder):
 
     def run(self):
         """Runs the container"""
-        env = os.environ.copy()
-        env.update(self.context.env)
         self.cleanup()
         self.start()
 
