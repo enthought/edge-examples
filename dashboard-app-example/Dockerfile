@@ -1,26 +1,27 @@
-FROM quay.io/enthought/edm-centos-7:latest
+# Multi-stage build
 
-# install tini
-RUN curl -sLO https://github.com/krallin/tini/releases/download/v0.19.0/tini_0.19.0-amd64.rpm && \
-    echo "ab82980245169e93f8507f8d9a5fd008f5057df61a06fe46f464c4d624e6424a tini_0.19.0-amd64.rpm" | sha256sum --check && \
-    rpm -i tini_0.19.0-amd64.rpm && \
-    rm tini_0.19.0-amd64.rpm
+# Intermediate image with enthought_edge package included via bundle
+FROM quay.io/enthought/edge-native-base:1.0.0 as edge_dashboard_app_stage
 
-RUN adduser app_admin
-USER app_admin
+ARG EDGE_BUNDLE=ci/artifacts/app_environment.zbundle
+COPY $EDGE_BUNDLE /tmp/app_environment.zbundle
 
-RUN edm install --version 3.8 click "flask>2" gunicorn requests -y
+# Create a default EDM environment using the enthought_edge bundle
+RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
-RUN edm run -- python -m pip install "jupyterhub==2.2.2" "sqlalchemy<2" dockerspawner "configurable-http-proxy" Flask-Session
+# Final image
+FROM edge_dashboard_app_stage
 
-WORKDIR /home/app_admin
-COPY --chown=app_admin ./src dashboard-app-example/
+# Install dependencies for Flask Hello World in the default EDM environment
+RUN edm run -- pip install Flask-Session
 
-WORKDIR /home/app_admin
-RUN chmod 777 dashboard-app-example/startup-script.sh
+# Copy location template
+COPY ./app.location.conf.template /opt/nginx/app.location.conf.template
 
-ARG CI_IMAGE_REPOSITORY=quay.io/enthought/edge-native-app-flask-demo
-ARG CI_IMAGE_TAG=latest
-ENV APP_VERSION=$CI_IMAGE_REPOSITORY:$CI_IMAGE_TAG
+# Copy startup script and application
+COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+RUN chmod +x /home/app/startup-script.sh
+COPY --chown=app ./src/application/ /home/app/application
 
-CMD ["tini", "-g", "--", "dashboard-app-example/startup-script.sh"]
+ARG CI_IMAGE=quay.io/enthought/edge-dashboard-demo:latest
+ENV APP_VERSION=$CI_IMAGE

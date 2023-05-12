@@ -1,6 +1,9 @@
 import os
+import shutil
 import subprocess
 from subprocess import Popen
+
+import click
 
 
 class Builder:
@@ -39,10 +42,7 @@ class DevBuilder(Builder):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        cmd = ["flask", "--app", "application/app.py", "run"]
-        env = os.environ.copy()
-        env.update(self.context.env)
-        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
+        raise NotImplementedError
 
     def test(self):
         cmd = ["pytest", self.context.src_dir]
@@ -69,6 +69,8 @@ class ContainerBuilder(Builder):
 
     def run(self):
         """Runs the container"""
+        env = os.environ.copy()
+        env.update(self.context.env)
         self.cleanup()
         self.start()
 
@@ -81,17 +83,55 @@ class ContainerBuilder(Builder):
         _docker_stop(self.context.container_name)
         _docker_remove(self.context.container_name)
 
-    def build(self):
+    def generate_bundle(self, edm_config=None, edm_token=None):
+        """Build enthought_edge bundle"""
+        click.echo(f"Generating bundle at {self.context.bundle_path}")
+        shutil.rmtree(self.context.artifact_dir, ignore_errors=True)
+        os.mkdir(self.context.artifact_dir)
+        env = os.environ.copy()
+        base_cmd = ["edm"]
+        if edm_config is not None:
+            click.echo(f"Using edm configuration {edm_config}")
+            base_cmd.append("-c")
+            base_cmd.append(edm_config)
+        if edm_token is not None:
+            click.echo("Using edm token ***")
+            base_cmd.append("-t")
+            base_cmd.append(edm_token)
+        cmd = (
+            base_cmd
+            + [
+                "bundle",
+                "generate",
+                "--platform",
+                "rh7-x86_64",
+                "--version=3.8",
+                "-i",
+                "-f",
+                self.context.bundle_path,
+            ]
+            + self.context.bundle_packages
+        )
+        subprocess.run(cmd, env=env, check=True)
+
+    def build(self, generate_bundle=False, edm_config=None, edm_token=None):
         """Build the application's docker image"""
+        if generate_bundle or not os.path.isfile(self.context.bundle_path):
+            self.generate_bundle(edm_config=edm_config, edm_token=edm_token)
+
         cmd = [
             "docker",
+            "buildx",
             "build",
             "-t",
             f"{self.context.image}",
+            "--load",
             "-f",
             "Dockerfile",
             self.context.module_dir,
         ]
+        env = os.environ.copy()
+        env.update(self.context.env)
         subprocess.run(cmd, check=True)
 
     def test(self, verbose=False):
@@ -109,7 +149,8 @@ class ContainerBuilder(Builder):
     def publish(self):
         """Publishes the application's docker image"""
         cmd = ["docker", "push", f"{self.context.image}"]
-        subprocess.run(cmd, check=True)
+        env = os.environ.copy()
+        subprocess.run(cmd, env=env, check=True)
 
 
 class PreflightBuilder(ContainerBuilder):
@@ -137,6 +178,18 @@ class PreflightBuilder(ContainerBuilder):
         """Start the application"""
         process = self.start_jupyterhub()
         process.wait()
+
+    def test(self, verbose=False):
+        """Test the application container"""
+        cmd = ["pytest"]
+        if verbose:
+            cmd.append("-vvvs")
+        cmd.append(self._test_path)
+        env = os.environ.copy()
+        env["PYTHONPATH"] = self.context.module_dir
+        if self.context.edge_settings_file is not None:
+            env["EDGE_SETTINGS_FILE"] = self.context.edge_settings_file
+        subprocess.run(cmd, check=True, env=env, cwd=self.context.module_dir)
 
     def start_jupyterhub(self):
         self.cleanup()

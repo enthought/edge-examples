@@ -27,7 +27,7 @@ COPY --chown=app ./container_config/supervisor /opt/supervisor/
 RUN chmod +x /opt/supervisor/scripts/*.sh
 COPY --chown=app ./container_config/nginx /opt/nginx/
 COPY --chown=app ./oauth2_proxy /opt/oauth2_proxy/
-COPY --chown=app ./default /home/app/default/
+COPY --chown=app ./src/default /home/app/default/
 COPY --chown=app ./startup-script.sh /home/app
 
 RUN chmod +x /home/app/startup-script.sh

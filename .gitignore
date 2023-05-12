@@ -8,3 +8,6 @@ flask_session/
 *.zbundle
 .hypothesis/
 .pytest_cache/
+supervisord.log
+supervisord.pid
+jupyterhub.sqlite

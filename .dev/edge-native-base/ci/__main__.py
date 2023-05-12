@@ -7,13 +7,15 @@
 # Distribution is prohibited.
 
 import os
-import shutil
 import subprocess
 
 import click
 
-from .builders import ContainerBuilder, DevBuilder, PreflightBuilder
-from .config import IMAGE_TAG, LINT_ENV_NAME
+from config import CONTAINER_BUILDER_CLS as ContainerBuilder
+from config import DEV_BUILDER_CLS as DevBuilder
+from config import IMAGE_TAG, LINT_ENV_NAME
+from config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
+
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
 CI_DIR = os.path.dirname(__file__)
@@ -21,47 +23,11 @@ BUNDLE_NAME = "app_environment.zbundle"
 ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 
-BUNDLE_PACKAGES = [
-    "enthought_edge",
-    "appdirs",
-    "packaging",
-    "pip",
-    "pyparsing",
-    "setuptools",
-    "six",
-    "click",
-]
-
 
 @click.group()
 def cli():
     """All commands constituting continuous integration."""
     pass
-
-
-@cli.command("generate_bundle")
-def generate_bundle():
-    """Generate a bundle with Edge packages"""
-    _generate_bundle()
-
-
-def _generate_bundle():
-    """Build enthought_edge bundle"""
-    shutil.rmtree(ARTIFACT_DIR, ignore_errors=True)
-    os.mkdir(ARTIFACT_DIR)
-    env = os.environ.copy()
-    cmd = [
-        "edm",
-        "bundle",
-        "generate",
-        "--platform",
-        "rh7-x86_64",
-        "--version=3.8",
-        "-i",
-        "-f",
-        BUNDLE_PATH,
-    ] + BUNDLE_PACKAGES
-    subprocess.run(cmd, env=env, check=True)
 
 
 @cli.command()
@@ -189,18 +155,36 @@ def container_test(context, verbose):
 
 
 @container.command("build")
+@click.option(
+    "--generate-bundle", is_flag=True, default=False, help="Regenerate bundle"
+)
+@click.option("--edm-config", default=None, help="EDM configuration path")
+@click.option("--edm-token", default=None, help="EDM token")
 @click.pass_obj
-def build(context):
+def container_build(context, generate_bundle, edm_config, edm_token):
     """Build the application"""
-    click.echo(f"Building {context.app_name}...")
+    click.echo(f"Building {context.image} image for {context.app_name}...")
     builder = ContainerBuilder(context)
-    builder.build()
+    builder.build(
+        generate_bundle=generate_bundle, edm_config=edm_config, edm_token=edm_token
+    )
+    click.echo("Done")
+
+
+@container.command("generate_bundle")
+@click.option("--edm-config", default=None, help="EDM configuration path")
+@click.option("--edm-token", default=None, help="EDM token")
+@click.pass_obj
+def container_generate_bundle(context, edm_config, edm_token):
+    """Generate a bundle with Edge packages"""
+    builder = ContainerBuilder(context)
+    builder.generate_bundle(edm_config=edm_config, edm_token=edm_token)
     click.echo("Done")
 
 
 @container.command("publish")
 @click.pass_obj
-def publish(context):
+def container_publish(context):
     """Publish the application image"""
     click.echo(f"Publishing {context.app_name}...")
     builder = ContainerBuilder(context)
