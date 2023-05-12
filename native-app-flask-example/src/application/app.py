@@ -135,11 +135,14 @@ def create_app():
     @track_activity
     def serve(**kwargs):
         """The main handle to serve the index page."""
-        hub_user = kwargs.get("hub_user", {"name": "No user"})
+        edge = get_edge_session()
+        if edge is not None:
+            whoami = edge.whoami()
+            user_name = whoami.user_name
         return render_template(
             "index.html",
             **{
-                "user": hub_user["name"],
+                "user_name": user_name,
                 "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
                 "app_version": APP_VERSION,
             },

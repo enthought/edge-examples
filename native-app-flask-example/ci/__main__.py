@@ -86,7 +86,7 @@ def style(apply, rebuild):
 @cli.group("preflight")
 @click.option(
     "--edge-settings-file",
-    default=None,
+    default="edge_settings.json",
     help="A json file with E2E test settings",
 )
 @click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
@@ -120,7 +120,7 @@ def preflight_test(context, verbose):
 @cli.group("container")
 @click.option(
     "--edge-settings-file",
-    default=None,
+    default="edge_settings.json",
     help="A json file with E2E test settings",
 )
 @click.option("--tag", default=IMAGE_TAG, help="Docker tag to use.")
@@ -195,7 +195,7 @@ def container_publish(context):
 @cli.group("dev")
 @click.option(
     "--edge-settings-file",
-    default=None,
+    default="edge_settings.json",
     help="A json file with E2E test settings",
 )
 @click.pass_context
