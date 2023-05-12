@@ -10,7 +10,7 @@ CONTAINER_NAME = "edge-hello-world"
 ENV_NAME = "edge-hello-world"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge>=2.6.0", "pytest", "requests"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -19,7 +19,7 @@ PIP_DEPS = [
 
 # EDM dependencies that will be packaged into the Docker container
 BUNDLE_PACKAGES = [
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "appdirs",
     "packaging",
     "pip",
@@ -39,11 +39,12 @@ ARTIFACT_DIR = os.path.join(CI_DIR, "artifacts")
 LINT_ENV_NAME = f"lint-{ENV_NAME}"
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
+
 class HelloWorldDevBuilder(DevBuilder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
-        cmd = ["flask", "--app", "application/app.py", "run"]
+        cmd = ["flask", "--app", "application/app.py", "--debug", "run"]
         subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
 
 

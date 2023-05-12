@@ -33,6 +33,7 @@ NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
+EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
 _EDGE_SESSION = None
 
 
@@ -51,7 +52,7 @@ def get_edge_session():
         _EDGE_SESSION is None
         and EDGE_API_SERVICE_URL
         and EDGE_API_ORG
-        and JUPYTERHUB_API_TOKEN
+        and (JUPYTERHUB_API_TOKEN or EDGE_API_TOKEN)
     ):
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
@@ -100,7 +101,8 @@ def create_app():
         edge = get_edge_session()
         greeting = "Hello World"
         if edge is not None:
-            greeting = greeting + " from Edge"
+            whoami = edge.whoami()
+            greeting = f"Hello {whoami.user_name}"
         return greeting
 
     return app

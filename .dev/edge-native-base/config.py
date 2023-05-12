@@ -10,7 +10,7 @@ CONTAINER_NAME = "edge-native-base"
 ENV_NAME = "edge-native-base"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]
+EDM_DEPS = ["click", "flask>2", "enthought_edge>=2.6.0", "pytest", "requests"]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -19,7 +19,7 @@ PIP_DEPS = [
 
 # EDM dependencies that will be packaged into the Docker container
 BUNDLE_PACKAGES = [
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "appdirs",
     "packaging",
     "pip",
