@@ -15,10 +15,10 @@ from functools import wraps
 from urllib.parse import unquote
 
 import requests
-from flask import Flask, render_template
-from flask_session import Session
 from edge.api import EdgeSession
+from flask import Flask, render_template
 
+from flask_session import Session
 
 LOG = logging.getLogger(__name__)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -84,7 +84,11 @@ def track_activity(f):
                         "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
                         "Content-Type": "application/json",
                     },
-                    json={"servers": {JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}}},
+                    json={
+                        "servers": {
+                            JUPYTERHUB_SERVER_NAME: {"last_activity": last_activity}
+                        }
+                    },
                 )
             except Exception:
                 pass
@@ -94,8 +98,7 @@ def track_activity(f):
 
 
 def create_app():
-    """Creates the Flask app with routes for serving the React application
-    """
+    """Creates the Flask app with routes for serving the React application"""
     app = Flask(
         __name__,
         template_folder="frontend/templates",
@@ -146,6 +149,7 @@ def get_scatterplot():
         "style": {"width": "400px", "height": "400px"},
     }
 
+
 def get_piechart():
     return {
         "id": "piechart",
@@ -159,6 +163,7 @@ def get_piechart():
         "layout": {"title": "Pie Chart"},
         "style": {"width": "400px", "height": "400px"},
     }
+
 
 def get_sunburst():
     return {
@@ -195,6 +200,7 @@ def get_sunburst():
         "style": {"width": "400px", "height": "400px"},
     }
 
+
 def get_choropleth():
     locations = ["United States", "Switzerland", "Japan", "United Kingdom"]
     z = [random.random() * 10 for n in range(len(locations))]
@@ -216,6 +222,7 @@ def get_choropleth():
         },
         "style": {"width": "1220px", "height": "400px"},
     }
+
 
 def get_dashboard(user_name):
     """Get dashboard for this hub user"""
