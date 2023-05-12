@@ -12,7 +12,7 @@ ENV_NAME = "edge-plotly-dash"
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = [
     "click",
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "pytest",
     "requests",
     "pandas",
@@ -23,7 +23,7 @@ PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner", "dash", "panda
 
 # EDM dependencies that will be packaged into the Docker container
 BUNDLE_PACKAGES = [
-    "enthought_edge",
+    "enthought_edge>=2.6.0",
     "appdirs",
     "packaging",
     "pip",

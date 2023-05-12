@@ -43,12 +43,10 @@ APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
 
 NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 
+JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
 EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
 EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
-JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
-
-
 _EDGE_SESSION = None
 
 
@@ -56,17 +54,18 @@ def get_edge_session():
     """Helper function to get an EdgeSession object
 
     Returns:
-        An EdgeSession object, if the container environment has
-        the EDGE_API_SERVICE_URL, EDGE_API_ORG and API_TOKEN
+        An EdgeSession object, if the environment has
+        the EDGE_API_SERVICE_URL, EDGE_API_ORG and JUPYTERHUB_API_TOKEN
         environment variables. If these variables are not set,
         then None is returned
     """
     global _EDGE_SESSION
+
     if (
         _EDGE_SESSION is None
         and EDGE_API_SERVICE_URL
         and EDGE_API_ORG
-        and (EDGE_API_TOKEN or JUPYTERHUB_API_TOKEN)
+        and (JUPYTERHUB_API_TOKEN or EDGE_API_TOKEN)
     ):
         _EDGE_SESSION = EdgeSession()
     return _EDGE_SESSION
@@ -108,6 +107,13 @@ df = pd.read_csv(
     "https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv"
 )
 
+greeting = ""
+edge = get_edge_session()
+if edge is not None:
+    whoami = edge.whoami()
+    greeting = f"Logged in as {whoami.user_name}"
+
+
 app.layout = html.Div(
     [
         html.H1(
@@ -116,6 +122,7 @@ app.layout = html.Div(
         ),
         dcc.Dropdown(df.country.unique(), "Canada", id="dropdown-selection"),
         dcc.Graph(id="graph-content"),
+        html.Div(children=greeting),
     ]
 )
 
