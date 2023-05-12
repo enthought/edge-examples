@@ -10,16 +10,52 @@
 # https://docs.streamlit.io/library/get-started/create-an-app
 
 import logging
+import os
 
 import numpy as np
 import pandas as pd
 import streamlit as st
+from edge.api import EdgeSession
 
 LOG = logging.getLogger(__name__)
+
+JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN", "")
+EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
+EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
+EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
+_EDGE_SESSION = None
+
+
+def get_edge_session():
+    """Helper function to get an EdgeSession object
+
+    Returns:
+        An EdgeSession object, if the environment has
+        the EDGE_API_SERVICE_URL, EDGE_API_ORG and JUPYTERHUB_API_TOKEN
+        environment variables. If these variables are not set,
+        then None is returned
+    """
+    global _EDGE_SESSION
+
+    if (
+        _EDGE_SESSION is None
+        and EDGE_API_SERVICE_URL
+        and EDGE_API_ORG
+        and (JUPYTERHUB_API_TOKEN or EDGE_API_TOKEN)
+    ):
+        _EDGE_SESSION = EdgeSession()
+    return _EDGE_SESSION
+
 
 st.set_page_config(page_title="", initial_sidebar_state="collapsed")
 
 st.title("Uber pickups in NYC")
+
+edge = get_edge_session()
+if edge is not None:
+    whoami = edge.whoami()
+    user_name = whoami.user_name
+    st.write(f"Logged in as {user_name}")
 
 DATE_COLUMN = "date/time"
 DATA_URL = (
