@@ -11,13 +11,8 @@ import subprocess
 
 import click
 
-from config import (
-    CONTAINER_BUILDER_CLS,
-    DEV_BUILDER_CLS,
-    IMAGE_TAG,
-    LINT_ENV_NAME,
-    PREFLIGHT_BUILDER_CLS,
-)
+from config import CONTAINER_BUILDER_CLS, DEV_BUILDER_CLS, PREFLIGHT_BUILDER_CLS
+from config import IMAGE_TAG
 
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
@@ -31,59 +26,6 @@ BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 def cli():
     """All commands constituting continuous integration."""
     pass
-
-
-@cli.command()
-@click.option(
-    "--apply",
-    is_flag=True,
-    default=False,
-    help="Whether or not to apply isort and black formatting.",
-)
-@click.option(
-    "--rebuild", is_flag=True, default=False, help="Force-rebuild style checking env"
-)
-def style(apply, rebuild):
-    """Run formatting checks"""
-
-    cmd = ["edm", "envs", "list"]
-    proc = subprocess.run(cmd, check=True, capture_output=True)
-
-    # Build env if needed
-    if rebuild or (LINT_ENV_NAME not in proc.stdout.decode("utf8")):
-        cmd = ["edm", "envs", "create", LINT_ENV_NAME, "--force", "--version", "3.8"]
-        subprocess.run(cmd, check=True)
-
-        cmd = [
-            "edm",
-            "install",
-            "-e",
-            LINT_ENV_NAME,
-            "-y",
-            "black",
-            "click",
-            "flake8",
-            "isort",
-            "pyyaml",
-        ]
-        subprocess.run(cmd, check=True)
-
-    # Then run checking commands
-    commands = [
-        (["isort", "."], ["--check", "--diff"], "isort check failed"),
-        (["black", "."], ["--check"], "Black check failed"),
-        (["python", "-m", "flake8"], [], "Flake8 check failed"),
-    ]
-
-    for cmd, options, fail_message in commands:
-        if not apply:
-            cmd = cmd + options
-        cproc = subprocess.run(["edm", "run", "-e", LINT_ENV_NAME, "--"] + cmd)
-        rc = cproc.returncode
-        if rc is not None and rc != 0:
-            # Ensure user can see why the check failed
-            click.echo(cproc.stderr)
-            raise click.ClickException(fail_message)
 
 
 @cli.group("preflight")

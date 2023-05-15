@@ -7,7 +7,8 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file for the edge-hello-world example.
+    Bootstrap file, which builds the local EDM development environment for this
+    example.
 """
 
 import getopt
