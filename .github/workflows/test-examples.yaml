@@ -103,21 +103,3 @@ jobs:
           edm run -e ${{ matrix.example.environment }} -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
           edm run -e ${{ matrix.example.environment }} -- python -m ci container test
           edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test
-
-
-  comment:
-    needs: [test-examples]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Comment on PR
-        uses: actions/github-script@v6
-        if: github.ref_name != 'main'
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Edge Examples build and pass tests'
-            })
