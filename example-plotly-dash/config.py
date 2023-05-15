@@ -1,7 +1,22 @@
+# Enthought product code
+#
+# (C) Copyright 2010-2022 Enthought, Inc., Austin, TX
+# All rights reserved.
+#
+# This file and its contents are confidential information and NOT open source.
+# Distribution is prohibited.
+
+"""
+    Settings file for the "plotly-dash" example.
+"""
+
 import os
 import subprocess
 
 from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
+
+
+### APPLICATION SETTINGS AND DEPENDENCIES #####################################
 
 APP_NAME = "Edge Plotly Dash App"
 IMAGE_NAME = "quay.io/enthought/edge-plotly-dash-example"
@@ -37,6 +52,10 @@ BUNDLE_PACKAGES = [
     "flask>2",
     "dash",
 ]
+
+###############################################################################
+
+
 BUNDLE_NAME = "app_environment.zbundle"
 MODULE_DIR = os.path.join(os.path.dirname(__file__))
 CI_DIR = os.path.join(MODULE_DIR, "ci")
