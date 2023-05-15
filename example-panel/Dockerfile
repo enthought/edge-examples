@@ -9,9 +9,9 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 # Final image
 FROM edge_panel_app_stage
 
-COPY ./app.location.conf.template /opt/nginx/app.location.conf.template
+COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 
 # Copy startup script and application
-COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/application/ /home/app/application

@@ -14,6 +14,6 @@ RUN edm run -- python -m pip install --no-cache-dir \
     streamlit streamlit-javascript streamlit-extras
 
 # Copy startup script and application
-COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/application/ /home/app/application
