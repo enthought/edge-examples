@@ -12,3 +12,4 @@ supervisord.log
 supervisord.pid
 jupyterhub.sqlite
 edge_settings.json
+artifacts/

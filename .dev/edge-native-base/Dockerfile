@@ -21,12 +21,12 @@ RUN edm -r /opt/_edm_oauth2_proxy install --version 3.8 flask gunicorn -y \
 	&& edm -r /opt/_edm_oauth2_proxy run -- python -m pip install --no-cache-dir "jupyterhub==2.2.2" Flask-Session \
 	&& edm -r /opt/_edm_oauth2_proxy cache purge --yes
 
-COPY --chown=app ./container_config/supervisor /opt/supervisor/
+COPY --chown=app ./src/container_config/supervisor /opt/supervisor/
 RUN chmod +x /opt/supervisor/scripts/*.sh
-COPY --chown=app ./container_config/nginx /opt/nginx/
-COPY --chown=app ./oauth2_proxy /opt/oauth2_proxy/
+COPY --chown=app ./src/container_config/nginx /opt/nginx/
+COPY --chown=app ./src/oauth2_proxy /opt/oauth2_proxy/
 COPY --chown=app ./src/default /home/app/default/
-COPY --chown=app ./startup-script.sh /home/app
+COPY --chown=app ./src/startup-script.sh /home/app
 
 RUN chmod +x /home/app/startup-script.sh
 

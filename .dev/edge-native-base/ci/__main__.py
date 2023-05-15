@@ -11,10 +11,8 @@ import subprocess
 
 import click
 
-from config import CONTAINER_BUILDER_CLS as ContainerBuilder
-from config import DEV_BUILDER_CLS as DevBuilder
-from config import IMAGE_TAG, LINT_ENV_NAME
-from config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
+from config import CONTAINER_BUILDER_CLS, DEV_BUILDER_CLS, PREFLIGHT_BUILDER_CLS
+from config import IMAGE_TAG
 
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
@@ -28,59 +26,6 @@ BUNDLE_PATH = os.path.join(ARTIFACT_DIR, BUNDLE_NAME)
 def cli():
     """All commands constituting continuous integration."""
     pass
-
-
-@cli.command()
-@click.option(
-    "--apply",
-    is_flag=True,
-    default=False,
-    help="Whether or not to apply isort and black formatting.",
-)
-@click.option(
-    "--rebuild", is_flag=True, default=False, help="Force-rebuild style checking env"
-)
-def style(apply, rebuild):
-    """Run formatting checks"""
-
-    cmd = ["edm", "envs", "list"]
-    proc = subprocess.run(cmd, check=True, capture_output=True)
-
-    # Build env if needed
-    if rebuild or (LINT_ENV_NAME not in proc.stdout.decode("utf8")):
-        cmd = ["edm", "envs", "create", LINT_ENV_NAME, "--force", "--version", "3.8"]
-        subprocess.run(cmd, check=True)
-
-        cmd = [
-            "edm",
-            "install",
-            "-e",
-            LINT_ENV_NAME,
-            "-y",
-            "black",
-            "click",
-            "flake8",
-            "isort",
-            "pyyaml",
-        ]
-        subprocess.run(cmd, check=True)
-
-    # Then run checking commands
-    commands = [
-        (["isort", "."], ["--check", "--diff"], "isort check failed"),
-        (["black", "."], ["--check"], "Black check failed"),
-        (["python", "-m", "flake8"], [], "Flake8 check failed"),
-    ]
-
-    for cmd, options, fail_message in commands:
-        if not apply:
-            cmd = cmd + options
-        cproc = subprocess.run(["edm", "run", "-e", LINT_ENV_NAME, "--"] + cmd)
-        rc = cproc.returncode
-        if rc is not None and rc != 0:
-            # Ensure user can see why the check failed
-            click.echo(cproc.stderr)
-            raise click.ClickException(fail_message)
 
 
 @cli.group("preflight")
@@ -103,7 +48,7 @@ def preflight(ctx, edge_settings_file, tag):
 def preflight_run(context):
     """Start the application"""
     click.echo("Starting JupyterHub...")
-    builder = PreflightBuilder(context)
+    builder = PREFLIGHT_BUILDER_CLS(context)
     builder.run()
 
 
@@ -113,7 +58,7 @@ def preflight_run(context):
 def preflight_test(context, verbose):
     """Start the application"""
     click.echo("Running preflight checks...")
-    builder = PreflightBuilder(context)
+    builder = PREFLIGHT_BUILDER_CLS(context)
     builder.test(verbose)
 
 
@@ -137,7 +82,7 @@ def container(ctx, edge_settings_file, tag):
 def container_run(context):
     """Start the application in container mode"""
     click.echo(f"Running {context.app_name} in container {context.container_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.run()
 
 
@@ -150,7 +95,7 @@ def container_test(context, verbose):
         f"Running tests on {context.app_name} "
         + f"using container {context.container_name}..."
     )
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.test(verbose)
 
 
@@ -164,7 +109,7 @@ def container_test(context, verbose):
 def container_build(context, generate_bundle, edm_config, edm_token):
     """Build the application"""
     click.echo(f"Building {context.image} image for {context.app_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.build(
         generate_bundle=generate_bundle, edm_config=edm_config, edm_token=edm_token
     )
@@ -177,7 +122,7 @@ def container_build(context, generate_bundle, edm_config, edm_token):
 @click.pass_obj
 def container_generate_bundle(context, edm_config, edm_token):
     """Generate a bundle with Edge packages"""
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.generate_bundle(edm_config=edm_config, edm_token=edm_token)
     click.echo("Done")
 
@@ -187,7 +132,7 @@ def container_generate_bundle(context, edm_config, edm_token):
 def container_publish(context):
     """Publish the application image"""
     click.echo(f"Publishing {context.app_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.publish()
     click.echo("Done")
 
@@ -209,7 +154,7 @@ def dev(ctx, edge_settings_file):
 def dev_run(context):
     """Start the application and watch backend changes"""
     click.echo(f"Starting {context.app_name} in dev mode")
-    builder = DevBuilder(context)
+    builder = DEV_BUILDER_CLS(context)
     builder.run()
 
 
@@ -218,7 +163,7 @@ def dev_run(context):
 def dev_test(context):
     """Run unit tests on the application"""
     click.echo(f"Running tests on {context.app_name}")
-    builder = DevBuilder(context)
+    builder = DEV_BUILDER_CLS(context)
     builder.test()
 
 
