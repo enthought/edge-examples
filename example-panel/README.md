@@ -5,16 +5,17 @@
 
 1. Make a copy of this example.
 
-2. Ensure you are able to run the ``dev``, ``container``, and ``preflight``
-   group commands (``run`` and ``test``) as outlined below.  This will help
-   find problems with your development environment (missing tools/packages).
+2. Ensure you are able to run the "ci" module ``dev``, ``container``, and 
+   ``preflight`` group commands as outlined below.  This will help find
+   problems with your development environment (missing tools/packages).
 
-3. Change the app name and Docker repository information in config.py, and then
-   publish your app and register it with Edge.
+3. Change the app name and Docker repository information in config.py.
 
-4. Ensure you can run the app in Edge.
+4. Publish your app and register it with Edge.
 
-5. Then, start to modify the example to add your desired functionality.
+5. Ensure you can run the app in Edge.
+
+6. Modify the example to add your desired functionality.
 
 
 ## Bootstrapping
@@ -28,12 +29,10 @@ Before starting, ensure you have the following installed:
 After insuring these are installed, run ``npm install -g configurable-http-proxy``
 to install a proxy module needed by JupyterHub. 
 
-Then, create an EDM environment for local development:
-
-* Run ``python bootstrap.py``.  This will install a number of packages, and 
-  finally print the name of your new EDM environment.
-
-* Activate the environment, by running ``edm shell -e <environment name>``.
+Then, run ``python bootstrap.py``.  This will install a number of packages,
+and finally activate a shell with your local EDM development environment.
+Running bootstrap.py again will skip rebuilding the environment, and bring
+you straight to the shell.
 
 
 ## Overview of files in this example
