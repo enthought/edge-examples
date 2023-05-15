@@ -11,10 +11,8 @@ import subprocess
 
 import click
 
-from config import CONTAINER_BUILDER_CLS as ContainerBuilder
-from config import DEV_BUILDER_CLS as DevBuilder
+from config import CONTAINER_BUILDER_CLS, DEV_BUILDER_CLS, PREFLIGHT_BUILDER_CLS
 from config import IMAGE_TAG, LINT_ENV_NAME
-from config import PREFLIGHT_BUILDER_CLS as PreflightBuilder
 
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
@@ -103,7 +101,7 @@ def preflight(ctx, edge_settings_file, tag):
 def preflight_run(context):
     """Start the application"""
     click.echo("Starting JupyterHub...")
-    builder = PreflightBuilder(context)
+    builder = PREFLIGHT_BUILDER_CLS(context)
     builder.run()
 
 
@@ -113,7 +111,7 @@ def preflight_run(context):
 def preflight_test(context, verbose):
     """Start the application"""
     click.echo("Running preflight checks...")
-    builder = PreflightBuilder(context)
+    builder = PREFLIGHT_BUILDER_CLS(context)
     builder.test(verbose)
 
 
@@ -137,7 +135,7 @@ def container(ctx, edge_settings_file, tag):
 def container_run(context):
     """Start the application in container mode"""
     click.echo(f"Running {context.app_name} in container {context.container_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.run()
 
 
@@ -150,7 +148,7 @@ def container_test(context, verbose):
         f"Running tests on {context.app_name} "
         + f"using container {context.container_name}..."
     )
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.test(verbose)
 
 
@@ -164,7 +162,7 @@ def container_test(context, verbose):
 def container_build(context, generate_bundle, edm_config, edm_token):
     """Build the application"""
     click.echo(f"Building {context.image} image for {context.app_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.build(
         generate_bundle=generate_bundle, edm_config=edm_config, edm_token=edm_token
     )
@@ -177,7 +175,7 @@ def container_build(context, generate_bundle, edm_config, edm_token):
 @click.pass_obj
 def container_generate_bundle(context, edm_config, edm_token):
     """Generate a bundle with Edge packages"""
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.generate_bundle(edm_config=edm_config, edm_token=edm_token)
     click.echo("Done")
 
@@ -187,7 +185,7 @@ def container_generate_bundle(context, edm_config, edm_token):
 def container_publish(context):
     """Publish the application image"""
     click.echo(f"Publishing {context.app_name}...")
-    builder = ContainerBuilder(context)
+    builder = CONTAINER_BUILDER_CLS(context)
     builder.publish()
     click.echo("Done")
 
@@ -209,7 +207,7 @@ def dev(ctx, edge_settings_file):
 def dev_run(context):
     """Start the application and watch backend changes"""
     click.echo(f"Starting {context.app_name} in dev mode")
-    builder = DevBuilder(context)
+    builder = DEV_BUILDER_CLS(context)
     builder.run()
 
 
@@ -218,7 +216,7 @@ def dev_run(context):
 def dev_test(context):
     """Run unit tests on the application"""
     click.echo(f"Running tests on {context.app_name}")
-    builder = DevBuilder(context)
+    builder = DEV_BUILDER_CLS(context)
     builder.test()
 
 
