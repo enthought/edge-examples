@@ -1,5 +1,22 @@
 # Development Guide
 
+
+## Recommended development workflow
+
+1. Make a copy of this example.
+
+2. Ensure you are able to run the ``dev``, ``container``, and ``preflight``
+   group commands (``run`` and ``test``) as outlined below.  This will help
+   find problems with your development environment (missing tools/packages).
+
+3. Change the app name and Docker repository information in config.py, and then
+   publish your app and register it with Edge.
+
+4. Ensure you can run the app in Edge.
+
+5. Then, start to modify the example to add your desired functionality.
+
+
 ## Bootstrapping
 
 Before starting, ensure you have the following installed:
@@ -25,7 +42,7 @@ This example contains:
 
 * A **"ci" module**, whose commands are detailed in the following sections.  This
   module provides everything needed for local development and running e.g.
-  tests in GitHub Actions.
+  tests in GitHub Actions ("ci" stands for "continuous integration").
 
 * A **config.py** module, with various settings including package dependencies.
 
@@ -40,7 +57,7 @@ This example contains:
 * Other various configuration and settings files.
 
 
-## The "ci" module commands
+## "ci" module commands
 
 This example directory contains a "ci" module, which you can use to perform
 development tasks, either locally or in GitHub Actions.
@@ -58,15 +75,16 @@ There are three command groups, for the following purposes:
 * The "preflight" command group, accessed via ``python -m ci preflight``,
   allows you to test your app against a local JupyterHub process before
   publishing to Edge.  This is important as it will allow you to catch
-  problems with e.g. your app's authentication system, before publishing to
-  Edge.
+  problems with e.g. your app's authentication system before going to
+  production.
 
 
 ## Local development tasks
 
 The ``python -m ci dev run`` and ``python -m ci dev test`` commands,
 respectively, will run and test your app outside of Docker and Edge.  These
-run very quickly, and so are suited to day-to-day development.
+run very quickly, and so are suited for routine use in your development
+cycle.
 
 
 ## Docker-container tasks
@@ -83,15 +101,15 @@ To start with, you can build a Docker image containing your app by running
 * Construct an EDM data bundle ("zbundle") with your app's Python dependencies.
   These are defined in "config.py".
 * Perform any build tasks, such as running ``npm`` to package up React code.
-* Finally, uses the Dockerfile to combine the various parts
-  (source files, zbundle, npm-generated archives) together into a Docker image.
+* Finally, use the Dockerfile to combine the various parts (source files, 
+  zbundle, npm-generated archives) together into a Docker image.
 
 ### Run
 
 Once your Docker image has been built, you can the app as a container via
 ``python -m ci container run``.  The app will start on http://127.0.0.1:8888.
 Note that other URLs or IP addresses may be printed to the console during
-app startup, and should be ignored.
+app startup, and should be ignored.  Type Ctrl-C to exit.
 
 ### Test
 
@@ -104,7 +122,7 @@ that your app won't work when deployed to Edge.
 Running ``python -m ci container publish`` will push your app to the appropriate
 Docker registry.  Be sure you are logged in (``docker login <registry>``)
 before attempting.  **Before publishing, you should run preflight checks as
-described later in this document**.
+described later in this document.**
 
 ### Bundle rebuild
 
@@ -121,6 +139,7 @@ test your app against a local JupyterHub instance.
 
 Run ``python -m ci preflight run`` to run JupyterHub.  You can log in at
 http://127.0.0.1:8000.  Enter the username "edge" and the password "password".
+When finished, type Ctrl-C to exit.
 
 To run the preflight check in an automated way, do 
 ``python -m ci preflight test``.  This can be e.g. incorporated into a 
@@ -130,7 +149,7 @@ GitHub Actions workflow.
 ## edge_settings.json
 
 You will notice an edge_settings.json.example file in this example's root.
-During development, it is often convenient to have a genuine EdgeSession
+During local development, it is often convenient to have a genuine EdgeSession
 object for e.g. interacting with the Edge file system.  To make an EdgeSession
 available in your app during development, fill in the fields in this file
 and rename it to "edge_settings.json".  The "ci" module will pick up the
@@ -140,7 +159,7 @@ information and set the appropriate environment variables when your app runs.
 do not copy it into your Docker image.**  When running in the real Edge
 system, the EdgeSession object can be created automatically using the
 token, etc., of the user who launched the app.  This information is scraped
-from the environment when you call ``EdgeSession()`` constructor.
+from the environment when you call the ``EdgeSession()`` constructor.
 
 
 ## Environment variables
@@ -162,8 +181,9 @@ to production.
 ## Managing EDM and Pip dependencies
 
 In config.py, you can specify both _local development_ dependencies, which
-will be used in your bootstrap.py-build development environment, and you
-_application dependencies_, which will be installed into your Dockerfile.
+will be used in your bootstrap.py-built development environment, and
+_application dependencies_, which will be installed into your Docker image.
+
 By default, both will use the list of Deployment Server repositories given
 in your ``~/edm.yaml`` file, along with any credentials in that file.  You
 can select a different ``edm.yaml`` file using the ``--edm-config`` option
@@ -180,17 +200,19 @@ Using ``--no-cache-dir`` will reduce the size of the Docker image.
 
 ## Registering versions of your app with Edge
 
-Once you have published
+Once you have published your Docker image, you are ready to register that
+version of your app with Edge.
+
 As a quick reminder, in Edge, there is a distinction between an _app_ and an
 _app version_.  Your organization administrator can define an _app_, and then
 developers are free to register _app versions_ associated with that app.  This
 ensures that org administrators have full control over what shows up on the
 dashboard, but gives developers freedom to publish new versions by themselves.
 
-You can register a new app version by logging in to Edge, going to the
-gear icon in the upper-right corner, and navigating to the app in question.
-There is a form to fill out which asks for the version, Quay.io or DockerHub
-URL for the image, and some other information.
+The easiest way to register a new app version is by logging in to Edge, going
+to the gear icon in the upper-right corner, and navigating to the app in
+question. There is a form to fill out which asks for the version, Quay.io or
+DockerHub URL for the image, and some other information.
 
 You can also register your app version programmatically.  This is particularly
 convenient during the development process, for automated builds.  A general
@@ -202,7 +224,7 @@ from edge.apps.application import Application
 from edge.apps.app_version import AppKindEnum, AppVersion
 from edge.apps.server_info import ServerInfo
 
-# Create an Edge session
+# Create an Edge session.
 edge = EdgeSession(
     service_url="https://edge.enthought.com/services/api",
     organization="<YOUR_ORGANIZATION>",
