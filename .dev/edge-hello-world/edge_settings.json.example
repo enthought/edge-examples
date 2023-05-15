@@ -1,5 +1,0 @@
-{
-  "EDGE_API_TOKEN": "<API_TOKEN>",
-  "EDGE_API_ORG": "<ORG_NAME>",
-  "EDGE_API_SERVICE_URL": "https://edge.enthought.com/services/api"
-}

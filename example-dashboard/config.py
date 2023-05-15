@@ -6,8 +6,8 @@ from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 APP_NAME = "Edge Dashboard App"
 IMAGE_NAME = "quay.io/enthought/edge-dashboard-demo"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-dashboard-demo"
-ENV_NAME = "edge-dashboard-demo"
+CONTAINER_NAME = "example-dashboard"
+ENV_NAME = "example-dashboard"
 
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = ["click", "flask>2", "enthought_edge", "pytest", "requests"]

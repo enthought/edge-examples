@@ -6,8 +6,8 @@ from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 APP_NAME = "Edge Native Flask App"
 IMAGE_NAME = "quay.io/enthought/edge-native-app-flask-demo"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-native-app-flask"
-ENV_NAME = "edge-native-app-flask"
+CONTAINER_NAME = "example-flask"
+ENV_NAME = "example-flask"
 
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = [

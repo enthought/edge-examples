@@ -6,8 +6,8 @@ from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 APP_NAME = "Edge Panel Example"
 IMAGE_NAME = "quay.io/enthought/edge-panel-example"
 IMAGE_TAG = "1.0.0"
-CONTAINER_NAME = "edge-panel-example"
-ENV_NAME = "edge-panel-example"
+CONTAINER_NAME = "example-panel"
+ENV_NAME = "example-panel"
 
 # Dependencies for bootstrap.py development environment
 EDM_DEPS = [

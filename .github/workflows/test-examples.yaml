@@ -22,34 +22,29 @@ jobs:
             environment: edge-native-base
           },
           {
-            component: edge-hello-world,
-            directory: .dev/edge-hello-world,
-            environment: edge-hello-world
+            component: example-dashboard,
+            directory: example-dashboard,
+            environment: example-dashboard
           },
           {
-            component: native-app-flask-example,
-            directory: native-app-flask-example,
-            environment: edge-native-app-flask
+            component: example-flask,
+            directory: example-flask,
+            environment: example-flask
           },
           {
-            component: dashboard-app-example,
-            directory: dashboard-app-example,
-            environment: edge-dashboard-demo
+            component: example-panel,
+            directory: example-panel,
+            environment: example-panel
           },
           {
-            component: edge-panel-example,
-            directory: edge-panel-example,
-            environment: edge-panel-example
+            component: example-plotly-dash,
+            directory: example-plotly-dash,
+            environment: example-plotly-dash
           },
           {
-            component: edge-streamlit-example,
-            directory: edge-streamlit-example,
-            environment: edge-streamlit-example
-          },
-          {
-            component: edge-plotly-dash-example,
-            directory: edge-plotly-dash-example,
-            environment: edge-plotly-dash
+            component: example-streamlit,
+            directory: example-streamlit,
+            environment: example-streamlit
           }
         ]
       fail-fast: false
