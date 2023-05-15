@@ -28,12 +28,10 @@ Before starting, ensure you have the following installed:
 After insuring these are installed, run ``npm install -g configurable-http-proxy``
 to install a proxy module needed by JupyterHub. 
 
-Then, create an EDM environment for local development:
-
-* Run ``python bootstrap.py``.  This will install a number of packages, and 
-  finally print the name of your new EDM environment.
-
-* Activate the environment, by running ``edm shell -e <environment name>``.
+Then, run ``python bootstrap.py``.  This will install a number of packages,
+and finally activate a shell with your local EDM development environment.
+Running bootstrap.py again will skip rebuilding the environment, and bring
+you straight to the shell.
 
 
 ## Overview of files in this example

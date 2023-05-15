@@ -44,7 +44,11 @@ def bootstrap(edm_config=None, edm_token=None):
         cmd = base_cmd + ["run", "-e", ENV_NAME, "--", "pip", "install"] + PIP_DEPS
         subprocess.run(cmd, check=True)
 
-    print("Bootstrap complete.")
+        print("Bootstrap complete.")
+
+    else:
+        print("Environment already exists; reusing.")
+
     print(f"Activating dev environment {ENV_NAME}")
     subprocess.run(["edm", "shell", "-e", ENV_NAME])
 

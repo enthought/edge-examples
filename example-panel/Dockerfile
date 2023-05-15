@@ -1,4 +1,4 @@
-# This is the Dockerfile for the Enthought Edge "flask" example.
+# This is the Dockerfile for the Enthought Edge "panel" example.
 # 
 # We use "edge-native-base" as the base image.  This is a Centos-7 based image
 # which includes EDM, as well as a small proxy server which automatically 
@@ -18,7 +18,7 @@ COPY $EDGE_BUNDLE /tmp/app_environment.zbundle
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
-# Final image
+# Second stage
 FROM $BASE_IMAGE
 
 COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
