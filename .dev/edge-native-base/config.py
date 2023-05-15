@@ -1,3 +1,15 @@
+# Enthought product code
+#
+# (C) Copyright 2010-2022 Enthought, Inc., Austin, TX
+# All rights reserved.
+#
+# This file and its contents are confidential information and NOT open source.
+# Distribution is prohibited.
+
+"""
+    Settings file for "edge-native-base".
+"""
+
 import os
 import subprocess
 

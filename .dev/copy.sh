@@ -1,3 +1,6 @@
+# Copy ci, bootstrap.py, and README across all example dirs.
+# Also updates a subset of these files in edge-native-base.
+
 cp -r base-files/* ../example-dashboard
 cp -r base-files/* ../example-flask
 cp -r base-files/* ../example-panel
