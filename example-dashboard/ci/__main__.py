@@ -11,8 +11,13 @@ import subprocess
 
 import click
 
-from config import CONTAINER_BUILDER_CLS, DEV_BUILDER_CLS, PREFLIGHT_BUILDER_CLS
-from config import IMAGE_TAG, LINT_ENV_NAME
+from config import (
+    CONTAINER_BUILDER_CLS,
+    DEV_BUILDER_CLS,
+    IMAGE_TAG,
+    LINT_ENV_NAME,
+    PREFLIGHT_BUILDER_CLS,
+)
 
 from .contexts import ContainerBuildContext, DevBuildContext, PreflightBuildContext
 
