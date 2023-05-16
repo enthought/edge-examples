@@ -34,7 +34,6 @@ JUPYTERHUB_ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL", None)
 JUPYTERHUB_SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 
 NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
-APP_VERSION = os.environ.get("APP_VERSION", "dashboard-app-example")
 
 
 EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
@@ -126,7 +125,6 @@ def create_app():
             **{
                 "dashboard": dashboard,
                 "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
-                "app_version": APP_VERSION,
             },
         )
 

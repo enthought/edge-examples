@@ -33,6 +33,3 @@ COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/application/ /home/app/application
-
-ARG CI_IMAGE=quay.io/enthought/edge-dashboard-demo:latest
-ENV APP_VERSION=$CI_IMAGE

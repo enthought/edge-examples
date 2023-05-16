@@ -39,7 +39,6 @@ JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
 API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
-APP_VERSION = os.environ.get("APP_VERSION", "native-app-example")
 
 NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
 

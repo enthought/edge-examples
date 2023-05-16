@@ -166,9 +166,6 @@ from the environment when you call the ``EdgeSession()`` constructor.
 Within your app, you have access to a number of environment variables which
 may be useful for the development process:
 
-APP_VERSION: In local mode, this is a string with the Docker image name + tag.
-**When running in the real Edge system, this variable will not be defined.**
-
 NATIVE_APP_MODE: When running with ``python -m ci dev``, this will be set to
 "dev".  When running with ``python -m ci container``, this will be set to
 "container".  **When running in the real Edge system, this variable
