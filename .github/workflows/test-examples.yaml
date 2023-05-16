@@ -98,6 +98,10 @@ jobs:
         run: |
           export PATH="$HOME/edm/bin:$PATH"
           set -e
+          cd .dev/edge-native-base
+          edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
+          edm run -e edge-native-base -- python -m ci docker build
+          cd ../..
           cd ${{ matrix.example.directory }}
           edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
           edm run -e ${{ matrix.example.environment }} -- python -m ci dev test
