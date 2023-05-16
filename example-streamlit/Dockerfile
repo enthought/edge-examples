@@ -8,7 +8,7 @@
 # a two-stage build, to avoid including the .zbundle in the layers of the 
 # published image.
 
-ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.0.1
+ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.0.0
 
 FROM $BASE_IMAGE as stage_one
 
