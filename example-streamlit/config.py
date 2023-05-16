@@ -74,7 +74,7 @@ class StreamlitDevBuilder(DevBuilder):
         subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
 
     def test(self):
-        raise NotImplementedError
+        pass
 
 
 DEV_BUILDER_CLS = StreamlitDevBuilder
