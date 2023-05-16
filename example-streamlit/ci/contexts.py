@@ -110,7 +110,10 @@ class BuildContext:
                     raise ValueError(f"{key} not in settings file")
             return settings
         except FileNotFoundError:
-            print(f"Could not find settings file {filename}")
+            print(
+                f"Could not find optional settings file {filename}; "
+                "proceeding without it."
+            )
             return {}
 
 

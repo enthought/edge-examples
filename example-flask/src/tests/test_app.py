@@ -12,4 +12,4 @@ class TestHelloWorld(TestCase):
         response = self.client.get("/")
         # Assert that the Flask app serves the React app
         # bootstrap
-        self.assertIn("native-app-example", response.text)
+        self.assertIn("Welcome to the Flask example!", response.text)
