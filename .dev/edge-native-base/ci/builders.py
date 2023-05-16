@@ -123,6 +123,8 @@ class ContainerBuilder(Builder):
             "build",
             "-t",
             f"{self.context.image}",
+            "--output",
+            "type=docker",
             "--load",
             "-f",
             "Dockerfile",
