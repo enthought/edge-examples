@@ -22,34 +22,29 @@ jobs:
             environment: edge-native-base
           },
           {
-            component: edge-hello-world,
-            directory: .dev/edge-hello-world,
-            environment: edge-hello-world
+            component: example-dashboard,
+            directory: example-dashboard,
+            environment: example-dashboard
           },
           {
-            component: native-app-flask-example,
-            directory: native-app-flask-example,
-            environment: edge-native-app-flask
+            component: example-flask,
+            directory: example-flask,
+            environment: example-flask
           },
           {
-            component: dashboard-app-example,
-            directory: dashboard-app-example,
-            environment: edge-dashboard-demo
+            component: example-panel,
+            directory: example-panel,
+            environment: example-panel
           },
           {
-            component: edge-panel-example,
-            directory: edge-panel-example,
-            environment: edge-panel-example
+            component: example-plotly-dash,
+            directory: example-plotly-dash,
+            environment: example-plotly-dash
           },
           {
-            component: edge-streamlit-example,
-            directory: edge-streamlit-example,
-            environment: edge-streamlit-example
-          },
-          {
-            component: edge-plotly-dash-example,
-            directory: edge-plotly-dash-example,
-            environment: edge-plotly-dash
+            component: example-streamlit,
+            directory: example-streamlit,
+            environment: example-streamlit
           }
         ]
       fail-fast: false
@@ -105,24 +100,7 @@ jobs:
           set -e
           cd ${{ matrix.example.directory }}
           edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
+          edm run -e ${{ matrix.example.environment }} -- python -m ci dev test
           edm run -e ${{ matrix.example.environment }} -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
           edm run -e ${{ matrix.example.environment }} -- python -m ci container test
           edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test
-
-
-  comment:
-    needs: [test-examples]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Comment on PR
-        uses: actions/github-script@v6
-        if: github.ref_name != 'main'
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Edge Examples build and pass tests'
-            })
