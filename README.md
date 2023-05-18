@@ -6,10 +6,10 @@ copies of the apps here and modify them to add your own functionality.
 
 Table of Contents
 
-* [Suggested Development Workflow](suggested-development-workflow)
-* [List of Examples](list-of-examples)
-* [Using the edge-native-base Docker image](using-the-edge-native-base-docker-image)
-* [Security when not using edge-native-base](security-when-not-using-edge-native-base)
+* [Suggested Development Workflow](#suggested-development-workflow)
+* [List of Examples](#list-of-examples)
+* [Using the edge-native-base Docker image](#using-the-edge-native-base-docker-image)
+* [Security when not using edge-native-base](#security-when-not-using-edge-native-base)
 
 ## Suggested Development Workflow
 
