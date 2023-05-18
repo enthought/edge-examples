@@ -1,23 +1,5 @@
 # Development Guide
 
-
-## Recommended development workflow
-
-1. Make a copy of this example.
-
-2. Ensure you are able to run the "ci" module ``dev``, ``container``, and 
-   ``preflight`` group commands as outlined below.  This will help find
-   problems with your development environment (missing tools/packages).
-
-3. Change the app name and Docker repository information in config.py.
-
-4. Publish your app and register it with Edge.
-
-5. Ensure you can run the app in Edge.
-
-6. Modify the example to add your desired functionality.
-
-
 ## Bootstrapping
 
 Before starting, ensure you have the following installed:
