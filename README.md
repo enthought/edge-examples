@@ -112,6 +112,9 @@ Here are some things to keep in mind, as you work with ``edge-native-base``:
   startup script at ``/home/app/startup-script.sh``.  See the examples for
   what goes in this script.
 
+* Do not change the user, for example via a ``USER`` Dockerfile directive.
+  The name of the current user is ``app``.
+
 * Your app should serve on port 9000.  The ``edge-native-base`` image will
   automatically proxy this to port 8888, which is what Edge expects.
 
