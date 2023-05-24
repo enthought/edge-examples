@@ -39,6 +39,6 @@ class StandaloneApplication(gunicorn.app.base.BaseApplication):
 
 
 if __name__ == "__main__":
-    options = {"bind": "0.0.0.0:5000", "workers": 1, "threads": 1}
+    options = {"bind": "127.0.0.1:5000", "workers": 1, "threads": 1}
     application = create_app()
     StandaloneApplication(application, options).run()

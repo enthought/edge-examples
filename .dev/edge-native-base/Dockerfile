@@ -17,7 +17,7 @@ RUN chmod o+rwx /opt
 
 USER app
 
-RUN edm -r /opt/_edm_oauth2_proxy install --version 3.8 flask gunicorn -y \
+RUN edm -r /opt/_edm_oauth2_proxy install --version 3.8 flask gunicorn requests -y \
 	&& edm -r /opt/_edm_oauth2_proxy run -- python -m pip install --no-cache-dir "jupyterhub==2.2.2" Flask-Session \
 	&& edm -r /opt/_edm_oauth2_proxy cache purge --yes
 
