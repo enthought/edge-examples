@@ -9,6 +9,7 @@
 import logging
 import os
 import sys
+import time
 from datetime import datetime, timezone
 
 from flask import Flask, jsonify, make_response, redirect, request, session
@@ -33,6 +34,8 @@ JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX")
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
 HAVE_JUPYTERHUB = API_TOKEN is not None
 
+# Must be explicitly set to disable authentication
+EDGE_DISABLE_AUTH = bool(os.environ.get("EDGE_DISABLE_AUTH"))
 
 # This *must* be provided, and must be a non-empty string
 SESSION_SECRET_KEY = os.environ.get("SESSION_SECRET_KEY")
@@ -44,6 +47,10 @@ if API_TOKEN is not None and API_URL is not None:
     AUTH = HubOAuth(api_token=API_TOKEN, cache_max_age=60, api_url=API_URL)
 else:
     AUTH = None
+
+# Used to prevent hammering the JupyterHub activity tracker
+LAST_PING = None
+PING_MIN_INTERVAL = 30  # Skip pings within this window (seconds)
 
 
 def create_app():
@@ -65,11 +72,12 @@ def create_app():
             A 202 status if the user has an auth session
 
         """
-        if not HAVE_JUPYTERHUB:
+        if EDGE_DISABLE_AUTH:
             return "OK", 202
-        ping_server()
+
         token = session.get("token")
         if token:
+            ping_server()
             hub_user = AUTH.user_for_token(token)
             LOG.debug(f"Auth hub user {hub_user}")
             return jsonify(hub_user), 202
@@ -128,9 +136,20 @@ def create_app():
 
 def ping_server():
     """Send activity ping to the JupyterHub server"""
+    global LAST_PING
 
-    if not HAVE_JUPYTERHUB:
-        LOG.debug("Activity ping: skipped, no JupyterHub")
+    if not ACTIVITY_URL:
+        LOG.debug("Activity ping: skipped, no activity URL")
+        return
+
+    if not API_TOKEN:
+        LOG.error("Activity ping: skipped, URL present but no API token")
+        return
+
+    time_now = time.monotonic()
+    if LAST_PING is not None and (time_now - LAST_PING) < PING_MIN_INTERVAL:
+        LOG.debug("Activity ping: skipped, pinged recently")
+        return
 
     last_activity = datetime.now()
 
@@ -139,18 +158,18 @@ def ping_server():
         last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
 
     last_activity = last_activity.isoformat() + "Z"
-    if ACTIVITY_URL:
-        try:
-            response = requests.post(
-                ACTIVITY_URL,
-                headers={
-                    "Authorization": f"token {API_TOKEN}",
-                    "Content-Type": "application/json",
-                },
-                json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
-            )
-            response.raise_for_status()
-        except Exception as e:
-            LOG.error(f"Activity ping: failed {e}")
-        else:
-            LOG.debug(f"Activity ping: succcess ({last_activity})")
+    try:
+        response = requests.post(
+            ACTIVITY_URL,
+            headers={
+                "Authorization": f"token {API_TOKEN}",
+                "Content-Type": "application/json",
+            },
+            json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
+        )
+        response.raise_for_status()
+    except Exception as e:
+        LOG.error(f"Activity ping: failed {e}")
+    else:
+        LOG.debug(f"Activity ping: succcess ({last_activity})")
+        LAST_PING = time_now

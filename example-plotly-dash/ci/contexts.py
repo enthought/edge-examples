@@ -23,6 +23,8 @@ class BuildContext:
         _env = self._get_edge_settings(self.edge_settings_file)
         if self.mode is not None:
             _env["NATIVE_APP_MODE"] = self.mode
+            if self.mode in ("container", "dev"):
+                _env["EDGE_DISABLE_AUTH"] = "1"
         return _env
 
     @property
