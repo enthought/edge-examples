@@ -5,22 +5,33 @@ contains just enough machinery to build a "hello world" app, run it locally,
 and publish the image for use with Edge.
 
 
+## Before you begin
+
+Before starting, ensure you have the following installed:
+
+* [Docker](https://docker.com)
+* [Node JS](https://nodejs.org)
+* [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+
+After insuring these are installed, run ``npm install -g configurable-http-proxy``
+to install a proxy module needed by JupyterHub. 
+
+Finally, ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg
+repository.  This will be necessary to use EdgeSession in the example.
+
+
 ## Quick start
 
-1. Before starting, ensure EDM is installed and your ``edm.yaml`` file lists
-   ``enthought/edge`` as an egg repository.  This will be necessary to use
-   EdgeSession in the example.
-
-2. Run ``python bootstrap.py``.  This will create a development environment
+1. Run ``python bootstrap.py``.  This will create a development environment
    and activate it, dropping you into a development shell.
 
-3. From within the development shell, build the example by running
+2. From within the development shell, build the example by running
    ``python -m ci build``.  This will produce a Docker image.
 
-4. Run the Docker image via ``python -m ci run``.  The app will serve on
+3. Run the Docker image via ``python -m ci run``.  The app will serve on
    http://127.0.0.1:8888 in a local development mode.
 
-5. To reduce the risk that the app will fail when run on Edge, you can run
+4. To reduce the risk that the app will fail when run on Edge, you can run
    a "preflight check", via ``python -m ci preflight``.  This will launch
    a local version of JupyterHub at http://127.0.0.1:8000.
    You can log in using username "edge" and password "password".  Ensure the
