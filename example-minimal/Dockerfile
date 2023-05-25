@@ -38,4 +38,7 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 
 COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
+
 COPY --chown=app main.py /home/app/main.py
+
+

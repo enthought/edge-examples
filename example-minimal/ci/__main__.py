@@ -27,7 +27,8 @@ def cli():
 def build(rebuild_zbundle):
     """Build the Docker image"""
 
-    # Build bundle with dependencies
+    # First, we build a "zbundle" which contains all the eggs needed to
+    # build the environment within the Docker image.
     fname = "app_environment.zbundle"
     if not op.exists(op.join(SRC_ROOT, fname)) or rebuild_zbundle:
         cmd = [
@@ -46,6 +47,8 @@ def build(rebuild_zbundle):
         ] + APP_DEPENDENCIES
         subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
+    # Second, we run Docker.  The Dockerfile will copy the zbundle into
+    # a temp folder and install it.
     cmd = ["docker", "build", "-t", f"{IMAGE}:{VERSION}", "."]
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
@@ -54,8 +57,9 @@ def build(rebuild_zbundle):
 def run():
     """Run the Docker image for testing"""
 
-    # Get values from the .env file (API tokens for testing, etc.)
-    # For testing, also disable the OAuth2 machinery.
+    # Get values from the dev settings file (API tokens for testing, etc.)
+    # Because we are running outside of JupyterHub, we also disable the OAuth2
+    # machinery.
     envs = _load_dev_settings()
     envs["EDGE_DISABLE_AUTH"] = "1"
 
@@ -63,14 +67,18 @@ def run():
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
     cmd += [f"{IMAGE}:{VERSION}"]
+
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
 def run_in_jupyter():
     """Run the Docker image in a local JupyterHub environment"""
+
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
 
+    # Pass down container name, and any dev settings.
+    # The other end of this process in is jupyterhub_config.py.
     env = os.environ.copy()
     env.update(
         {
@@ -86,11 +94,16 @@ def run_in_jupyter():
 @cli.command()
 def publish():
     """Publish the Docker image for use with Edge"""
-    pass
+    cmd = ["docker", "push", f"{IMAGE}:{VERSION}"]
+    subprocess.run(cmd, check=True)
 
 
 def _load_dev_settings():
-    """Load dev_settings.json file"""
+    """Load dev_settings.json file.
+
+    Returns a dict with "EDGE_*" key/value pairs, or an empty dict if the
+    file doesn't exist.
+    """
     fpath = op.join(SRC_ROOT, "dev_settings.json")
     if not op.exists(fpath):
         return {}
