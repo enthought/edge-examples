@@ -90,7 +90,7 @@ def preflight():
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
 
     # Pass down container name, and any dev settings.
-    # The other end of this process in is jupyterhub_config.py.
+    # The other end of this process is in jupyterhub_config.py.
     env = os.environ.copy()
     env.update(
         {

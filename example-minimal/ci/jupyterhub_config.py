@@ -8,7 +8,7 @@
 
 """
     Config file for local JupyterHub.  This is used by the "ci" module for
-    running your app in test mode.
+    running your app in preflight mode.
 """
 
 import os

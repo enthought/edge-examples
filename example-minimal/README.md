@@ -18,11 +18,11 @@ and publish the image for use with Edge.
    ``python -m ci build``.  This will produce a Docker image.
 
 4. Run the Docker image via ``python -m ci run``.  The app will serve on
-   (http://127.0.0.1:8888)[http://127.0.0.1:8888] in a local development mode.
+   http://127.0.0.1:8888 in a local development mode.
 
 5. To reduce the risk that the app will fail when run on Edge, you can run
    a "preflight check", via ``python -m ci preflight``.  This will launch
-   a local version of JupyterHub at (http://127.0.0.1:8000)[http://127.0.0.1:8000].
+   a local version of JupyterHub at http://127.0.0.1:8000.
    You can log in using username "edge" and password "password".  Ensure the
    app launches and works correctly.
 
@@ -82,7 +82,7 @@ To do so, follow this procedure:
 * Define EDGE_API_SERVICE_URL in that file.  The typical value here is
   ``"https://edge.enthought.com/services/api"``.
 * Define EDGE_API_ORG in that file.  This is the "short name" displayed in
-  the URL bar when you log into an organiation, for example, ``"default"``.
+  the URL bar when you log into an organization, for example, ``"default"``.
 * Define EDGE_API_TOKEN.  You can get one of these by going to the
   ``/hub/token`` endpoint on the Edge server.
 

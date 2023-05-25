@@ -79,15 +79,18 @@ def root():
     {% endfor %}
     </ul>
     </p>
-    <p>Server prefix: "{{ prefix }}".</p>
+    <p>This example is served from: "{{ example_served_from }}".</p>
     </body></html>
     """
 
-    # See the README.md file for the meaning of "prefix".
+    # See the README.md file for more info on how routes work.  You typically
+    # don't need to use this value in your code; your Flask routes, etc.,
+    # should be set up as though it was located at the server root.
+    example_served_from = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
     return render_template_string(
         html,
         user_name=user_name,
         edge_session=edge_session,
-        prefix=os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/"),
+        example_served_from=example_served_from,
     )
