@@ -32,7 +32,6 @@ API_URL = os.environ.get("JUPYTERHUB_API_URL")
 ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
 JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX")
 SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME", "")
-HAVE_JUPYTERHUB = API_TOKEN is not None
 
 # Must be explicitly set to disable authentication
 EDGE_DISABLE_AUTH = bool(os.environ.get("EDGE_DISABLE_AUTH"))
