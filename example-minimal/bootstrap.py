@@ -11,9 +11,7 @@
     example.
 """
 
-import getopt
 import subprocess
-import sys
 
 ENV_NAME = "edge-minimal-example"
 EDM_DEPS = ["click", "pip", "setuptools"]
@@ -21,7 +19,7 @@ PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner"]
 
 
 def bootstrap():
-    """Create and populate dev env"""
+    """Create and populate dev env."""
 
     if ENV_NAME not in _list_edm_envs():
         print(f"Creating development environment {ENV_NAME}...")

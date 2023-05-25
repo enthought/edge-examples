@@ -11,6 +11,12 @@
 # of the published image.
 
 
+# IMPORTANT: Please do not define any of the EDGE_* environment variables, or
+# any of the JUPYTERHUB_* variables, directly in this file. They will be set
+# automatically when running in Edge, or by the "ci" module when running
+# locally.
+
+
 
 # First stage
 
@@ -31,6 +37,11 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 FROM $BASE_IMAGE
 
 COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
+
+# Make any global changes (yum install, e.g.) in the second stage.
+# Don't change the user, and in particular don't make the user "root".
+
+RUN sudo echo "(Run yum via sudo if needed)"
 
 # Copy startup script and application.
 # Note: the startup script must be placed in /home/app for the base image

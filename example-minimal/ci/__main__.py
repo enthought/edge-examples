@@ -1,3 +1,15 @@
+# Enthought product code
+#
+# (C) Copyright 2010-2022 Enthought, Inc., Austin, TX
+# All rights reserved.
+#
+# This file and its contents are confidential information and NOT open source.
+# Distribution is prohibited.
+
+"""
+    This is the "ci" module for the minimal example.
+"""
+
 import click
 import os.path as op
 import subprocess
@@ -8,8 +20,8 @@ import json
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 # Docker image will be tagged "IMAGE:VERSION"
-VERSION = "0.0.1"
 IMAGE = "quay.io/enthought/edge-example-minimal"
+VERSION = "0.0.1"
 
 # These will go into the built Docker image.  You may wish to modify this
 # minimal example to pin the dependencies, or use a bundle file to define them.
@@ -30,7 +42,7 @@ def build(rebuild_zbundle):
     # First, we build a "zbundle" which contains all the eggs needed to
     # build the environment within the Docker image.
     fname = "app_environment.zbundle"
-    if not op.exists(op.join(SRC_ROOT, fname)) or rebuild_zbundle:
+    if rebuild_zbundle or not op.exists(op.join(SRC_ROOT, fname)):
         cmd = [
             "edm",
             "bundle",
@@ -72,7 +84,7 @@ def run():
 
 
 @cli.command()
-def run_in_jupyter():
+def preflight():
     """Run the Docker image in a local JupyterHub environment"""
 
     cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
@@ -88,7 +100,7 @@ def run_in_jupyter():
     )
     env.update(_load_dev_settings())
 
-    subprocess.run(cmd, env=env)
+    subprocess.run(cmd, env=env, cwd=SRC_ROOT)
 
 
 @cli.command()
@@ -102,7 +114,7 @@ def _load_dev_settings():
     """Load dev_settings.json file.
 
     Returns a dict with "EDGE_*" key/value pairs, or an empty dict if the
-    file doesn't exist.
+    file doesn't exist.  Any other keys are filtered out.
     """
     fpath = op.join(SRC_ROOT, "dev_settings.json")
     if not op.exists(fpath):

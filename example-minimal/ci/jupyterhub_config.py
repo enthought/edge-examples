@@ -10,6 +10,7 @@
     Config file for local JupyterHub.  This is used by the "ci" module for
     running your app in test mode.
 """
+
 import os
 import socket
 import tempfile

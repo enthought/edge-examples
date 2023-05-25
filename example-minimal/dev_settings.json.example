@@ -1,7 +1,8 @@
 {
+  "?0": "This is an *optional* settings file to make development more convenient.",
   "?1": "Make a copy of this file, named 'dev_settings.json', and fill in the values.",
   "?2": "This will allow EdgeSession() to work locally for testing/development.",
-  "?3": "DO NOT CHECK THE dev_settings.json FILE INTO SOURCE CONTROL.",
+  "?3": "DO NOT CHECK THE dev_settings.json FILE INTO SOURCE CONTROL!",
 
   "EDGE_API_TOKEN": "<YOUR_API_TOKEN>",
   "EDGE_API_ORG": "<ORG_ID>",

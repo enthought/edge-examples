@@ -42,24 +42,52 @@ def get_edge_session():
     return None
 
 
-session = get_edge_session()
+edge_session = get_edge_session()
 app = Flask(__name__)
 
 
 @app.get("/")
 def root():
-    if session is not None:
-        user_name = session.whoami().user_name
-    else:
-        user_name = "(Not available; please run in Edge or set up 'dev_settings.json')"
+    """Example Flask route"""
+
+    if edge_session is None:
+        html = """\
+        <html><body>
+        <h1>Hello World!</h1>
+        <p>To see more information, run this app in Edge or set up
+        the "dev_settings.json" file locally.</p>
+        </body></html>"""
+        return render_template_string(html)
+
+    try:
+        user_name = edge_session.whoami().user_name
+    except Exception as e:
+        msg = "EdgeSession error!  Check the container logs for more information."
+        return msg, 500
 
     html = """\
     <html><body>
-    <h1>Hello World!</h1>
+    <h1>Hello {{ user_name }}!</h1>
     <p>
-    <li>User Name: {{ user_name }}</li>
+    Welcome!  You are in the "{{ edge_session.organization }}" organization.
+    </p>
+    <p>
+    Here is a list of the files in your organization (top folder only):
+    <ul>
+    {% for fname in edge_session.files.list_files() %}
+    <li>{{ fname }}</li>
+    {% endfor %}
     </ul>
+    </p>
+    <p>Server prefix: "{{ prefix }}".</p>
     </body></html>
     """
 
-    return render_template_string(html, user_name=user_name)
+    # See the README.md file for the meaning of "prefix".
+
+    return render_template_string(
+        html,
+        user_name=user_name,
+        edge_session=edge_session,
+        prefix=os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/"),
+    )
