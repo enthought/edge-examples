@@ -27,6 +27,10 @@ VERSION = "0.0.1"
 # minimal example to pin the dependencies, or use a bundle file to define them.
 APP_DEPENDENCIES = ["flask", "gunicorn", "enthought_edge"]
 
+# This will be used when running locally ("run" or "preflight" commands).
+# We just use the last component of the full image URL.
+CONTAINER_NAME = IMAGE.split("/")[-1]
+
 
 @click.group()
 def cli():
@@ -75,7 +79,7 @@ def run():
     envs = _load_dev_settings()
     envs["EDGE_DISABLE_AUTH"] = "1"
 
-    cmd = ["docker", "run", "-p", "8888:8888"]
+    cmd = ["docker", "run", "--rm", "-p", "8888:8888", "--name", CONTAINER_NAME]
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
     cmd += [f"{IMAGE}:{VERSION}"]
@@ -95,7 +99,7 @@ def preflight():
     env.update(
         {
             "IMAGE": f"{IMAGE}:{VERSION}",
-            "CONTAINER_NAME": IMAGE.split("/")[-1],
+            "CONTAINER_NAME": CONTAINER_NAME,
         }
     )
     env.update(_load_dev_settings())

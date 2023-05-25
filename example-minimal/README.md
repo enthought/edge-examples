@@ -136,7 +136,6 @@ the prefix from requests, handling the OAuth2 login flow, pinging JupyterHub
 for container activity, and more.  But, there are a few guidelines you will
 need to follow in your own Dockerfile.
 
-* EDM and runtime dependencies are already installed.
 * Don't change the user (for example, by the Dockerfile ``USER`` command).
   The active user is called ``app``.  If you need to run ``yum`` for some
   reason, use ``sudo``.
