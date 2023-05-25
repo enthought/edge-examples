@@ -59,15 +59,9 @@ def root():
         </body></html>"""
         return render_template_string(html)
 
-    try:
-        user_name = edge_session.whoami().user_name
-    except Exception as e:
-        msg = "EdgeSession error!  Check the container logs for more information."
-        return msg, 500
-
     html = """\
     <html><body>
-    <h1>Hello {{ user_name }}!</h1>
+    <h1>Hello {{ edge_session.whoami().user_name }}!</h1>
     <p>
     Welcome!  You are in the "{{ edge_session.organization }}" organization.
     </p>
@@ -85,12 +79,11 @@ def root():
 
     # See the README.md file for more info on how routes work.  You typically
     # don't need to use this value in your code; your Flask routes, etc.,
-    # should be set up as though it was located at the server root.
+    # should be set up as though the app was located at the server root.
     example_served_from = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
     return render_template_string(
         html,
-        user_name=user_name,
         edge_session=edge_session,
         example_served_from=example_served_from,
     )
