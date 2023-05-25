@@ -31,7 +31,6 @@ PIP_DEPS = [
 
 # EDM dependencies that will be packaged into the Docker container
 BUNDLE_PACKAGES = [
-    "enthought_edge>=2.6.0",
     "appdirs",
     "packaging",
     "pip",
@@ -39,6 +38,7 @@ BUNDLE_PACKAGES = [
     "setuptools",
     "six",
     "click",
+    "requests",
 ]
 BUNDLE_NAME = "app_environment.zbundle"
 MODULE_DIR = os.path.join(os.path.dirname(__file__))
