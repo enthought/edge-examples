@@ -104,9 +104,28 @@ care of serving your response on the appropriate route in Edge.
 
 It's sometimes useful to know, programmatically, what "real" prefix your app
 is being served under.  This can be useful when writing e.g. a React front-end
-that needs to know where to serve requests.  The "real" prefix is available
-in the environment variable ``JUPYTERHUB_SERVICE_PREFIX``.  Keep in mind that
-when running outside of Edge or JupyterHub, this variable will not be defined.
+that needs to know where to serve requests.  
+
+The "real" prefix is available in the environment variable 
+``JUPYTERHUB_SERVICE_PREFIX``.  Please note that the value will have a
+trailing slash (``"/"``) character.  When running outside of Edge or
+JupyterHub, this variable will not be defined.
+
+
+## Viewing console output
+
+When running with ``python -m ci run``, the app's output will be displayed
+on the console where you launched it.  When running in preflight mode, with
+``python -m ci preflight``, the JupyterHub output is displayed instead.  Once
+you've launched your app in the JupyterHub UI, you can use the ``docker logs``
+command to see output:
+
+```
+$ docker logs edge-example-minimal -f
+```
+
+(If you've changed the IMAGE constant in ``ci/__main__.py``, replace
+"edge-example-minimal" above with the new image name).
 
 
 ## Guidelines for your Dockerfile
