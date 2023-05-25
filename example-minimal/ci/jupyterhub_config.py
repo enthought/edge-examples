@@ -28,7 +28,7 @@ container_name = os.environ.get("CONTAINER_NAME")
 # the 'dev_settings.json' file.
 container_env = {}
 for name in ("EDGE_API_TOKEN", "EDGE_API_SERVICE_URL", "EDGE_API_ORG"):
-    val = os.environ.get(name):
+    val = os.environ.get(name)
     if val is not None:
         container_env[name] = val
 

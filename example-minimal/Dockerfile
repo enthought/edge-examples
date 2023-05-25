@@ -36,9 +36,9 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Note: the startup script must be placed in /home/app for the base image
 # machinery to pick it up.
 
-COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
+COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 
-COPY --chown=app main.py /home/app/main.py
+COPY --chown=app ./src/main.py /home/app/main.py
 
 
