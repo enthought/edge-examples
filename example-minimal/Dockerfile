@@ -40,8 +40,7 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 
 # Make any global changes (yum install, e.g.) in the second stage.
 # Don't change the user, and in particular don't make the user "root".
-
-RUN sudo echo "(Run yum via sudo if needed)"
+# RUN sudo echo "(Run yum via sudo if needed)"
 
 # Copy startup script and application.
 # Note: the startup script must be placed in /home/app for the base image
