@@ -1,6 +1,8 @@
-# Edge examples gallery
+# Edge Examples
 
 ![Screenshot of the Flask/React example](.dev/images/example-flask.png)
+
+## About
 
 This GitHub repo holds working examples of apps which run on Enthought Edge.
 
