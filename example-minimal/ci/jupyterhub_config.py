@@ -14,8 +14,23 @@ from os import path
 from dockerspawner import DockerSpawner
 
 
-def discover_ip():
-    """Find the IP address we are connected to."""
+# These are set by the CI script, based on the parameters at the top
+# of ci/__main__.py.
+image = os.environ.get("IMAGE")
+container_name = os.environ.get("CONTAINER_NAME")
+
+
+# These, if they exist, are forwarded by the CI script from settings in
+# the 'dev_settings.json' file.
+container_env = {}
+for name in ("EDGE_API_TOKEN", "EDGE_API_SERVICE_URL", "EDGE_API_ORG"):
+    val = os.environ.get(name):
+    if val is not None:
+        container_env[name] = val
+
+
+def discover_hub_ip():
+    """Find the right IP address for JupyterHub."""
     st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         st.connect(("10.255.255.255", 1))
@@ -26,24 +41,6 @@ def discover_ip():
         st.close()
     return ip
 
-
-IMAGE = os.environ.get("IMAGE")
-CONTAINER_NAME = os.environ.get("CONTAINER_NAME")
-EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
-EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
-EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
-if (
-    EDGE_API_TOKEN is not None
-    and EDGE_API_SERVICE_URL is not None
-    and EDGE_API_ORG is not None
-):
-    container_env = {
-        "EDGE_API_TOKEN": EDGE_API_TOKEN,
-        "EDGE_API_ORG": EDGE_API_ORG,
-        "EDGE_API_SERVICE_URL": EDGE_API_SERVICE_URL,
-    }
-else:
-    container_env = {}
 
 c = get_config()  # noqa
 temp = tempfile.gettempdir()
@@ -56,18 +53,18 @@ c.DummyAuthenticator.password = "password"
 c.JupyterHub.spawner_class = DockerSpawner
 
 # the hostname/ip that should be used to connect to the hub
-c.JupyterHub.hub_ip = discover_ip()
+c.JupyterHub.hub_ip = discover_hub_ip()
 c.JupyterHub.ip = "127.0.0.1"
 c.JupyterHub.bind_url = "http://127.0.0.1:8000"
 c.JupyterHub.redirect_to_server = False
 
-# Don't delete containers when the stop
+# Containers will be auto-removed when they stop.
 c.DockerSpawner.remove = True
 c.DockerSpawner.environment = container_env
 
 # docker image for the spawner
-c.DockerSpawner.image = IMAGE
-c.DockerSpawner.name_template = CONTAINER_NAME
+c.DockerSpawner.image = image
+c.DockerSpawner.name_template = container_name
 
 c.JupyterHub.tornado_settings = {"slow_spawn_timeout": 0}
 

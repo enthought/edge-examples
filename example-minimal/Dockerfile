@@ -4,9 +4,11 @@
 # which includes EDM, as well as a small proxy server which automatically 
 # handles OAuth2 communication between your app and Edge.
 #
-# EDM dependencies for the app are brought in via a .zbundle file.  We perform
-# a two-stage build, to avoid including the .zbundle in the layers of the 
-# published image.
+# EDM dependencies for the app are brought in via a .zbundle file.  This avoids
+# the need to pass your EDM token and/or a custom edm.yaml into the Dockerfile.
+#
+# We perform a two-stage build, to avoid including the .zbundle in the layers
+# of the published image.
 
 
 
@@ -30,7 +32,10 @@ FROM $BASE_IMAGE
 
 COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 
-# Copy startup script and application
+# Copy startup script and application.
+# Note: the startup script must be placed in /home/app for the base image
+# machinery to pick it up.
+
 COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app main.py /home/app/main.py

@@ -3,16 +3,17 @@ import os.path as op
 import subprocess
 import sys
 import os
+import json
+
+SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 # Docker image will be tagged "IMAGE:VERSION"
 VERSION = "0.0.1"
 IMAGE = "quay.io/enthought/edge-example-minimal"
 
-# These will go into the built Docker image
+# These will go into the built Docker image.  You may wish to modify this
+# minimal example to pin the dependencies, or use a bundle file to define them.
 APP_DEPENDENCIES = ["flask", "gunicorn", "enthought_edge"]
-
-
-ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 
 @click.group()
@@ -22,13 +23,13 @@ def cli():
 
 
 @cli.command()
-@click.option("--rebuild-bundle", default=False, is_flag=True)
-def build(rebuild_bundle):
+@click.option("--rebuild-zbundle", default=False, is_flag=True)
+def build(rebuild_zbundle):
     """Build the Docker image"""
 
     # Build bundle with dependencies
     fname = "app_environment.zbundle"
-    if not op.exists(op.join(ROOT, fname)) or rebuild_bundle:
+    if not op.exists(op.join(SRC_ROOT, fname)) or rebuild_zbundle:
         cmd = [
             "edm",
             "bundle",
@@ -43,11 +44,10 @@ def build(rebuild_bundle):
             "-f",
             fname,
         ] + APP_DEPENDENCIES
-        subprocess.run(cmd, check=True, cwd=ROOT)
+        subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
-    # Create the Docker image
     cmd = ["docker", "build", "-t", f"{IMAGE}:{VERSION}", "."]
-    subprocess.run(cmd, check=True, cwd=ROOT)
+    subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
@@ -56,14 +56,14 @@ def run():
 
     # Get values from the .env file (API tokens for testing, etc.)
     # For testing, also disable the OAuth2 machinery.
-    envs = _load_env()
+    envs = _load_dev_settings()
     envs["EDGE_DISABLE_AUTH"] = "1"
 
     cmd = ["docker", "run", "-p", "8888:8888"]
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
     cmd += [f"{IMAGE}:{VERSION}"]
-    subprocess.run(cmd, check=True, cwd=ROOT)
+    subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
@@ -78,7 +78,7 @@ def run_in_jupyter():
             "CONTAINER_NAME": IMAGE.split("/")[-1],
         }
     )
-    env.update(_load_env())
+    env.update(_load_dev_settings())
 
     subprocess.run(cmd, env=env)
 
@@ -89,23 +89,14 @@ def publish():
     pass
 
 
-def _load_env():
-    """Load .env file"""
-    data = {}
-    path = op.join(ROOT, ".env")
-    with open(path, "r") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith("#"):
-                continue
-            parts = line.split("=")
-            if len(parts) != 2:
-                msg = f"Bad line (must be KEY=VALUE): {line}"
-                raise ValueError(msg)
-            data[parts[0]] = parts[1]
-    return data
+def _load_dev_settings():
+    """Load dev_settings.json file"""
+    fpath = op.join(SRC_ROOT, "dev_settings.json")
+    if not op.exists(fpath):
+        return {}
+    with open(fpath, "r") as f:
+        data = json.load(f)
+    return {k: v for k, v in data.items() if k.startswith("EDGE_")}
 
 
 if __name__ == "__main__":
