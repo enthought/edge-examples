@@ -17,11 +17,6 @@ jobs:
       matrix:
         example: [
           {
-            component: edge-native-base,
-            directory: .dev/edge-native-base,
-            environment: edge-native-base
-          },
-          {
             component: example-dashboard,
             directory: example-dashboard,
             environment: example-dashboard
