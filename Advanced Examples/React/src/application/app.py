@@ -6,10 +6,6 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
-import logging
-import multiprocessing as mp
-
-
 import os
 import sys
 from datetime import datetime, timezone
@@ -26,84 +22,37 @@ from flask_session import Session
 from .opencv_model.model import detect_face
 
 
-# When running flask in debug mode outside of a JupyterHub environment,
-# deactivate the `authenticated` and `track_activity` decorator.
-FLASK_DEBUG = int(os.environ.get("FLASK_DEBUG", 0))
-
-LOG = logging.getLogger(__name__)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-handler = logging.StreamHandler(sys.stdout)
-handler.setFormatter(formatter)
-handler.setLevel(logging.DEBUG)
-LOG.addHandler(handler)
-LOG.setLevel(logging.INFO)
-if FLASK_DEBUG:
-    LOG.setLevel(logging.DEBUG)
-
 # When run from Edge, these environment variables will be provided
 JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-ACTIVITY_URL = os.environ.get("JUPYTERHUB_ACTIVITY_URL")
-SERVER_NAME = os.environ.get("JUPYTERHUB_SERVER_NAME")
-API_URL = os.environ.get("JUPYTERHUB_API_URL", "http://127.0.0.1:8081")
-
-NATIVE_APP_MODE = os.environ.get("NATIVE_APP_MODE")
-
-EDGE_API_SERVICE_URL = os.environ.get("EDGE_API_SERVICE_URL")
-EDGE_API_ORG = os.environ.get("EDGE_API_ORG")
-EDGE_API_TOKEN = os.environ.get("EDGE_API_TOKEN")
-JUPYTERHUB_API_TOKEN = os.environ.get("JUPYTERHUB_API_TOKEN")
-
-
-_EDGE_SESSION = None
 
 
 def get_edge_session():
-    """Helper function to get an EdgeSession object
+    """Helper function to get an EdgeSession object.
 
-    Returns:
-        An EdgeSession object, if the container environment has
-        the EDGE_API_SERVICE_URL, EDGE_API_ORG and API_TOKEN
-        environment variables. If these variables are not set,
-        then None is returned
+    EdgeSession will auto-load environment variables, including the API token,
+    location of the Edge server, etc. Please note:
+
+    1. In production, they are set by Edge itself; you don't have to do anything.
+    2. In testing, you can set values in "dev_settings.json"
+
+    Returns an EdgeSession object if one can be constructed, or None if the
+    required information is missing.
     """
-    global _EDGE_SESSION
+
+    def is_set(name):
+        return name in os.environ
+
     if (
-        _EDGE_SESSION is None
-        and EDGE_API_SERVICE_URL
-        and EDGE_API_ORG
-        and (EDGE_API_TOKEN or JUPYTERHUB_API_TOKEN)
+        is_set("EDGE_API_SERVICE_URL")
+        and is_set("EDGE_API_ORG")
+        and (is_set("EDGE_API_TOKEN") or is_set("JUPYTERHUB_API_TOKEN"))
     ):
-        _EDGE_SESSION = EdgeSession()
-    return _EDGE_SESSION
+        return EdgeSession()
+
+    return None
 
 
-def track_activity(f):
-    """Decorator for reporting server activities with the Hub"""
-
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        if NATIVE_APP_MODE == "container" or NATIVE_APP_MODE == "dev":
-            return f(*args, **kwargs)
-        last_activity = datetime.now()
-        # Format this in  format that JupyterHub understands
-        if last_activity.tzinfo:
-            last_activity = last_activity.astimezone(timezone.utc).replace(tzinfo=None)
-        last_activity = last_activity.isoformat() + "Z"
-        if ACTIVITY_URL:
-            try:
-                requests.post(
-                    ACTIVITY_URL,
-                    headers={
-                        "Authorization": f"token {JUPYTERHUB_API_TOKEN}",
-                        "Content-Type": "application/json",
-                    },
-                    json={"servers": {SERVER_NAME: {"last_activity": last_activity}}},
-                )
-            except Exception:
-                pass
-        return f(*args, **kwargs)
-
-    return decorated
+edge_session = get_edge_session()
 
 
 def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
@@ -117,10 +66,7 @@ def create_app():
     and API routes for running jobs
     """
 
-    manager = mp.Manager()
-
-    # Use a multiprocessing shared dictionary for aggregating job results
-    RESULTS = manager.dict()
+    RESULTS = {}
 
     app = Flask(
         __name__,
@@ -135,12 +81,10 @@ def create_app():
     app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
     @app.route(JUPYTERHUB_SERVICE_PREFIX)
-    @track_activity
     def serve(**kwargs):
         """The main handle to serve the index page."""
-        edge = get_edge_session()
         user_name = None
-        if edge is not None:
+        if edge_session is not None:
             whoami = edge.whoami()
             user_name = whoami.user_name
         props = {
@@ -151,7 +95,6 @@ def create_app():
         return render_template("index.html", **props)
 
     @app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
-    @track_activity
     def job(**kwargs):
         """A job endpoint for receiving images and returning job results"""
         if request.method == "GET":
@@ -160,7 +103,8 @@ def create_app():
             for taskId, value in RESULTS.items():
                 if value:
                     ret[taskId] = value
-                del RESULTS[taskId]
+            for taskId in ret:
+                RESULTS.pop(taskId, None)
             return ret
 
         if request.method == "POST":
