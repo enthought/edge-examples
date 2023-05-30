@@ -13,6 +13,7 @@ from functools import wraps
 from urllib.parse import unquote
 from uuid import uuid4
 import threading
+import secrets
 
 import requests
 from edge.api import EdgeSession
@@ -54,72 +55,60 @@ def get_edge_session():
 
 edge_session = get_edge_session()
 
-
-def task(id: str, result_dict: dict, encoded_string: str, params: dict) -> None:
-    """Run face detection and store the result"""
-    result = detect_face(encoded_string, params)
-    result_dict[id] = result
+RESULTS = {}
 
 
-def create_app():
-    """Creates the Flask app with routes for serving the React application
-    and API routes for running jobs
-    """
+def task(task_id, encoded_string, params):
+    """Compute task result and store it in a global dictionary when done."""
+    RESULTS[task_id] = detect_face(encoded_string, params)
 
-    RESULTS = {}
 
-    app = Flask(
-        __name__,
-        template_folder="frontend/templates",
-        static_folder="frontend/dist",
-        static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
+app = Flask(
+    __name__,
+    template_folder="frontend/templates",
+    static_folder="frontend/dist",
+    static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
+)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SECRET_KEY"] = secrets.token_hex()
+sess = Session()
+sess.init_app(app)
+app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
+
+
+@app.route(JUPYTERHUB_SERVICE_PREFIX)
+def serve(**kwargs):
+    """The main handle to serve the index page."""
+
+    if edge_session is not None:
+        user_name = edge.whoami().user_name
+    else:
+        user_name = "(user name not available)"
+
+    return render_template(
+        "index.html", url_prefix=JUPYTERHUB_SERVICE_PREFIX, user_name=user_name
     )
-    app.config["SESSION_TYPE"] = "filesystem"
-    app.config["SECRET_KEY"] = "super secret key"
-    sess = Session()
-    sess.init_app(app)
-    app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
-
-    @app.route(JUPYTERHUB_SERVICE_PREFIX)
-    def serve(**kwargs):
-        """The main handle to serve the index page."""
-        user_name = None
-        if edge_session is not None:
-            whoami = edge.whoami()
-            user_name = whoami.user_name
-        props = {
-            "url_prefix": JUPYTERHUB_SERVICE_PREFIX,
-        }
-        if user_name is not None:
-            props["user_name"] = user_name
-        return render_template("index.html", **props)
-
-    @app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
-    def job(**kwargs):
-        """A job endpoint for receiving images and returning job results"""
-        if request.method == "GET":
-            # Return finished task results and remove them from shared results
-            ret = {}
-            for taskId, value in RESULTS.items():
-                if value:
-                    ret[taskId] = value
-            for taskId in ret:
-                RESULTS.pop(taskId, None)
-            return ret
-
-        if request.method == "POST":
-            # Spawn a face detection task and an id
-            body = request.json
-            id = str(uuid4())
-            RESULTS[id] = None
-            t = threading.Thread(
-                target=task, args=(id, RESULTS, body["image"], body["params"])
-            )
-            t.start()
-
-            return {"id": id}
-
-    return app
 
 
-app = create_app()
+@app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
+def job(**kwargs):
+    """A job endpoint for receiving images and returning job results"""
+    if request.method == "GET":
+        # Return finished task results and remove them from shared results
+        ret = {}
+        for taskId, value in RESULTS.items():
+            if value:
+                ret[taskId] = value
+        for taskId in ret:
+            RESULTS.pop(taskId, None)
+        return ret
+
+    if request.method == "POST":
+        # Spawn a face detection task and an id
+        body = request.json
+        id = str(uuid4())
+        RESULTS[id] = None
+        t = threading.Thread(target=task, args=(id, body["image"], body["params"]))
+        t.start()
+
+        return {"id": id}
