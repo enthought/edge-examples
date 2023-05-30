@@ -64,10 +64,13 @@ def task(task_id, encoded_string, params):
     RESULTS.put((task_id, detect_face(encoded_string, params)))
 
 
+import os.path as op
+
+HERE = op.abspath(op.dirname(__file__))
 app = Flask(
     __name__,
-    template_folder="frontend/templates",
-    static_folder="frontend/dist",
+    template_folder=op.join(HERE, "frontend/templates"),
+    static_folder=op.join(HERE, "frontend/dist"),
     static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
 )
 app.config["SESSION_TYPE"] = "filesystem"
@@ -77,7 +80,7 @@ sess.init_app(app)
 app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
 
-@app.route(JUPYTERHUB_SERVICE_PREFIX)
+@app.route("/")
 def serve():
     """The main handle to serve the index page."""
 
@@ -91,7 +94,7 @@ def serve():
     )
 
 
-@app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
+@app.route("/job", methods=["GET", "POST"])
 def job():
     """A job endpoint for receiving images and returning job results"""
 

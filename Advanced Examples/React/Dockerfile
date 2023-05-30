@@ -52,6 +52,6 @@ COPY --chown=app ./src/application/ /home/app/application
 
 # Dash requires a small "shim" to make it compatible with JupyterHub's routing.
 # This file will be picked up by the edge-native-base machinery.
-COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
+#COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 
 
