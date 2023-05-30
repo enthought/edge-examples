@@ -17,7 +17,8 @@ Then, run ``npm install -g configurable-http-proxy`` to install a proxy module
 needed by JupyterHub. 
 
 Finally, ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg
-repository.  This will be necessary to use EdgeSession in the example.
+repository, along with ``enthought/free`` and ``enthought/lgpl``.  This will be
+necessary to use EdgeSession in the example.
 
 
 ## Quick start
