@@ -50,8 +50,8 @@ COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/application/ /home/app/application
 
-# Dash requires a small "shim" to make it compatible with JupyterHub's routing.
-# This file will be picked up by the edge-native-base machinery.
+# This example requires a small "shim" to make it compatible with JupyterHub's
+# routing. This file will be picked up by the edge-native-base machinery.
 COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 
 

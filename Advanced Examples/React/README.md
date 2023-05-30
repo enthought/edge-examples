@@ -1,7 +1,33 @@
-# Plotly Dash example
+# React example
 
 This example shows how to develop an application for Edge using the React
 library.  You can read more about React at https://react.dev/.
+
+One of the most exciting features of Edge native applications is the ability
+to do long-running computation, without leaving your app.  Because each user
+has their own dedicated container, doing heavyweight computation is as easy
+as creating a new thread.
+
+This example uses the OpenCV library to detect faces in uploaded images.
+Upon upload to the React front-end, a compute task is launched inside the
+backend process.  When the compute task finishes, the image is updated to
+display bounding boxes around the features that match.  See "app.py" in the
+src/application folder for details.
+
+Tips for using React (and Flask) when building an Edge native app:
+
+* The "prefix" (URL) of your app changes depending on which user is running
+  the app.  See "app.py" for how to retrieve this value.  You can then pass it
+  down to React via a template file.  See the frontend/templates/index.html file
+  for an example of how to do this using a script tag.  This value can be used
+  in turn, on the React side, to compute the right URL for use with "fetch".
+
+* Don't "block" a Flask callback waiting on compute.  Instead, spin off a
+  thread to manage it, and use e.g. polling to update the frontend state once
+  the compute job is finished.
+
+* You should run with a single gunicorn worker.  If you want to run subprocesses,
+  avoid forking the process, and use spawn instead.
 
 
 ## Before you begin
