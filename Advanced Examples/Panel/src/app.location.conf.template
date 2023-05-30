@@ -1,8 +1,10 @@
-# Templated app.location.conf file. This will file should be copied
-# into the container path /opt/nginx/app.location.conf.template. 
-# It will be unpacked at runtime into /opt/nginx/app.location.conf 
-# with JUPYTERHUB_SERVICE_PREFIX substituted for the required routes
+# This file is required to make Panel compatible with JupyterHub's routing.
+# It is picked up by the base image (edge-native-base) and ensures that the
+# application is served on the expected route.  Not all frameworks will
+# require this file.
 
+# In your Dockerfile, this file should be copied to
+# "/opt/nginx/app.location.conf.template".
 
 location ${JUPYTERHUB_SERVICE_PREFIX} { 
     auth_request ${JUPYTERHUB_SERVICE_PREFIX}oauth_status/;

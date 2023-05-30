@@ -7,4 +7,8 @@ set -e
 # 127.0.0.1 on port 9000 for this to work.  The container itself will
 # serve on port 8888, through the proxy.
 
+# Please note the --prefix option is required, in conjunction with the
+# app.location.conf.template file, in order to make Panel compatible with
+# JupyterHub's routing.
+
 exec edm run -- panel serve app.py --address="127.0.0.1" --port=9000 --prefix=$JUPYTERHUB_SERVICE_PREFIX --allow-websocket-origin=* --log-level=debug

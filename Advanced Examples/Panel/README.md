@@ -5,7 +5,6 @@ library.  You can read more about Panel at their official site:
 https://panel.holoviz.org/.
 
 
-
 ## Before you begin
 
 Before starting, ensure you have the following installed:
