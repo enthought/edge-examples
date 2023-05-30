@@ -1,4 +1,4 @@
-# This file is required to make Dash compatible with JupyterHub's routing.
+# This file is required to make React compatible with JupyterHub's routing.
 # It is picked up by the base image (edge-native-base) and ensures that the
 # application is served on the expected route.  Not all frameworks will
 # require this file.

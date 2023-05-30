@@ -1,4 +1,4 @@
-# This is the Dockerfile for the Enthought Edge "Streamlit" example.
+# This is the Dockerfile for the Enthought Edge "React" example.
 # 
 # We use "edge-native-base" as the base image.  This is a Centos-7 based image
 # which includes EDM, as well as a small proxy server which automatically 
@@ -52,6 +52,6 @@ COPY --chown=app ./src/application/ /home/app/application
 
 # Dash requires a small "shim" to make it compatible with JupyterHub's routing.
 # This file will be picked up by the edge-native-base machinery.
-#COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
+COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 
 

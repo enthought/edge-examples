@@ -7,12 +7,12 @@
 # Distribution is prohibited.
 
 import os
+import secrets
 import sys
+import threading
+from queue import Empty, Queue
 from urllib.parse import unquote
 from uuid import uuid4
-import threading
-import secrets
-from queue import Queue, Empty
 
 from edge.api import EdgeSession
 from flask import Flask, render_template, request
@@ -20,9 +20,7 @@ from flask_session import Session
 
 from .opencv_model.model import detect_face
 
-
-# When run from Edge, these environment variables will be provided
-JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
 
 def get_edge_session():
@@ -64,14 +62,11 @@ def task(task_id, encoded_string, params):
     RESULTS.put((task_id, detect_face(encoded_string, params)))
 
 
-import os.path as op
-
-HERE = op.abspath(op.dirname(__file__))
 app = Flask(
     __name__,
-    template_folder=op.join(HERE, "frontend/templates"),
-    static_folder=op.join(HERE, "frontend/dist"),
-    static_url_path=JUPYTERHUB_SERVICE_PREFIX + "static",
+    template_folder="frontend/templates",
+    static_folder="frontend/dist",
+    static_url_path=PREFIX + "static",
 )
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SECRET_KEY"] = secrets.token_hex()
@@ -80,7 +75,7 @@ sess.init_app(app)
 app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
 
-@app.route("/")
+@app.route(PREFIX)
 def serve():
     """The main handle to serve the index page."""
 
@@ -89,12 +84,10 @@ def serve():
     else:
         user_name = "(user name not available)"
 
-    return render_template(
-        "index.html", url_prefix=JUPYTERHUB_SERVICE_PREFIX, user_name=user_name
-    )
+    return render_template("index.html", url_prefix=PREFIX, user_name=user_name)
 
 
-@app.route("/job", methods=["GET", "POST"])
+@app.route(PREFIX + "job", methods=["GET", "POST"])
 def job():
     """A job endpoint for receiving images and returning job results"""
 
