@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') | url_decode }}"
+    />
+    <script id="server-config-data" type="application/json">
+      {
+        "urlPrefix": "{{url_prefix}}",
+        "user_name": "{{user_name}}"
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="version" style="position: absolute; bottom: 0px;">
+      <span style="font-size: 50%; margin-top: 10px">Welcome to the Flask example!</span>
+    </div>
+  </body>
+  <script
+    type="module"
+    src="{{ url_for('static', filename='index.js') | url_decode }}"
+  ></script>
+</html>
