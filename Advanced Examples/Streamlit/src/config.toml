@@ -1,0 +1,5 @@
+# Streamlit config file.
+# This is needed to disable Streamlit's built-in telemetry.
+
+[browser]
+gatherUsageStats = false
