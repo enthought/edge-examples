@@ -6,6 +6,10 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
+"""
+    Example for using Plotly Dash with Edge.
+"""
+
 import os
 import sys
 from datetime import datetime, timezone
@@ -50,17 +54,13 @@ def get_edge_session():
     return None
 
 
-# Incorporate data
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv"
-)
-
 # Note: in development, you should run "dash_app" (as in the __main__ block at
 # the bottom of this file), but in your Dockerfile, gunicorn should point at
 # "flask_app" instead.
 flask_app = Flask(__name__)
 
 dash_app = Dash(server=flask_app, url_base_pathname=JUPYTERHUB_SERVICE_PREFIX)
+
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv"
