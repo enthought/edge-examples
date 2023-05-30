@@ -8,14 +8,12 @@
 
 import os
 import sys
-from datetime import datetime, timezone
-from functools import wraps
 from urllib.parse import unquote
 from uuid import uuid4
 import threading
 import secrets
+from queue import Queue, Empty
 
-import requests
 from edge.api import EdgeSession
 from flask import Flask, render_template, request
 from flask_session import Session
@@ -53,14 +51,17 @@ def get_edge_session():
     return None
 
 
-edge_session = get_edge_session()
+# Used to determine user name; could also be used to store the result in
+# the Edge file system.
+EDGE_SESSION = get_edge_session()
 
-RESULTS = {}
+# This will be used to hold the compute jobs.
+RESULTS = Queue()
 
 
 def task(task_id, encoded_string, params):
-    """Compute task result and store it in a global dictionary when done."""
-    RESULTS[task_id] = detect_face(encoded_string, params)
+    """Compute task result and store it in a global when done."""
+    RESULTS.put((task_id, detect_face(encoded_string, params)))
 
 
 app = Flask(
@@ -77,11 +78,11 @@ app.jinja_env.filters["url_decode"] = lambda url: unquote(url)
 
 
 @app.route(JUPYTERHUB_SERVICE_PREFIX)
-def serve(**kwargs):
+def serve():
     """The main handle to serve the index page."""
 
-    if edge_session is not None:
-        user_name = edge.whoami().user_name
+    if EDGE_SESSION is not None:
+        user_name = EDGE_SESSION.whoami().user_name
     else:
         user_name = "(user name not available)"
 
@@ -91,24 +92,28 @@ def serve(**kwargs):
 
 
 @app.route(JUPYTERHUB_SERVICE_PREFIX + "job", methods=["GET", "POST"])
-def job(**kwargs):
+def job():
     """A job endpoint for receiving images and returning job results"""
+
     if request.method == "GET":
-        # Return finished task results and remove them from shared results
+        # De-queue and return any finished jobs
+
         ret = {}
-        for taskId, value in RESULTS.items():
-            if value:
-                ret[taskId] = value
-        for taskId in ret:
-            RESULTS.pop(taskId, None)
+        while True:
+            try:
+                task_id, result = RESULTS.get(block=False)
+                RESULTS.task_done()
+                ret[task_id] = result
+            except Empty:
+                break
         return ret
 
     if request.method == "POST":
         # Spawn a face detection task and an id
+
         body = request.json
-        id = str(uuid4())
-        RESULTS[id] = None
-        t = threading.Thread(target=task, args=(id, body["image"], body["params"]))
+        task_id = str(uuid4())
+        t = threading.Thread(target=task, args=(task_id, body["image"], body["params"]))
         t.start()
 
-        return {"id": id}
+        return {"id": task_id}

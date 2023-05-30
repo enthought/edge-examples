@@ -35,7 +35,6 @@ APP_DEPENDENCIES = [
     "six",
     "click",
     "flask>2",
-    "requests",
     "gunicorn",
     "opencv_python",
 ]
