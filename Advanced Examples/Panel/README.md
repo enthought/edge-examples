@@ -1,8 +1,8 @@
-# Minimal Flask-based example
+# Panel example
 
-This example shows how to develop an basic Edge native application.  It
-contains just enough machinery to build a "hello world" app, run it locally,
-and publish the image for use with Edge.
+This example shows how to develop an application for Edge using the Panel
+library.  You can read more about Panel at their official site: 
+https://panel.holoviz.org/.
 
 
 ## Before you begin
