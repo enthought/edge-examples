@@ -26,10 +26,10 @@ interface IState {
   parameters: {
     [key: string]: IParams;
   };
-  username?: string;
+  greeting?: string;
 }
 
-export class Main extends Component<{ urlPrefix: string; username?: string}, IState> {
+export class Main extends Component<{ urlPrefix: string; greeting?: string}, IState> {
   private stageRef: React.RefObject<HTMLDivElement>;
   private stage?: Konva.Stage;
   private layer?: Konva.Layer;
@@ -37,7 +37,7 @@ export class Main extends Component<{ urlPrefix: string; username?: string}, ISt
     [key: string]: { name: string; konvaImage: Konva.Image };
   } = {};
   private pollHandler: any = null;
-  constructor(props: { urlPrefix: string; username?: string }) {
+  constructor(props: { urlPrefix: string; greeting?: string }) {
     super(props);
     this.state = {
       id: "",
@@ -58,7 +58,7 @@ export class Main extends Component<{ urlPrefix: string; username?: string}, ISt
           step: 1,
         },
       },
-      username: props.username
+      greeting: props.greeting
     };
 
     window.addEventListener("resize", this.resizeCanvas);
@@ -296,6 +296,7 @@ export class Main extends Component<{ urlPrefix: string; username?: string}, ISt
             </Navbar>
             <div style={{ padding: "10px", overflow: "auto" }}>
               <div className="full-height flex-column">
+                {this.state.greeting}
                 {this.state.log.map((log, idx) => (
                   <span key={idx}>
                     <>
@@ -320,11 +321,7 @@ export class Main extends Component<{ urlPrefix: string; username?: string}, ISt
             ref={this.stageRef}
             id={"canvas-container"}
           ></div>
-          {this.state.username && (
-            <div>
-              Logged in as {this.state.username}
-            </div>
-          )}
+
         </Col>
       </div>
     );

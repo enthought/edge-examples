@@ -6,6 +6,10 @@
 # This file and its contents are confidential information and NOT open source.
 # Distribution is prohibited.
 
+"""
+    Example for using Edge with Flask/React.
+"""
+
 import os
 import secrets
 import sys
@@ -20,6 +24,9 @@ from flask_session import Session
 
 from .opencv_model.model import detect_face
 
+
+# The Flask app will be served under this route.  It should appear in e.g.
+# route decorators as "@app.get(PREFIX + 'foo')".
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
 
@@ -49,8 +56,6 @@ def get_edge_session():
     return None
 
 
-# Used to determine user name; could also be used to store the result in
-# the Edge file system.
 EDGE_SESSION = get_edge_session()
 
 # This will be used to hold the compute jobs.
@@ -81,10 +86,14 @@ def serve():
 
     if EDGE_SESSION is not None:
         user_name = EDGE_SESSION.whoami().user_name
+        greeting = f"Welcome! Logged in to Edge as {user_name}."
     else:
-        user_name = "(user name not available)"
+        greeting = (
+            "Welcome!  If you would like to use EdgeSession during development, "
+            "please see the README on how to configure dev_settings.json."
+        )
 
-    return render_template("index.html", url_prefix=PREFIX, user_name=user_name)
+    return render_template("index.html", url_prefix=PREFIX, greeting=greeting)
 
 
 @app.route(PREFIX + "job", methods=["GET", "POST"])
