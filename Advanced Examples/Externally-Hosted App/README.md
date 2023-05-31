@@ -40,15 +40,28 @@ Before starting, ensure you have the following installed:
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 * Deployment-time dependencies listed in the [deploy](./deploy/README.md) folder.
 
-You will need an EDM environment with ``click`` installed to run the "ci" code
-described in this file.
-
 Collect the following information:
 
 * The hostname under which your app will be deployed.  For this example, we will
   use "https://edge-external-app-demo.platform-devops.enthought.com".
 * A Docker repository and related username/password.  For this example, we will
   use "quay.io/enthought/edge-external-app-demo".
+
+To get started with local development, run ``python bootstrap.py``.  This will
+create a local development environment and activate development shell.  From
+within this shell you can run various "ci" module commands.
+
+To build the application, use:
+
+```commandline
+python -m ci build
+```
+
+You can run this application in debug mode without Edge authentication integration using:
+
+```commandline
+python -m ci watch
+```
 
 
 ## 2. Application code requirements
@@ -136,34 +149,3 @@ take you to your deployed web app.  If you click the Login button on the
 example application, it will perform a login using Edge.
 
 
-## Running the Application Locally
-
-To perform local development on this application without Edge integration, you will need:
-- [Docker](https://docker.com)
-- [Node JS](https://nodejs.org)
-- [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager
-
-First, you will need to create an EDM environment named `dev_env` and install some dependencies.
-
-```commandline
-edm install -e dev_env --version 3.8 -y install authlib "flask>2" gunicorn requests && \
-edm run -e dev_env -- python -m pip install Flask-Session
-```   
-
-Once you have created the `dev_env` environment, you may activate it with:
-
-```commandline
-edm shell -e dev_env
-```
-
-To build the application, use:
-
-```commandline
-python -m ci build
-```
-
-You can run this application in debug mode without Edge authentication integration using:
-
-```commandline
-python -m ci watch backend
-```
