@@ -3,6 +3,7 @@
 This folder holds tools which are useful during the application development
 process.
 
+
 ## "Preflight" check utility
 
 The ``preflight.py`` script is a self-contained utility to check your
@@ -13,6 +14,19 @@ local JupyterHub instance, and run a variety of checks including:
 * Whether the application's root page is accessible.
 * Whether the application correctly handles authorization (this is automatic,
   if you are using the ``edge-native-base`` image in your Dockerfile).
+
+### Before you begin
+
+Before starting, ensure you have the following installed:
+
+* [Docker](https://docker.com)
+* [Node JS](https://nodejs.org)
+* [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
+
+Then, run ``npm install -g configurable-http-proxy`` to install a proxy module
+needed by JupyterHub. 
+
+### Using the preflight utility
 
 To get started, run ``python bootstrap.py`` to install dependencies in a
 separate EDM environment, and activate that environment.
