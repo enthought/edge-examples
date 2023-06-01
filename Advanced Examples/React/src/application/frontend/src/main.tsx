@@ -26,9 +26,10 @@ interface IState {
   parameters: {
     [key: string]: IParams;
   };
+  greeting?: string;
 }
 
-export class Main extends Component<{ urlPrefix: string }, IState> {
+export class Main extends Component<{ urlPrefix: string; greeting?: string}, IState> {
   private stageRef: React.RefObject<HTMLDivElement>;
   private stage?: Konva.Stage;
   private layer?: Konva.Layer;
@@ -36,7 +37,7 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
     [key: string]: { name: string; konvaImage: Konva.Image };
   } = {};
   private pollHandler: any = null;
-  constructor(props: { urlPrefix: string }) {
+  constructor(props: { urlPrefix: string; greeting?: string }) {
     super(props);
     this.state = {
       id: "",
@@ -57,6 +58,7 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
           step: 1,
         },
       },
+      greeting: props.greeting
     };
 
     window.addEventListener("resize", this.resizeCanvas);
@@ -294,6 +296,7 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
             </Navbar>
             <div style={{ padding: "10px", overflow: "auto" }}>
               <div className="full-height flex-column">
+                {this.state.greeting}
                 {this.state.log.map((log, idx) => (
                   <span key={idx}>
                     <>
@@ -318,6 +321,7 @@ export class Main extends Component<{ urlPrefix: string }, IState> {
             ref={this.stageRef}
             id={"canvas-container"}
           ></div>
+
         </Col>
       </div>
     );
