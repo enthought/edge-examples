@@ -22,7 +22,14 @@ CONTAINER_NAME = "edge-native-base"
 ENV_NAME = "edge-native-base"
 
 # Dependencies for bootstrap.py development environment
-EDM_DEPS = ["click", "flask>2", "enthought_edge>=2.6.0", "pytest", "requests"]
+EDM_DEPS = [
+    "click",
+    "flask>2",
+    "enthought_edge>=2.6.0",
+    "pytest",
+    "requests",
+    "gunicorn",
+]
 PIP_DEPS = [
     "jupyterhub==2.2.2",
     "sqlalchemy<2",
@@ -52,8 +59,9 @@ class NativeBaseDevBuilder(DevBuilder):
     def run(self):
         env = os.environ.copy()
         env.update(self.context.env)
-        cmd = ["python", "-m", "http.server", "9000", "--directory", "default"]
-        subprocess.run(cmd, check=True, env=env, cwd=self.context.src_dir)
+        cmd = ["gunicorn", "app:app", "-b", "127.0.0.1:9000"]
+        app_dir = os.path.join(self.context.src_dir, "default")
+        subprocess.run(cmd, check=True, env=env, cwd=app_dir)
 
     def test(self):
         pass
