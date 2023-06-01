@@ -14,7 +14,7 @@ import click
 from .config import discover_ip, EXTERNAL_EXAMPLE_IMAGE
 
 
-MODULE_DIR = os.path.join(os.path.dirname(__file__), '..')
+MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 SRC_DIR = os.path.join(MODULE_DIR, "src")
 
 
@@ -40,7 +40,7 @@ def build(tag):
         f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}",
         "-f",
         "Dockerfile",
-        "." 
+        ".",
     ]
     subprocess.run(cmd, cwd=MODULE_DIR, check=True)
     click.echo("Done")
@@ -73,27 +73,24 @@ def stop():
     click.echo("Example app stopped")
 
 
-@cli.group(name="watch")
-def watch_cmd():
-    pass
-
-
-@watch_cmd.command(name="backend")
-def watch_backend():
+@cli.command()
+def watch():
     """Start the application and watch backend changes"""
 
     print(f"\nStart {EXTERNAL_EXAMPLE_IMAGE} in files watching mode\n")
-    cmd = ["flask", "--app", "app.py", "run", "-p 8020" ]
+    cmd = ["flask", "--app", "app.py", "run", "-p 8020"]
     host = discover_ip()
     env = os.environ.copy()
-    env.update({
-        "SESSION_SECRET_KEY_FILE": f"{MODULE_DIR}/test_secrets/secret_key",
-        "OAUTH_CLIENT_SECRET_FILE": f"{MODULE_DIR}/test_secrets/client_secret",
-        "OAUTH_CLIENT_ID": "service-edge-app-default-edge-external-app-demo",
-        "EDGE_BASE_URL": f"http://{host}:8000",
-        "OAUTH_REDIRECT_URI": "http://localhost:8020/authorize",
-        "FLASK_DEBUG": "1",
-    })
+    env.update(
+        {
+            "SESSION_SECRET_KEY_FILE": f"{MODULE_DIR}/test_secrets/secret_key",
+            "OAUTH_CLIENT_SECRET_FILE": f"{MODULE_DIR}/test_secrets/client_secret",
+            "OAUTH_CLIENT_ID": "service-edge-app-default-edge-external-app-demo",
+            "EDGE_BASE_URL": f"http://{host}:8000",
+            "OAUTH_REDIRECT_URI": "http://localhost:8020/authorize",
+            "FLASK_DEBUG": "1",
+        }
+    )
     subprocess.run(cmd, check=True, env=env, cwd=SRC_DIR)
 
 
@@ -108,7 +105,7 @@ def start_external_example(tag):
         "EDGE_BASE_URL": f"http://{host}:8000",
         "OAUTH_REDIRECT_URI": "http://localhost:8020/authorize",
     }
-    
+
     for key, val in env.items():
         cmd.extend(["--env", f"{key}={val}"])
     cmd.extend(
@@ -118,7 +115,7 @@ def start_external_example(tag):
             "--name",
             "edge-external-demo-app",
             "-d",
-            f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}"
+            f"{EXTERNAL_EXAMPLE_IMAGE}:{tag}",
         ]
     )
     subprocess.run(cmd, cwd=MODULE_DIR, check=True)
