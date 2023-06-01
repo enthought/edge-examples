@@ -85,6 +85,8 @@ def preflight(image, app_log, hub_log):
             redirects = redirects + [urlparse(r.url).path for r in response.history]
             if not response.url.startswith("http://localhost:8000/user/edgeuser"):
                 raise AssertionError("Application home page did not load")
+            if not (response.status_code >= 200 and response.status_code < 300):
+                raise AssertionError("Application home page not served with 2XX")
 
         with check("Check authorization flow"):
             if "/user/edgeuser/oauth_start/" not in redirects:
