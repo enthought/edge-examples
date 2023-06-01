@@ -1,11 +1,11 @@
-name: Test Native Examples
+name: Test
 
 on:
   pull_request:
 
 jobs:
   test-edge-native-base:
-    name: Test Native Base Image
+    name: Native Base Image
     runs-on: ubuntu-latest
 
     env:
@@ -52,7 +52,7 @@ jobs:
         run: |
           export PATH="$HOME/edm/bin:$PATH"
           set -e
-          cd ${{ matrix.example.directory }}
+          cd .dev/edge-native-base
           edm run -- python bootstrap.py -c $CI_EDM_CONFIG -t $CI_EDM_TOKEN
           edm run -e edge-native-base -- python -m ci dev test
           edm run -e edge-native-base -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
