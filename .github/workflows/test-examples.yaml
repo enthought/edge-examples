@@ -73,9 +73,9 @@ test-examples:
         example: [
           {
             directory: "Minimal",
-            environment: "edge-minimal-example"
+            environment: "edge-minimal-example",
             image: "quay.io/enthought/edge-example-minimal:0.0.1"
-          },
+          }
         ]
       fail-fast: false
 
@@ -127,7 +127,7 @@ test-examples:
       #     set -e
       #     cd ${{ github.workspace }}/Tools
       #     edm run -- python bootstrap.py
-          
+
       #     edm run -e ${{ matrix.example.environment }} -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
       #     edm run -e ${{ matrix.example.environment }} -- python -m ci container test
       #     edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test
