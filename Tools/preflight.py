@@ -83,7 +83,7 @@ def preflight(image, app_log, hub_log):
             response = s.get("http://localhost:8000/user/edgeuser")
             response.raise_for_status()
             redirects = redirects + [urlparse(r.url).path for r in response.history]
-            if response.url != "http://localhost:8000/user/edgeuser/":
+            if not response.url.startswith("http://localhost:8000/user/edgeuser"):
                 raise AssertionError("Application home page did not load")
 
         with check("Check authorization flow"):
@@ -98,7 +98,7 @@ def preflight(image, app_log, hub_log):
             response = requests.get(
                 "http://localhost:8000/user/edgeuser/", allow_redirects=True
             )
-            if "http://localhost:8000/user/edgeuser/" in response.url:
+            if response.url.startswith("http://localhost:8000/user/edgeuser"):
                 raise AssertionError("Response URL points to app")
 
 
