@@ -12,7 +12,7 @@ without notice.
 
 ## 1.0.1
 
-* Bugfixes associated with PRD 023 work.
+* Bugfixes associated with example development work.
 
 ## 1.0.0
 
