@@ -15,7 +15,6 @@ from flask import Flask, render_template_string
 
 from edge.api import EdgeSession
 
-
 # Your app will be served by Edge under this URL prefix.
 # Please note the value will contain a trailing "/" character.
 PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
