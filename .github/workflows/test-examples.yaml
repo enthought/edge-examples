@@ -127,5 +127,12 @@ jobs:
           export PATH="$HOME/edm/bin:$PATH"
           set -e
           cd ${{ github.workspace }}/Tools
-          edm run -- python bootstrap.py
+          edm run -- python bootstrap.py --ci
           edm run -e edge-preflight-tool -- python preflight.py ${{ matrix.example.image }}
+
+      - name: Archive logs if failed
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-logs
+          path: |
+            ${{ github.workspace }}/Tools/*.txt
