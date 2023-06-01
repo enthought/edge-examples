@@ -128,4 +128,4 @@ jobs:
           set -e
           cd ${{ github.workspace }}/Tools
           edm run -- python bootstrap.py
-          edn run -e edge-preflight-tool -- python preflight.py ${{ matrix.example.image }}
+          edm run -e edge-preflight-tool -- python preflight.py ${{ matrix.example.image }}
