@@ -59,7 +59,7 @@ jobs:
           edm run -e edge-native-base -- python -m ci container test
           edm run -e edge-native-base -- python -m ci preflight test
 
-test-examples:
+  test-examples:
     name: Test Examples
     runs-on: ubuntu-latest
 
