@@ -131,6 +131,7 @@ jobs:
           edm run -e edge-preflight-tool -- python preflight.py ${{ matrix.example.image }}
 
       - name: Archive logs if failed
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v3
         with:
           name: error-logs
