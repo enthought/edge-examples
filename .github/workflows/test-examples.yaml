@@ -58,3 +58,76 @@ jobs:
           edm run -e edge-native-base -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
           edm run -e edge-native-base -- python -m ci container test
           edm run -e edge-native-base -- python -m ci preflight test
+
+test-examples:
+    name: Test Examples
+    runs-on: ubuntu-latest
+
+    env:
+      SHELL: /bin/bash
+      INSTALLED_EDM_VERSION: "3.4.0"
+      EDM_API_TOKEN: ${{ secrets.HATCHER_TOKEN }}
+
+    strategy:
+      matrix:
+        example: [
+          {
+            directory: "Minimal",
+            environment: "edge-minimal-example"
+            image: "quay.io/enthought/edge-example-minimal:0.0.1"
+          },
+        ]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup NodeJS 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: |
+            **/package-lock.json
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: buildx
+        with:
+          install: true
+
+      - name: Set up EDM
+        uses: enthought/setup-edm-action@v2
+        with:
+          edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
+
+      - name: Bootstrap
+        shell: bash
+        run: |
+          export PATH="$HOME/edm/bin:$PATH"
+          cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
+          edm envs create edm --version 3.8 --force
+          npm install -g configurable-http-proxy
+
+      - name: Build example 
+        shell: bash
+        run: |
+          export PATH="$HOME/edm/bin:$PATH"
+          set -e
+          cd ${{ matrix.example.directory }}
+          edm run -- python bootstrap.py
+          edm run -e ${{ matrix.example.environment }} -- python -m ci build
+
+      # - name: Preflight test
+      #   shell: bash
+      #   run: |
+      #     export PATH="$HOME/edm/bin:$PATH"
+      #     set -e
+      #     cd ${{ github.workspace }}/Tools
+      #     edm run -- python bootstrap.py
+          
+      #     edm run -e ${{ matrix.example.environment }} -- python -m ci container build --generate-bundle --edm-config $CI_EDM_CONFIG --edm-token $CI_EDM_TOKEN
+      #     edm run -e ${{ matrix.example.environment }} -- python -m ci container test
+      #     edm run -e ${{ matrix.example.environment }} -- python -m ci preflight test

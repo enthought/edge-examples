@@ -11,6 +11,7 @@
     example.
 """
 
+import argparse
 import subprocess
 
 ENV_NAME = "edge-minimal-example"
@@ -37,8 +38,8 @@ def bootstrap():
     else:
         print("Environment already exists; reusing.")
 
-    print(f"Activating dev environment {ENV_NAME}")
-    subprocess.run(["edm", "shell", "-e", ENV_NAME])
+    # print(f"Activating dev environment {ENV_NAME}")
+    # subprocess.run(["edm", "shell", "-e", ENV_NAME])
 
 
 def _list_edm_envs():
