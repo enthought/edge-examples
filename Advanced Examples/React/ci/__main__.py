@@ -57,7 +57,7 @@ def build(rebuild_zbundle):
 
     # First, build the React application
     jsdir = op.join(SRC_ROOT, "src", "application", "frontend")
-    subprocess.run(["npm", "install"], cwd=jsdir, check=True)
+    subprocess.run(["npm", "ci"], cwd=jsdir, check=True)
     subprocess.run(["npm", "run", "build"], cwd=jsdir, check=True)
 
     # Second, we build a "zbundle" which contains all the eggs needed to
