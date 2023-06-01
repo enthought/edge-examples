@@ -131,7 +131,7 @@ jobs:
         run: |
           export PATH="$HOME/edm/bin:$PATH"
           set -e
-          cd ${{ matrix.example.directory }}
+          cd "${{ matrix.example.directory }}"
           edm run -- python bootstrap.py --ci
           edm run -e ${{ matrix.example.environment }} -- python -m ci build
 
