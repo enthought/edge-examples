@@ -17,7 +17,7 @@ from ci.builders import ContainerBuilder, DevBuilder, PreflightBuilder
 
 APP_NAME = "Edge Native Base"
 IMAGE_NAME = "quay.io/enthought/edge-native-base"
-IMAGE_TAG = "1.0.1"
+IMAGE_TAG = "1.1.0"
 CONTAINER_NAME = "edge-native-base"
 ENV_NAME = "edge-native-base"
 
