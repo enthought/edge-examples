@@ -20,7 +20,7 @@
 
 # First stage
 
-ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.0.1
+ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.1.0
 
 FROM $BASE_IMAGE as stage_one
 

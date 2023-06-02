@@ -7,4 +7,4 @@ set -e
 # 127.0.0.1 on port 9000 for this to work.  The container itself will
 # serve on port 8888, through the proxy.
 
-exec edm run -- streamlit run app.py --server.headless true --server.port 9000
+exec edm run -- streamlit run app.py --server.headless true --server.address=127.0.0.1 --server.port 9000

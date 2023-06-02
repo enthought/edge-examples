@@ -15,6 +15,10 @@ from flask import Flask, render_template_string
 
 from edge.api import EdgeSession
 
+# Your app will be served by Edge under this URL prefix.
+# Please note the value will contain a trailing "/" character.
+PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+
 
 def get_edge_session():
     """Helper function to get an EdgeSession object.
@@ -46,7 +50,7 @@ edge_session = get_edge_session()
 app = Flask(__name__)
 
 
-@app.get("/")
+@app.get(PREFIX)
 def root():
     """Example Flask route"""
 
@@ -77,13 +81,8 @@ def root():
     </body></html>
     """
 
-    # See the README.md file for more info on how routes work.  You typically
-    # don't need to use this value in your code; your Flask routes, etc.,
-    # should be set up as though the app was located at the server root.
-    example_served_from = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-
     return render_template_string(
         html,
         edge_session=edge_session,
-        example_served_from=example_served_from,
+        example_served_from=PREFIX,
     )

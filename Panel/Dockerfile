@@ -19,7 +19,7 @@
 
 # First stage
 
-ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.0.1
+ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.1.0
 
 FROM $BASE_IMAGE as stage_one
 
@@ -47,9 +47,5 @@ RUN sudo echo "(Run yum via sudo if needed)"
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/app.py /home/app/app.py
-
-# Panel requires a small "shim" to make it compatible with JupyterHub's routing.
-# This file will be picked up by the edge-native-base machinery.
-COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
 
 
