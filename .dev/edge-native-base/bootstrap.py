@@ -49,9 +49,6 @@ def bootstrap(edm_config=None, edm_token=None):
     else:
         print("Environment already exists; reusing.")
 
-    print(f"Activating dev environment {ENV_NAME}")
-    subprocess.run(["edm", "shell", "-e", ENV_NAME])
-
 
 def _list_edm_envs(edm_base_cmd):
     cmd = edm_base_cmd + ["envs", "list"]

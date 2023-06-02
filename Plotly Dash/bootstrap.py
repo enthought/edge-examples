@@ -11,6 +11,7 @@
     example.
 """
 
+import argparse
 import subprocess
 
 ENV_NAME = "edge-plotly-dash-example"
@@ -18,8 +19,11 @@ EDM_DEPS = ["click", "pip", "setuptools"]
 PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner"]
 
 
-def bootstrap():
-    """Create and populate dev env."""
+def bootstrap(ci_mode):
+    """Create and populate dev env.
+
+    Will automatically activate the environment, unless ci_mode is True.
+    """
 
     if ENV_NAME not in _list_edm_envs():
         print(f"Creating development environment {ENV_NAME}...")
@@ -37,8 +41,9 @@ def bootstrap():
     else:
         print("Environment already exists; reusing.")
 
-    print(f"Activating dev environment {ENV_NAME}")
-    subprocess.run(["edm", "shell", "-e", ENV_NAME])
+    if not ci_mode:
+        print(f"Activating dev environment {ENV_NAME}")
+        subprocess.run(["edm", "shell", "-e", ENV_NAME])
 
 
 def _list_edm_envs():
@@ -59,4 +64,7 @@ def _list_edm_envs():
 
 
 if __name__ == "__main__":
-    bootstrap()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ci", action="store_true")
+    args = parser.parse_args()
+    bootstrap(args.ci)
