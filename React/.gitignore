@@ -1,3 +1,5 @@
+.parcel-cache/
+dist/
 /dev_settings.json
 /dev_settings.json.disabled
 *.zbundle

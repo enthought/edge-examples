@@ -23,9 +23,9 @@ from dash.dependencies import Input, Output
 from edge.api import EdgeSession
 from flask import Flask
 
-# This is needed for Dash's routing.  See the Dockerfile and the
-# app.location.conf.template file for more information.
-JUPYTERHUB_SERVICE_PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
+# Your app will be served by Edge under this URL prefix.
+# Please note the value will contain a trailing "/" character.
+PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
 
 
 def get_edge_session():
@@ -59,7 +59,7 @@ def get_edge_session():
 # "flask_app" instead.
 flask_app = Flask(__name__)
 
-dash_app = Dash(server=flask_app, url_base_pathname=JUPYTERHUB_SERVICE_PREFIX)
+dash_app = Dash(server=flask_app, url_base_pathname=PREFIX)
 
 
 df = pd.read_csv(

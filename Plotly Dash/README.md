@@ -107,21 +107,20 @@ contains your API token.
 This example uses the ``edge-native-base`` Docker image as a starting point.
 That image provides a small proxy server that handles routing, along with the
 more complicated parts of talking to JupyterHub (for example, handling the
-OAuth2 authentication process).
+OAuth2 connection process).
 
-Your app should be written as though it was serving from the server's root.
-In other words, if you have an "index.html" file, serve it from a Flask route
-like ``@app.get("/index.html")``.  The base image proxy server will take
-care of serving your response on the appropriate route in Edge.
+Edge will serve your app under a URL prefix which is set at runtime, and
+contains values like the current user name and app name.  This prefix is
+passed down to your app in the environment variable JUPYTERHUB_SERVICE_PREFIX.
+Your app will need to respond to HTTP requests that include this prefix.  
 
-It's sometimes useful to know, programmatically, what "real" prefix your app
-is being served under.  This can be useful when writing e.g. a React front-end
-that needs to know where to serve requests.  
-
-The "real" prefix is available in the environment variable 
-``JUPYTERHUB_SERVICE_PREFIX``.  Please note that the value will have a
-trailing slash (``"/"``) character.  When running outside of Edge or
-JupyterHub, this variable will not be defined.
+For Plotly Dash, the main thing you have to do is be sure to set the
+``url_base_pathname`` argument when creating the Dash app instance, for
+example:
+```python
+dash_app = Dash(server=flask_app, url_base_pathname=PREFIX)
+```
+See src/app.py for an example.
 
 
 ## Viewing console output

@@ -107,21 +107,19 @@ contains your API token.
 This example uses the ``edge-native-base`` Docker image as a starting point.
 That image provides a small proxy server that handles routing, along with the
 more complicated parts of talking to JupyterHub (for example, handling the
-OAuth2 authentication process).
+OAuth2 connection process).
 
-Your app should be written as though it was serving from the server's root.
-In other words, if you have an "index.html" file, serve it from a Flask route
-like ``@app.get("/index.html")``.  The base image proxy server will take
-care of serving your response on the appropriate route in Edge.
+Edge will serve your app under a URL prefix which is set at runtime, and
+contains values like the current user name and app name.  This prefix is
+passed down to your app in the environment variable JUPYTERHUB_SERVICE_PREFIX.
+Your app will need to respond to HTTP requests that include this prefix.  
 
-It's sometimes useful to know, programmatically, what "real" prefix your app
-is being served under.  This can be useful when writing e.g. a React front-end
-that needs to know where to serve requests.  
+In practical terms, if you want to serve your app's home page as "index.html",
+you should use a Flask route like ``@app.get(PREFIX + "index.html")``.
 
-The "real" prefix is available in the environment variable 
-``JUPYTERHUB_SERVICE_PREFIX``.  Please note that the value will have a
-trailing slash (``"/"``) character.  When running outside of Edge or
-JupyterHub, this variable will not be defined.
+The JUPYTERHUB_SERVICE_PREFIX value may or may not be set when running in
+local mode.  To be safe, you should fall back to a value of "/" if it's not
+found.
 
 
 ## Viewing console output
