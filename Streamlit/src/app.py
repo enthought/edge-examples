@@ -18,11 +18,8 @@ import os
 import numpy as np
 import pandas as pd
 import streamlit as st
-from streamlit.web.server import routes
 
 from edge.api import EdgeSession
-
-routes.ALLOWED_MESSAGE_ORIGINS.append("https://*.enthought.com")
 
 
 def get_edge_session():
