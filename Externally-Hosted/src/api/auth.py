@@ -23,7 +23,7 @@ auth = Blueprint("auth", __name__)
 
 
 def authenticated(f):
-    """Verify we have information o the user's ID"""
+    """Verify we have information on the user's ID"""
 
     @wraps(f)
     def decorated(*args, **kwargs):
