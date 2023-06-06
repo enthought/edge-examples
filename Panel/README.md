@@ -155,19 +155,35 @@ edge = EdgeSession(
     api_token="<YOUR_EDGE_API_TOKEN>"
 )
 
-# Register the application version
+# Register the application version.
+
+# Icon is a base64-encoded PNG.  
+# It should be square, any size; 64x64 or 128x128 are common.
 ICON = (
-    "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/w"
-    "D/AP+gvaeTAAABfklEQVRoge2ZTU7DMBBGHz9bECpLWAI36ZIdEvQa5Rpw"
-    "CFQhtaq66o5wErgCWSR7KAvbUrGaFI8Tu5XmSZbjuFK/mS/jNjYoiqLsMp"
-    "fAHKiBVeJWAwvgOkZ8mUG430rgQhLAfAfEuzZrEnnQEkANnAQG3RcVcLZp"
-    "oi2AlTe+7UzO/1h6441aDxMI6ZUcASz5m11/HMTeO3Cc8Lv8LDeNg2pNHQ"
-    "jAZdbPtCjzDnUgAK2BTWgN5CalAw4/01H/sfbeAQ0gN5IaOAJGwNBeF8AE"
-    "+LHzna4y25AEMALu18Z3GPGTThQFIglgaPsx8NmhFhGSGhjYPrt4iPsdeM"
-    "G8NxfAFPj25sVvWSHErEID4Bx4sM3xEaUokBgHxpgEPGHq4tXef/Q+16sT"
-    "EgdK269vc/hbMMmQOFBgHpln714WJAFMbe+W0zdatv76RnfmctPmQAWcph"
-    "KyhcbN3TYH3vvRIkK0SNwAX+Q/GyiBK0kAYE5GZhgLUwuvMIcsYvGKoij9"
-    "8ws479akcYBsnQAAAABJRU5ErkJggg=="
+    "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAk1BMVEUAAA"
+    "AMfIYAdnwAdnwAd3wAc3kAdntYsb8AdnwAdn0AdXwAdXsAd30Ad3xYsb8A"
+    "d30AdntYsL8Ad30AdnsAd30AdnwAd3wAd30AdnxYssBYsb5Ysr9Zs70Adn"
+    "tYsr9Ysb9Ysb9Ysr8AdnxXs75Ysb4AdXsAd3wAdnxYsb8AeoAAfYMAf4Vb"
+    "t8Zfv84Ad31ixtVevMuy+odXAAAAJ3RSTlMABPr88Shd+4pmkXyDbfB0Xy"
+    "dWTy0h9TLnkYv+IJmX9uigNzOIf5LOQ2WlAAAC/ElEQVR42sXX7VLiMBiG"
+    "4aTBDwQVEJSPXdkF3dAi1fM/uoXp7DyzIzHEm7bvT6Dc16SlDQbObG5anf"
+    "nHx4tpcea7q6sdWQPeXyyIgPc3+7nazQwY3N8sWhLM9uu/+Sd4NmBQvxog"
+    "YH0g4P2qLMFvAwb0WxE8q9+CwJqX96W6muV7U9fB8NfbsRV4u1ubhubHQf"
+    "C5PzQNjZXg/741dY8EdxKAPhTQPhfQPhfQPheQPhcM9wLa54KG+jYoCPZt"
+    "M4Llspn+KlRZr0PvrM7Z/7m9DHVCr19ub87Zd4UEX436hZeA9zPnJTix7z"
+    "IJcN97CU7tey8B70twev9Mgj+HvgQJ/fMIbqq+BCl9CXhfgpS+BLwvQUpf"
+    "At6XIN7nAvWTBOpDgfppgm6uPhGonyaw00LHAIH6qYLJNA8KeD8usF8Irk"
+    "E/SdChAvXbEajfjkD9dgTqtyNQv0XB9aFPBRcRAexzQXo/q1MQ77uyqHEN"
+    "4v2smPby0qUKHoOC1H7eGZtB4VMF47AgtX+hrU4Ngmj/cWzs+QU2rW/qFc"
+    "T7lSA/o6BvbEq/+rpRuuApiwvi/doE0X72pA/VJYj36xXE+7UL+sf7Tn0s"
+    "WPncBQTh51/Z0fV3oiDvBtegU/rQ/eC1OIpz5XRirEkQOFfch/8ulEfNru"
+    "gZcx8QVI+AuECnoGtM8NEc6N8aY0OC7ESB+qdvDdS33xQ8aH9A+0igfj74"
+    "Zh8K9BMEfSxwPgd9KKj6o8S+V58KaJ8LXJk/gD4WeM/6XMD6XDCC558LYJ"
+    "8LYJ8LQB8IYJ8IeD9+eG9LBPH7PxTgPhbQPhfwPhek932gDwTRfnjLyAW0"
+    "zwW8H5+IAPa5gPa5gPa5gPa5gPa5gPa5gPa5gPa5gPa5APa5gPW5YDJBfS"
+    "6YTkmfC1xZukb6NiiAfS4AfSAAfSQoHOpzwes2Q30+fQla6VsJQB8LeJ8L"
+    "wv0B6AMB6AMB6HMB7XMB7XMB7XMB7XMB7XMB7XMB7XMB7XMB7XMB7XMB7H"
+    "NBjvpccH0L+38B6kvWH2wXIe8AAAAASUVORK5CYII="
 )
 version = AppVersion(
     app_id="my-app-id",  # Specified when the app is created
