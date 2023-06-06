@@ -8,9 +8,9 @@ Edge.
 
 Edge provides two important mechanisms for integrating with externally-hosted
 apps.  First, you can register such an app on the Workbench, so that users
-can go straight to it after logging in.  Second, you can configure the
-externally-hosted app to use Edge as an _authentication provider_, using the
-industry-standard OAuth2 protocol.
+can go straight to it after logging in.  Second, you can set up the
+externally-hosted app's login flow to use Edge as a source of information on
+the user, via the industry-standard OAuth2 protocol.
 
 
 ## Overview
@@ -57,7 +57,7 @@ To build the application, use:
 python -m ci build
 ```
 
-You can run this application in debug mode without Edge authentication integration using:
+You can run this application in debug mode without Edge login integration using:
 
 ```commandline
 python -m ci watch
@@ -71,22 +71,22 @@ we will provide `client_id`, `client_secret` and `redirect_uri` to the
 [`authlib`](./src/app.py#L31) library.  These three pieces of information will
 come from the Edge registration process in step 3.
 
-The requirements for authentication in this example Flask application are handled
+The requirements for login in this example Flask application are handled
 in [`api/auth.py`](./api/auth.py). These include:
 - An [`authenticated` decorator](./src/api/auth.py#L25)
 - A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
-- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the `redirect_uri` for handling Edge OAuth
+- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the 
+`redirect_uri` for handling Edge OAuth
 
-Finally, keep in mind the Edge provides your application with the identity of
-the Edge user requesting access to your app, in the form of a user ID,
-typically an email address.  Edge guarantees that the user ID is genuine; in
-other words, the user is who they say they are.  This is _authentication_.
+Finally, keep in mind the Edge login flow grants your application basic
+identity information regarding a user, for example a user ID, typically an
+email address.
 
-Depending on your app's security model, you would likely also need to handle
-_authorization_.  Most apps won't want to simply allow any authenticated user to
-access information, because not every authenticated user may belong to the
+Depending on your app's security model, you would likely also need to provide
+a more detailed authorization process. Most apps won't want to simply allow any 
+user to access information, because not every Edge user may belong to the
 business unit or team working with the app.  Typically you will perform
-additional _authorization_ checks before allowing an authenticated user access.  
+additional checks before allowing an authenticated user access.  
 
 As an example, you might have a list of authorized user IDs in a database, or
 even in a config file that the app can load on startup. There is a

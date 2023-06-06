@@ -23,7 +23,7 @@ auth = Blueprint("auth", __name__)
 
 
 def authenticated(f):
-    """Verify if the user is authenticated"""
+    """Verify we have information on the user's ID"""
 
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -49,7 +49,7 @@ def login():
             return redirect("/")
 
     redirect_uri = url_for("auth.authorize", _external=True)
-    # Redirect to OAuth provider (Edge) for authentication, then back
+    # Redirect to OAuth provider (Edge), then back
     # to our 'redirect_uri' callback to handle the response
     return app.OAUTH.authorize_redirect(redirect_uri)
 
@@ -63,7 +63,7 @@ def authorize():
 
     With the access token in hand, we query the provider for the user
     information and save the user ID in our session. This user ID will be used
-    throught the application to verify the identity of the signed-in user.
+    throught the application to identify the signed-in user.
     """
     try:
         app.OAUTH.authorize_access_token()
@@ -97,7 +97,7 @@ def logout():
 
 
 def user_is_authorized(user_id):
-    """ Stub function for checking if a particular user ID is allowed access.
+    """Stub function for checking if a particular user ID is allowed access.
 
     You can trust that the user_id is genuine; Edge guarantees this as part
     of the login process.  As the app developer, you're responsible for also
