@@ -31,7 +31,11 @@ necessary to use EdgeSession in the example.
    ``python -m ci build``.  This will produce a Docker image.
 
 3. Run the Docker image via ``python -m ci run``.  The app will serve on
-   http://127.0.0.1:8888 in a local development mode.
+   http://127.0.0.1:8888 in a local development mode.  Please note that
+   you may see a message from  Streamlit in the terminal referencing port 9000,
+   which should be ignored.  Streamlit itself runs on port 9000, but this is
+   only used internally; the edge-native-base proxy server will listen on 8888
+   and forward requests.
 
 4. To reduce the risk that the app will fail when run on Edge, you can run
    a "preflight check", via ``python -m ci preflight``.  This will launch
@@ -147,7 +151,8 @@ need to follow in your own Dockerfile.
 * Don't set ``CMD`` or ``ENTRYPOINT``.  These are set by the base image already.
   Instead, place your command(s) in ``/home/app/startup-script.sh``.
 * Your app should bind to ``127.0.0.1``, *not* ``0.0.0.0``, and it should serve
-  on port 9000.
+  on port 9000.  The edge-native-base machinery will then respond to requests on
+  port 8888, and forward them to your app.
 
 
 ## Publishing versions from CI (e.g. GitHub Actions)
