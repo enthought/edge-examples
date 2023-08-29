@@ -72,10 +72,10 @@ we will provide `client_id`, `client_secret` and `redirect_uri` to the
 come from the Edge registration process in step 3.
 
 The requirements for login in this example Flask application are handled
-in [`api/auth.py`](./api/auth.py). These include:
+in [`api/auth.py`](./src/api/auth.py). These include:
 - An [`authenticated` decorator](./src/api/auth.py#L25)
 - A [`/login` endpoint with OAuth redirect to Edge](./src/api/auth.py#L41)
-- A [`/authorize` endpoint](./src/api/auth.#L57) which will be the 
+- A [`/authorize` endpoint](./src/api/auth.py#L57) which will be the 
 `redirect_uri` for handling Edge OAuth
 
 Finally, keep in mind the Edge login flow grants your application basic
