@@ -155,11 +155,11 @@ you've launched your app in the JupyterHub UI, you can use the ``docker logs``
 command to see output:
 
 ```
-$ docker logs edge-example-minimal -f
+$ docker logs edge-native-app-flask-demo -f
 ```
 
 (If you've changed the IMAGE constant in ``ci/__main__.py``, replace
-"edge-example-minimal" above with the new image name).
+"edge-native-app-flask-demo" above with the new image name).
 
 
 ## Guidelines for your Dockerfile
@@ -236,7 +236,7 @@ version = AppVersion(
     description="This Is An Example Edge Application",
     icon=ICON,
     kind=AppKindEnum.Native,
-    link="quay.io/enthought/YOUR_IMAGE_NAME_HERE:TAG",
+    link="quay.io/<YOUR_ORGANIZATION>/YOUR_IMAGE_NAME_HERE:TAG",
     recommended_profile="edge.medium"
 )
 edge.applications.add_app_version(version)

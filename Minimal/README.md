@@ -1,6 +1,6 @@
 # Minimal Flask-based example
 
-This example shows how to develop an basic Edge native application.  It
+This example shows how to develop a basic Edge native application.  It
 contains just enough machinery to build a "hello world" app, run it locally,
 and publish the image for use with Edge.
 
@@ -209,7 +209,7 @@ version = AppVersion(
     description="This Is An Example Edge Application",
     icon=ICON,
     kind=AppKindEnum.Native,
-    link="quay.io/enthought/YOUR_IMAGE_NAME_HERE:TAG",
+    link="quay.io/<YOUR_ORGANIZATION>/YOUR_IMAGE_NAME_HERE:TAG",
     recommended_profile="edge.medium"
 )
 edge.applications.add_app_version(version)
