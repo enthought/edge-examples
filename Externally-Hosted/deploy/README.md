@@ -3,7 +3,7 @@
 
 There are many ways to deploy a web application, such as Ansible or Helm.
 In this example, we are using Terraform to deploy the example application
-to Kubernetes, in a namespace called `edge-dev`.
+to Kubernetes, in a namespace called `external-app`.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ The requirements are:
 - [`kubelogin`](https://github.com/int128/kubelogin)
 - [`terraform`](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 - An Outh Client ID from Edge (see [`README.MD`](../README.md))
-- A `quay.io` username and password with access to the `quay.io/enthough/edge-external-app-demo` repo
+- A `quay.io` username and password with access to the `quay.io/enthought/edge-external-app-demo` repo
 
 ## Deploying Using Terraform
 
@@ -44,7 +44,7 @@ To check that your deployment succeded you can run `kubectl describe pod` or
 `kubectl describe deploy`.
 
 You can open the demo app in your browser by going to
-[`https://edge-external-app-demo.platform-devops.enthought.com`](https://edge-external-app-demo.platform-devops.enthought.com)
+[`https://edge-external-app-demo.edge-dev.enthought.com`](https://edge-external-app-demo.edge-dev.enthought.com)
 
 ## Deployment Configuration
 

@@ -70,7 +70,7 @@ resource "kubernetes_deployment_v1" "edge-example-app-dev" {
           }
           env {
             name  = "OAUTH_REDIRECT_URI"
-            value = "http://edge-external-app-dev.edge-dev.enthought.com/authorize"
+            value = "https://edge-external-app-dev.edge-dev.enthought.com/authorize"
           }
           env {
             name  = "EDGE_BASE_URL"
