@@ -43,7 +43,7 @@ Before starting, ensure you have the following installed:
 Collect the following information:
 
 * The hostname under which your app will be deployed.  For this example, we will
-  use "https://edge-external-app-demo.platform-devops.enthought.com".
+  use "https://edge-external-app-demo.edge-dev.enthought.com".
 * A Docker repository and related username/password.  For this example, we will
   use "quay.io/enthought/edge-external-app-demo".
 
@@ -111,7 +111,7 @@ dashboard, but gives developers freedom to publish new versions by themselves.
 Once your administrator has created the _app_, you can make a new _app version_
 by logging into Edge, going to the "gear" icon, and navigating to it.
 Click "Create Version" and fill out the form, being sure to set "Kind" to
-"Externally-Hosted App".  For the "Link", you should provide the hostname
+"Externally Hosted App".  For the "Link", you should provide the hostname
 from step (1).
 
 Once your app version is created, you will need to create the OAuth2
@@ -133,7 +133,7 @@ deploy the app.  It looks something like this:
 ```python
 {'client_id': 'service-edge-app-default-edge-external-app-demo',
  'client_secret': 'RANDOM_CLIENT_SECRET',
- 'redirect_uri': 'https://edge-external-app-demo.platform-devops.enthought.com/authorize'}
+ 'redirect_uri': 'https://edge-external-app-demo.edge-dev.enthought.com/authorize'}
  ```
 
 ## 4. Deploying the app
