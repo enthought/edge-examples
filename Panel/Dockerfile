@@ -1,4 +1,4 @@
-# This is the Dockerfile for the Enthought Edge "Streamlit" example.
+# This is the Dockerfile for the Enthought Edge "Panel" example.
 # 
 # We use "edge-native-base" as the base image.  This is a Centos-7 based image
 # which includes EDM, as well as a small proxy server which automatically 
