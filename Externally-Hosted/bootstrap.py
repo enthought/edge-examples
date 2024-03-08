@@ -14,7 +14,7 @@
 import subprocess
 
 ENV_NAME = "edge-externally-hosted-example"
-EDM_DEPS = ["click", "pip", "setuptools==59.8.0-1", "authlib", "flask>2", "gunicorn", "requests"]
+EDM_DEPS = ["click", "pip", "setuptools", "authlib", "flask>2", "gunicorn", "requests"]
 PIP_DEPS = ["Flask-Session"]
 
 

@@ -31,7 +31,7 @@ APP_DEPENDENCIES = [
     "packaging",
     "pip",
     "pyparsing",
-    "setuptools==59.8.0-1",
+    "setuptools",
     "six",
     "click",
     "flask>2",
