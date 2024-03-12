@@ -1,4 +1,4 @@
-# This is the Dockerfile for the Enthought Edge "Streamlit" core example.
+# This is the Dockerfile for the Enthought Edge "Panel" core example.
 # 
 # We use "edm-centos-7" as the base image.  This is a Centos-7 based image
 # which includes EDM.
@@ -14,7 +14,6 @@
 # any of the JUPYTERHUB_* variables, directly in this file. They will be set
 # automatically when running in Edge, or by the "ci" module when running
 # locally.
-
 
 # First stage
 
@@ -32,9 +31,6 @@ WORKDIR /home/app
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
-# Add a few 'pip' packages to the application environment
-RUN edm run -- python -m pip install --no-cache-dir \
-    streamlit streamlit-javascript streamlit-extras
 
 # Second stage
 
@@ -50,12 +46,11 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Don't change the user, and in particular don't make the user "root".
 
 # Copy startup script and application.
+# Note: the startup script must be placed in /home/app for the base image
+# machinery to pick it up.
+
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/app.py /home/app/app.py
-
-# Copy in the config file for Streamlit
-RUN mkdir /home/app/.streamlit
-COPY --chown=app ./src/config.toml /home/app/.streamlit
 
 CMD ["/home/app/startup-script.sh"]

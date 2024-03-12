@@ -7,7 +7,7 @@
 # Distribution is prohibited.
 
 """
-    This is the "ci" module for the Core Streamlit example.
+    This is the "ci" module for the Core Panel example.
 """
 
 import click
@@ -20,7 +20,7 @@ import json
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 # Docker image will be tagged "IMAGE:VERSION"
-IMAGE = "quay.io/enthought/edge-streamlit-core"
+IMAGE = "quay.io/enthought/edge-panel-core"
 VERSION = "1.1.0"
 
 # These will go into the built Docker image.  You may wish to modify this
@@ -33,7 +33,10 @@ APP_DEPENDENCIES = [
     "pyparsing",
     "setuptools",
     "six",
-    "requests",
+    "panel",
+    "numpy",
+    "pandas",
+    "matplotlib",
 ]
 
 # This will be used when running locally ("run" command).
