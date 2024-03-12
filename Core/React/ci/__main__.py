@@ -38,7 +38,7 @@ APP_DEPENDENCIES = [
     "six",
 ]
 
-# This will be used when running locally ("run" or "preflight" commands).
+# This will be used when running locally ("run" command).
 # We just use the last component of the full image URL.
 CONTAINER_NAME = IMAGE.split("/")[-1]
 
@@ -90,8 +90,6 @@ def run():
     """Run the Docker image for testing"""
 
     # Get values from the dev settings file (API tokens for testing, etc.)
-    # Because we are running outside of JupyterHub, we also disable the OAuth2
-    # machinery.
     envs = _load_dev_settings()
 
     cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", CONTAINER_NAME]

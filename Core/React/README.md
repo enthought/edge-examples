@@ -99,8 +99,7 @@ collecting environment variables set by Edge when the container is launched.
 
 When developing locally, it's also convenient to have an EdgeSession.  You
 can get the "ci" module to inject the appropriate environment variables, so
-that your ``EdgeSession()`` call will work with ``python -m ci run`` and
-``python -m ci preflight``.  
+that your ``EdgeSession()`` call will work with ``python -m ci run``.  
 
 To do so, follow this procedure:
 
@@ -109,8 +108,8 @@ To do so, follow this procedure:
   ``"https://edge.enthought.com/services/api"``.
 * Define EDGE_API_ORG in that file.  This is the "short name" displayed in
   the URL bar when you log into an organization, for example, ``"default"``.
-* Define EDGE_API_TOKEN.  You can get one of these by going to the
-  ``/hub/token`` endpoint on the Edge server.
+* Define EDGE_API_TOKEN.  You can get one of these from the ``My Profile``page
+  in the Edge UI.
 
 Be sure *not* to check the "dev_settings.json" file into source control, as it
 contains your API token.
@@ -138,16 +137,7 @@ found.
 ## Viewing console output
 
 When running with ``python -m ci run``, the app's output will be displayed
-on the console where you launched it.  Once you've launched your app locally, 
-you can use the ``docker logs``command to see output:
-
-```
-$ docker logs edge-react-core -f
-```
-
-(If you've changed the IMAGE constant in ``ci/__main__.py``, replace
-"edge-react-core" above with the new image name).
-
+on the console where you launched it.
 
 ## Guidelines for your Dockerfile
 
@@ -157,9 +147,6 @@ the prefix from requests, handling the OAuth2 login flow, pinging JupyterHub
 for container activity, and more.  But, there are a few guidelines you will
 need to follow in your own Dockerfile.
 
-* Don't change the user to anything other than ``app`` (for example, by the 
-  Dockerfile ``USER`` command). If you need to run ``yum`` for some reason, 
-  use ``sudo``.
 * Your app should bind to ``127.0.0.1``, *not* ``0.0.0.0``, and it should serve
   on port 9000.  The Edge machinery will respond to requests on port 8888 and 
   forward them to your app.
