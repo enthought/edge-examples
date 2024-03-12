@@ -7,7 +7,7 @@
 # Distribution is prohibited.
 
 """
-    This is the "ci" module for the Streamlit example.
+    This is the "ci" module for the Panel example.
 """
 
 import click

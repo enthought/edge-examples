@@ -1,9 +1,8 @@
-# Streamlit example
+# Panel example
 
-This example shows how to develop an application for Edge using the Streamlit
-library.  You can read more about Streamlit at their official site: 
-https://streamlit.io/.
-
+This example shows how to develop an application for Edge using the Panel
+library.  You can read more about Panel at their official site: 
+https://panel.holoviz.org/.
 
 
 ## Before you begin
@@ -27,7 +26,7 @@ necessary to use EdgeSession in the example.
    ``python -m ci build``.  This will produce a Docker image.
 
 3. Run the Docker image via ``python -m ci run``.  The app will serve on
-   http://0.0.0.0:9000 in a local development mode.
+   http://127.0.0.1:9000 in a local development mode.
 
 
 ## Modifying the example for your use case
