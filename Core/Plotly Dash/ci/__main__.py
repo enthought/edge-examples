@@ -40,7 +40,7 @@ APP_DEPENDENCIES = [
     "dash",
 ]
 
-# This will be used when running locally ("run" or "preflight" commands).
+# This will be used when running locally ("run" command).
 # We just use the last component of the full image URL.
 CONTAINER_NAME = IMAGE.split("/")[-1]
 
