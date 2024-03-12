@@ -17,7 +17,7 @@
 
 # First stage
 
-ARG BASE_IMAGE=quay.io/enthought/edm-centos-7:3.4.0
+ARG BASE_IMAGE=quay.io/enthought/edm-centos-7:latest
 
 FROM $BASE_IMAGE as stage_one
 
