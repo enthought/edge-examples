@@ -15,6 +15,7 @@
 # automatically when running in Edge, or by the "ci" module when running
 # locally.
 
+
 # First stage
 
 ARG BASE_IMAGE=quay.io/enthought/edm-centos-7:latest
@@ -49,9 +50,6 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Don't change the user, and in particular don't make the user "root".
 
 # Copy startup script and application.
-# Note: the startup script must be placed in /home/app for the base image
-# machinery to pick it up.
-
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/app.py /home/app/app.py

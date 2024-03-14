@@ -1,4 +1,4 @@
-# This is the Dockerfile for the Enthought Edge "Panel" core example.
+# This is the Dockerfile for the Enthought Edge "React" core example.
 # 
 # We use "edm-centos-7" as the base image.  This is a Centos-7 based image
 # which includes EDM.
@@ -32,6 +32,9 @@ WORKDIR /home/app
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
+# Install any 'pip' dependencies
+RUN edm run -- pip install --no-cache-dir Flask-Session
+
 
 # Second stage
 
@@ -49,6 +52,7 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Copy startup script and application.
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
-COPY --chown=app ./src/app.py /home/app/app.py
+COPY --chown=app ./src/application/ /home/app/application
+
 
 CMD ["/home/app/startup-script.sh"]

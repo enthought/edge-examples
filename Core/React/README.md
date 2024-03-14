@@ -1,9 +1,33 @@
-# Streamlit example
+# React example
 
-This example shows how to develop an application for Edge using the Streamlit
-library.  You can read more about Streamlit at their official site: 
-https://streamlit.io/.
+This example shows how to develop an application for Edge using the React
+library.  You can read more about React at https://react.dev/.
 
+One of the most exciting features of Edge native applications is the ability
+to do long-running computation, without leaving your app.  Because each user
+has their own dedicated container, doing heavyweight computation is as easy
+as creating a new thread.
+
+This example uses the OpenCV library to detect faces in uploaded images.
+Upon upload to the React front-end, a compute task is launched inside the
+backend process.  When the compute task finishes, the image is updated to
+display bounding boxes around the features that match.  See "app.py" in the
+src/application folder for details.
+
+Tips for using React (and Flask) when building an Edge native app:
+
+* The "prefix" (URL) of your app changes depending on which user is running
+  the app.  See "app.py" for how to retrieve this value.  You can then pass it
+  down to React via a template file.  See the frontend/templates/index.html file
+  for an example of how to do this using a script tag.  This value can be used
+  in turn, on the React side, to compute the right URL for use with "fetch".
+
+* Don't "block" a Flask callback waiting on compute.  Instead, spin off a
+  thread to manage it, and use e.g. polling to update the frontend state once
+  the compute job is finished.
+
+* You should run with a single gunicorn worker.  If you want to run subprocesses,
+  avoid forking the process, and use spawn instead.
 
 
 ## Before you begin
@@ -14,8 +38,7 @@ Before starting, ensure you have the following installed:
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
 Then ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg
-repository, along with ``enthought/free`` and ``enthought/lgpl``.  This will be
-necessary to use EdgeSession in the example.
+repository.  This will be necessary to use EdgeSession in the example.
 
 
 ## Quick start
@@ -90,6 +113,25 @@ To do so, follow this procedure:
 
 Be sure *not* to check the "dev_settings.json" file into source control, as it
 contains your API token.
+
+
+## Routes and prefixes
+
+This example is designed to be run next to a reverse proxy provided by Edge, 
+that handles routing, along with the more complicated parts of talking to 
+JupyterHub (for example, handling the OAuth2 connection process).
+
+Edge will serve your app under a URL prefix which is set at runtime, and
+contains values like the current user name and app name.  This prefix is
+passed down to your app in the environment variable JUPYTERHUB_SERVICE_PREFIX.
+Your app will need to respond to HTTP requests that include this prefix.  
+
+In practical terms, if you want to serve your app's home page as "index.html",
+you should use a Flask route like ``@app.get(PREFIX + "index.html")``.
+
+The JUPYTERHUB_SERVICE_PREFIX value may or may not be set when running in
+local mode.  To be safe, you should fall back to a value of "/" if it's not
+found.
 
 
 ## Viewing console output

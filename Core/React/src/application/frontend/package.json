@@ -1,0 +1,29 @@
+{
+  "name": "native-app-flask-example",
+  "version": "1.0.0",
+  "description": "",
+  "source": "src/index.tsx",
+  "scripts": {
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "dev": "parcel watch --dist-dir ./dist",
+    "build": "parcel build --dist-dir ./dist"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@types/react": "^18.0.20",
+    "parcel": "^2.7.0",
+    "prettier": "^2.7.1",
+    "process": "^0.11.10"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.1",
+    "konva": "^8.3.12",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
+}
