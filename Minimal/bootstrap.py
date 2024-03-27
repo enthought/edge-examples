@@ -15,7 +15,7 @@ import argparse
 import subprocess
 
 ENV_NAME = "edge-minimal-example"
-EDM_DEPS = ["click", "pip", "setuptools==67.7.2"]
+EDM_DEPS = ["click", "pip", "setuptools"]
 PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner"]
 
 

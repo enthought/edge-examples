@@ -42,7 +42,7 @@ BUNDLE_PACKAGES = [
     "packaging",
     "pip",
     "pyparsing",
-    "setuptools==67.7.2",
+    "setuptools",
     "six",
     "click",
     "requests",
