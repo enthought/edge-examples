@@ -29,6 +29,7 @@ from click import secho
 RETRIES = 5
 BACKOFF = 5
 
+transient_errors = [502, 503, 504]
 
 @click.command()
 @click.argument("image")
@@ -69,12 +70,18 @@ def preflight(image, app_log, hub_log):
         with check("Wait for the application to start"):
             # Collect all redirects
             redirects = []
-            for _ in range(RETRIES):
-                response = s.get("http://localhost:8000/user/edgeuser")
-                response.raise_for_status()
-                redirects = redirects + [urlparse(r.url).path for r in response.history]
-                if "spawn-pending" not in response.url:
-                    break
+            for attempt in range(RETRIES):
+                try:
+                    response = s.get("http://localhost:8000/user/edgeuser")
+                    if response.status_code in transient_errors:
+                        print(f"Attempt {attempt + 1}: Received {response.status_code} error, retrying after {BACKOFF} seconds...")
+                    else:
+                        response.raise_for_status()
+                        redirects = redirects + [urlparse(r.url).path for r in response.history]
+                        if "spawn-pending" not in response.url:
+                            break
+                except Exception as e:
+                    print(f"Attempt {attempt + 1}: Error encountered: {e}. Retrying after {BACKOFF} seconds...")
                 time.sleep(BACKOFF)
             else:
                 raise AssertionError("Application failed to start")
