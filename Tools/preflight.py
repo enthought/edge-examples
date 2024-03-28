@@ -29,7 +29,6 @@ from click import secho
 RETRIES = 5
 BACKOFF = 5
 
-transient_errors = [502, 503, 504]
 
 @click.command()
 @click.argument("image")
