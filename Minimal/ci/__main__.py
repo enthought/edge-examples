@@ -25,7 +25,7 @@ VERSION = "1.0.0"
 
 # These will go into the built Docker image.  You may wish to modify this
 # minimal example to pin the dependencies, or use a bundle file to define them.
-APP_DEPENDENCIES = ["flask", "pip", "setuptools", "gunicorn", "enthought_edge"]
+APP_DEPENDENCIES = ["flask", "pip", "gunicorn", "enthought_edge"]
 
 # This will be used when running locally ("run" or "preflight" commands).
 # We just use the last component of the full image URL.
