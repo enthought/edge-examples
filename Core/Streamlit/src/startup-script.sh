@@ -10,4 +10,10 @@ if [ -z $HOST_ADDRESS ]; then
   export HOST_ADDRESS='127.0.0.1';
 fi
 
+if [[ -z "${JUPYTERHUB_SERVICE_PREFIX}" ]]; then
+  export STREAMLIT_SERVER_BASE_URL_PATH="/"
+else
+  export STREAMLIT_SERVER_BASE_URL_PATH="${JUPYTERHUB_SERVICE_PREFIX}"
+fi
+
 exec edm run -- streamlit run app.py --server.headless true --server.address=${HOST_ADDRESS} --server.port 9000
