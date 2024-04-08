@@ -50,14 +50,6 @@ jobs:
         with:
           fetch-depth: 0
 
-#      - name: Setup NodeJS 16.x
-#        uses: actions/setup-node@v3
-#        with:
-#          node-version: 16
-#          cache: 'npm'
-#          cache-dependency-path: |
-#            **/package-lock.json
-
       - name: Set up EDM
         uses: enthought/setup-edm-action@v2
         with:
