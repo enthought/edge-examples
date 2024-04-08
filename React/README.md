@@ -35,6 +35,7 @@ Tips for using React (and Flask) when building an Edge native app:
 Before starting, ensure you have the following installed:
 
 * [Docker](https://docker.com)
+* [Node JS](https://nodejs.org)
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
 Then ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg

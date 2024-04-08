@@ -28,14 +28,15 @@ VERSION = "1.2.0"
 APP_DEPENDENCIES = [
     "enthought_edge>=2.16.0",
     "appdirs",
-    "gunicorn",
-    "opencv_python",
     "packaging",
     "pip",
     "pyparsing",
-    "requests",
     "setuptools",
     "six",
+    "click",
+    "flask>2",
+    "gunicorn",
+    "opencv_python",
 ]
 
 # This will be used when running locally ("run" command).
