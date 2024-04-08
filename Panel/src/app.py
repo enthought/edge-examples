@@ -9,7 +9,6 @@
 """
     Example Panel application for Edge.
 """
-
 import os
 
 import matplotlib as mpl
@@ -81,6 +80,7 @@ if edge is not None:
     greeting = pn.pane.Markdown(f"Logged in as {user_name}")
 else:
     greeting = pn.pane.Markdown(f"No EdgeSession available; see the README.")
+
 
 pn.extension()
 

@@ -15,8 +15,8 @@ import argparse
 import subprocess
 
 ENV_NAME = "edge-react-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
-PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner"]
+EDM_DEPS = ["click", "gunicorn", "pip", "setuptools"]
+PIP_DEPS = ["sqlalchemy<2", "dockerspawner"]
 
 
 def bootstrap(ci_mode):

@@ -11,13 +11,9 @@ https://streamlit.io/.
 Before starting, ensure you have the following installed:
 
 * [Docker](https://docker.com)
-* [Node JS](https://nodejs.org)
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
 
-Then, run ``npm install -g configurable-http-proxy`` to install a proxy module
-needed by JupyterHub. 
-
-Finally, ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg
+Then ensure your ``edm.yaml`` file lists ``enthought/edge`` as an egg
 repository, along with ``enthought/free`` and ``enthought/lgpl``.  This will be
 necessary to use EdgeSession in the example.
 
@@ -31,17 +27,7 @@ necessary to use EdgeSession in the example.
    ``python -m ci build``.  This will produce a Docker image.
 
 3. Run the Docker image via ``python -m ci run``.  The app will serve on
-   http://127.0.0.1:8888 in a local development mode.  Please note that
-   you may see a message from  Streamlit in the terminal referencing port 9000,
-   which should be ignored.  Streamlit itself runs on port 9000, but this is
-   only used internally; the edge-native-base proxy server will listen on 8888
-   and forward requests.
-
-4. To reduce the risk that the app will fail when run on Edge, you can run
-   a "preflight check", via ``python -m ci preflight``.  This will launch
-   a local version of JupyterHub at http://127.0.0.1:8000.
-   You can log in using username "edge" and password "password".  Ensure the
-   app launches and works correctly.
+   http://0.0.0.0:9000 in a local development mode.
 
 
 ## Modifying the example for your use case
@@ -90,8 +76,7 @@ collecting environment variables set by Edge when the container is launched.
 
 When developing locally, it's also convenient to have an EdgeSession.  You
 can get the "ci" module to inject the appropriate environment variables, so
-that your ``EdgeSession()`` call will work with ``python -m ci run`` and
-``python -m ci preflight``.  
+that your ``EdgeSession()`` call will work with ``python -m ci run``.  
 
 To do so, follow this procedure:
 
@@ -100,64 +85,34 @@ To do so, follow this procedure:
   ``"https://edge.enthought.com/services/api"``.
 * Define EDGE_API_ORG in that file.  This is the "short name" displayed in
   the URL bar when you log into an organization, for example, ``"default"``.
-* Define EDGE_API_TOKEN.  You can get one of these by going to the
-  ``/hub/token`` endpoint on the Edge server.
+* Define EDGE_API_TOKEN.  You can get one of these from the ``My Profile``page
+  in the Edge UI.
 
 Be sure *not* to check the "dev_settings.json" file into source control, as it
 contains your API token.
 
 
-## Routes and prefixes
-
-Streamlit requires one small tweak to ensure it will run properly on Edge.
-This example uses the ``edge-native-base`` Docker image as a starting point.
-That image provides a small proxy server that handles routing, along with the
-more complicated parts of talking to JupyterHub (for example, handling the
-OAuth2 connection process)
-
-For Streamlit to work properly, we need to configure the edge-native-base
-proxy server to strip any URL prefix from requests.  That's the purpose of
-the src/app.location.conf.template file.  In the Dockerfile, we put this file
-in a special location where the edge-native-base machinery can find it.
-
-
 ## Viewing console output
 
 When running with ``python -m ci run``, the app's output will be displayed
-on the console where you launched it.  When running in preflight mode, with
-``python -m ci preflight``, the JupyterHub output is displayed instead.  Once
-you've launched your app in the JupyterHub UI, you can use the ``docker logs``
-command to see output:
-
-```
-$ docker logs edge-streamlit-example -f
-```
-
-(If you've changed the IMAGE constant in ``ci/__main__.py``, replace
-"edge-streamlit-example" above with the new image name).
-
+on the console where you launched it.
 
 ## Guidelines for your Dockerfile
 
-Using the ``edge-native-base`` image, and its built-in proxy server, allows
-you to skip a lot work in the development process.  This includes stripping
+Edge will run your app next to a built-in reverse proxy, which allows
+you to skip a lot of work in the development process.  This includes stripping
 the prefix from requests, handling the OAuth2 login flow, pinging JupyterHub
 for container activity, and more.  But, there are a few guidelines you will
 need to follow in your own Dockerfile.
 
-* Don't change the user (for example, by the Dockerfile ``USER`` command).
-  The active user is called ``app``.  If you need to run ``yum`` for some
-  reason, use ``sudo``.
-* Don't set ``CMD`` or ``ENTRYPOINT``.  These are set by the base image already.
-  Instead, place your command(s) in ``/home/app/startup-script.sh``.
 * Your app should bind to ``127.0.0.1``, *not* ``0.0.0.0``, and it should serve
-  on port 9000.  The edge-native-base machinery will then respond to requests on
-  port 8888, and forward them to your app.
+  on port 9000.  The Edge machinery will respond to requests on port 8888 and 
+  forward them to your app.
 
 
 ## Publishing versions from CI (e.g. GitHub Actions)
 
-You can also register your app version programmatically.  This is particularly
+You can register your app version programmatically.  This is particularly
 convenient during the development process, for automated builds.  A general
 example looks like this, for an app whose ID is ``my-app-id``:
 
@@ -165,7 +120,7 @@ example looks like this, for an app whose ID is ``my-app-id``:
 ```
 from edge.api import EdgeSession
 from edge.apps.application import Application
-from edge.apps.app_version import AppKindEnum, AppVersion
+from edge.apps.app_version import AppKindEnum, AppProxyKindEnum, AppVersion
 from edge.apps.server_info import ServerInfo
 
 # Create an Edge session.
@@ -212,6 +167,7 @@ version = AppVersion(
     description="This Is An Example Edge Application",
     icon=ICON,
     kind=AppKindEnum.Native,
+    proxy_kind=AppProxyKindEnum.Streamlit,
     link="quay.io/<YOUR_ORGANIZATION>/YOUR_IMAGE_NAME_HERE:TAG",
     recommended_profile="edge.medium"
 )

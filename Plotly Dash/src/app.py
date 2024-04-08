@@ -23,10 +23,6 @@ from dash.dependencies import Input, Output
 from edge.api import EdgeSession
 from flask import Flask
 
-# Your app will be served by Edge under this URL prefix.
-# Please note the value will contain a trailing "/" character.
-PREFIX = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "/")
-
 
 def get_edge_session():
     """Helper function to get an EdgeSession object.
@@ -59,7 +55,7 @@ def get_edge_session():
 # "flask_app" instead.
 flask_app = Flask(__name__)
 
-dash_app = Dash(server=flask_app, url_base_pathname=PREFIX)
+dash_app = Dash(server=flask_app)
 
 
 df = pd.read_csv(

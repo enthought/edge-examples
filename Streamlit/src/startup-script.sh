@@ -2,9 +2,12 @@
 
 set -e
 
-# This file will be automatically picked up by the edge-native-base machinery,
-# which runs a small proxy server in front of your app.  Your app must bind to
-# 127.0.0.1 on port 9000 for this to work.  The container itself will
-# serve on port 8888, through the proxy.
+# Your app must bind to 127.0.0.1 on port 9000 for the Edge proxy to work.
+# However, for local docker execution without a proxy, we need to bind to 0.0.0.0
 
-exec edm run -- streamlit run app.py --server.headless true --server.address=127.0.0.1 --server.port 9000
+if [ -z $HOST_ADDRESS ]; then
+  # Provide a default if not specified explicitly
+  export HOST_ADDRESS='127.0.0.1';
+fi
+
+exec edm run -- streamlit run app.py --server.headless true --server.address=${HOST_ADDRESS} --server.port 9000

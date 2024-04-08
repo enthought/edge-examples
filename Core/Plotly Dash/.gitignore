@@ -1,7 +1,0 @@
-/dev_settings.json
-/dev_settings.json.disabled
-*.zbundle
-__pycache__/
-.DS_Store
-*.sqlite
-*.sqlite-journal

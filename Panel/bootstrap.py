@@ -16,7 +16,7 @@ import subprocess
 
 ENV_NAME = "edge-panel-example"
 EDM_DEPS = ["click", "pip", "setuptools"]
-PIP_DEPS = ["jupyterhub==2.2.2", "sqlalchemy<2", "dockerspawner"]
+PIP_DEPS = ["sqlalchemy<2", "dockerspawner"]
 
 
 def bootstrap(ci_mode):
