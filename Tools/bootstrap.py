@@ -7,15 +7,15 @@
 # Distribution is prohibited.
 
 """
-    Bootstrap file, which builds the local EDM development environment for this
-    example.
+    Bootstrap file, which builds the local EDM development environment for
+    the testrun tool.
 """
 
 import argparse
 import subprocess
 
-ENV_NAME = "edge-plotly-dash-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
+ENV_NAME = "edge-testrun-tool"
+EDM_DEPS = ["click", "pip", "requests", "setuptools"]
 
 
 def bootstrap(ci_mode):

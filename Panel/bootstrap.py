@@ -16,7 +16,6 @@ import subprocess
 
 ENV_NAME = "edge-panel-example"
 EDM_DEPS = ["click", "pip", "setuptools"]
-PIP_DEPS = ["sqlalchemy<2", "dockerspawner"]
 
 
 def bootstrap(ci_mode):
@@ -31,9 +30,6 @@ def bootstrap(ci_mode):
         subprocess.run(cmd, check=True)
 
         cmd = ["edm", "install", "-e", ENV_NAME, "-y"] + EDM_DEPS
-        subprocess.run(cmd, check=True)
-
-        cmd = ["edm", "run", "-e", ENV_NAME, "--", "pip", "install"] + PIP_DEPS
         subprocess.run(cmd, check=True)
 
         print("Bootstrap complete.")
