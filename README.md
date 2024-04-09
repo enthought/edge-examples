@@ -4,9 +4,11 @@
 
 ## About
 
-This GitHub repo holds working examples of apps which run on Enthought Edge.
+This GitHub repo holds working examples of apps supported by Enthought Edge.
 
-Each example is self-contained, with its own README.md and "ci" module that
+Each example is a standalone container that inherits from `edm-centos-7`.
+
+The examples are self-contained, with their own README.md and "ci" module that
 contains build commands.  For new users, the recommended workflow for
 development is:
 

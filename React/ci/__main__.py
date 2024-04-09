@@ -21,12 +21,12 @@ SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 # Docker image will be tagged "IMAGE:VERSION"
 IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 # These will go into the built Docker image.  You may wish to modify this
 # minimal example to pin the dependencies, or use a bundle file to define them.
 APP_DEPENDENCIES = [
-    "enthought_edge>=2.6.0",
+    "enthought_edge>=2.16.0",
     "appdirs",
     "packaging",
     "pip",
@@ -39,7 +39,7 @@ APP_DEPENDENCIES = [
     "opencv_python",
 ]
 
-# This will be used when running locally ("run" or "preflight" commands).
+# This will be used when running locally ("run" command).
 # We just use the last component of the full image URL.
 CONTAINER_NAME = IMAGE.split("/")[-1]
 
@@ -91,37 +91,15 @@ def run():
     """Run the Docker image for testing"""
 
     # Get values from the dev settings file (API tokens for testing, etc.)
-    # Because we are running outside of JupyterHub, we also disable the OAuth2
-    # machinery.
     envs = _load_dev_settings()
-    envs["EDGE_DISABLE_AUTH"] = "1"
 
-    cmd = ["docker", "run", "--rm", "-p", "8888:8888", "--name", CONTAINER_NAME]
+    cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", CONTAINER_NAME]
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
+    cmd += ["--env", "HOST_ADDRESS=0.0.0.0"]
     cmd += [f"{IMAGE}:{VERSION}"]
 
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
-
-
-@cli.command()
-def preflight():
-    """Run the Docker image in a local JupyterHub environment"""
-
-    cmd = ["jupyterhub", "-f", "ci/jupyterhub_config.py"]
-
-    # Pass down container name, and any dev settings.
-    # The other end of this process is in jupyterhub_config.py.
-    env = os.environ.copy()
-    env.update(
-        {
-            "IMAGE": f"{IMAGE}:{VERSION}",
-            "CONTAINER_NAME": CONTAINER_NAME,
-        }
-    )
-    env.update(_load_dev_settings())
-
-    subprocess.run(cmd, env=env, cwd=SRC_ROOT)
 
 
 @cli.command()

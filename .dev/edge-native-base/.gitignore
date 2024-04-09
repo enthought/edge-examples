@@ -1,7 +1,0 @@
-.hypothesis/
-.pytest_cache/
-__pycache__/
-*.sqlite
-*.sqlite-journal
-*.zbundle
-.DS_Store

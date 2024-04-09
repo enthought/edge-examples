@@ -1,8 +1,7 @@
 # This is the Dockerfile for the Enthought Edge "Streamlit" example.
 # 
-# We use "edge-native-base" as the base image.  This is a Centos-7 based image
-# which includes EDM, as well as a small proxy server which automatically 
-# handles OAuth2 communication between your app and Edge.
+# We use "edm-centos-7" as the base image.  This is a Centos-7 based image
+# which includes EDM.
 #
 # EDM dependencies for the app are brought in via a .zbundle file.  This avoids
 # the need to pass your EDM token and/or a custom edm.yaml into the Dockerfile.
@@ -19,12 +18,16 @@
 
 # First stage
 
-ARG BASE_IMAGE=quay.io/enthought/edge-native-base:1.1.0
+ARG BASE_IMAGE=quay.io/enthought/edm-centos-7:latest
 
 FROM $BASE_IMAGE as stage_one
 
 ARG EDGE_BUNDLE=app_environment.zbundle
 COPY $EDGE_BUNDLE /tmp/app_environment.zbundle
+
+RUN adduser app
+USER app
+WORKDIR /home/app
 
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
@@ -33,21 +36,20 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 RUN edm run -- python -m pip install --no-cache-dir \
     streamlit streamlit-javascript streamlit-extras
 
-
 # Second stage
 
-FROM $BASE_IMAGE
+FROM $BASE_IMAGE as stage_two
+
+RUN adduser app
+USER app
+WORKDIR /home/app
 
 COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 
 # Make any global changes (yum install, e.g.) in the second stage.
 # Don't change the user, and in particular don't make the user "root".
-RUN sudo echo "(Run yum via sudo if needed)"
 
 # Copy startup script and application.
-# Note: the startup script must be placed in /home/app for the base image
-# machinery to pick it up.
-
 COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
 COPY --chown=app ./src/app.py /home/app/app.py
@@ -56,7 +58,4 @@ COPY --chown=app ./src/app.py /home/app/app.py
 RUN mkdir /home/app/.streamlit
 COPY --chown=app ./src/config.toml /home/app/.streamlit
 
-# Streamlit requires a small "shim" to make it compatible with JupyterHub's
-# routing. This file will be picked up by the edge-native-base machinery.
-COPY ./src/app.location.conf.template /opt/nginx/app.location.conf.template
-
+CMD ["/home/app/startup-script.sh"]
