@@ -21,7 +21,7 @@ SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 # Docker image will be tagged "IMAGE:VERSION"
 IMAGE = "quay.io/enthought/edge-native-app-flask-demo"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 # These will go into the built Docker image.  You may wish to modify this
 # minimal example to pin the dependencies, or use a bundle file to define them.
