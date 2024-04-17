@@ -20,27 +20,27 @@ jobs:
           {
             directory: "Minimal",
             environment: "edge-minimal-example",
-            image: "quay.io/enthought/edge-example-minimal:1.1.0"
+            image: "quay.io/enthought/edge-example-minimal:1.2.0"
           },
           {
             directory: "Panel",
             environment: "edge-panel-example",
-            image: "quay.io/enthought/edge-panel-example:1.2.0"
+            image: "quay.io/enthought/edge-panel-example:1.3.0"
           },
           {
             directory: "Plotly Dash",
             environment: "edge-plotly-dash-example",
-            image: "quay.io/enthought/edge-plotly-dash-example:1.2.0"
+            image: "quay.io/enthought/edge-plotly-dash-example:1.3.0"
           },
           {
             directory: "React",
             environment: "edge-react-example",
-            image: "quay.io/enthought/edge-native-app-flask-demo:1.2.0"
+            image: "quay.io/enthought/edge-native-app-flask-demo:1.3.0"
           },
           {
             directory: "Streamlit",
             environment: "edge-streamlit-example",
-            image: "quay.io/enthought/edge-streamlit-example:1.2.0"
+            image: "quay.io/enthought/edge-streamlit-example:1.3.0"
           }
         ]
       fail-fast: false

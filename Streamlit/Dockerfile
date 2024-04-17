@@ -1,7 +1,7 @@
 # This is the Dockerfile for the Enthought Edge "Streamlit" example.
 # 
-# We use "edm-centos-7" as the base image.  This is a Centos-7 based image
-# which includes EDM.
+# We use "edm-rockylinux-8" as the base image.  This is a Rockylinux-8 based
+# image which includes EDM.
 #
 # EDM dependencies for the app are brought in via a .zbundle file.  This avoids
 # the need to pass your EDM token and/or a custom edm.yaml into the Dockerfile.
@@ -18,7 +18,7 @@
 
 # First stage
 
-ARG BASE_IMAGE=quay.io/enthought/edm-centos-7:latest
+ARG BASE_IMAGE=quay.io/enthought/edm-rockylinux-8:latest
 
 FROM $BASE_IMAGE as stage_one
 

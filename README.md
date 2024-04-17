@@ -6,7 +6,7 @@
 
 This GitHub repo holds working examples of apps supported by Enthought Edge.
 
-Each example is a standalone container that inherits from `edm-centos-7`.
+Each example is a standalone container that inherits from `edm-rockylinux-8`.
 
 The examples are self-contained, with their own README.md and "ci" module that
 contains build commands.  For new users, the recommended workflow for
