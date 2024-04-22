@@ -1,9 +1,5 @@
 # Edge Examples
 
-![Screenshot of the Flask/React example](.dev/images/example-flask.png)
-
-## About
-
 This GitHub repo holds working examples of apps supported by Enthought Edge.
 
 Each example is a standalone container that inherits from `edm-rockylinux-8`.
