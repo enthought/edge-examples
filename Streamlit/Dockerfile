@@ -40,6 +40,8 @@ RUN edm run -- python -m pip install --no-cache-dir \
 
 FROM $BASE_IMAGE as stage_two
 
+LABEL source="https://github.com/enthought/edge-examples/blob/main/Streamlit/Dockerfile"
+
 RUN adduser app
 USER app
 WORKDIR /home/app

@@ -37,6 +37,8 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
 FROM $BASE_IMAGE as stage_two
 
+LABEL source="https://github.com/enthought/edge-examples/blob/main/Panel/Dockerfile"
+
 RUN adduser app
 USER app
 WORKDIR /home/app

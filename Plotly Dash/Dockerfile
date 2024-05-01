@@ -40,6 +40,8 @@ RUN edm run -- pip install --no-cache-dir Flask-Session
 
 FROM $BASE_IMAGE as stage_two
 
+LABEL source="https://github.com/enthought/edge-examples/blob/main/Plotly%20Dash/Dockerfile"
+
 RUN adduser app
 USER app
 WORKDIR /home/app
