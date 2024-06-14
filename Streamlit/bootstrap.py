@@ -25,7 +25,7 @@ def bootstrap(ci_mode):
     """
 
     if ENV_NAME not in _list_edm_envs():
-        print(f"Creating development environment {ENV_NAME}...")
+        print(f"Creating development environment '{ENV_NAME}'...")
         cmd = ["edm", "envs", "create", ENV_NAME, "--version", "3.8", "--force"]
         subprocess.run(cmd, check=True)
 
@@ -38,7 +38,7 @@ def bootstrap(ci_mode):
         print("Environment already exists; reusing.")
 
     if not ci_mode:
-        print(f"Activating dev environment {ENV_NAME}")
+        print(f"Activating environment '{ENV_NAME}'")
         subprocess.run(["edm", "shell", "-e", ENV_NAME])
 
 
