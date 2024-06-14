@@ -14,8 +14,7 @@
 import argparse
 import subprocess
 
-ENV_NAME = "edge-minimal-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
+from support import ENV_NAME, EDM_DEPS
 
 
 def bootstrap(ci_mode):
