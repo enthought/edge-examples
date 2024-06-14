@@ -6,6 +6,6 @@
     "setuptools"
   ],
   "cmd_deps": [
-    "docker"
+    "docker", "bogus"
   ]
 }
