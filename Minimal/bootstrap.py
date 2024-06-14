@@ -13,9 +13,12 @@
 
 import argparse
 import subprocess
+import json
 
-from support import ENV_NAME, EDM_DEPS
-
+with open("config.json", "r") as f:
+    config = json.load(f)
+ENV_NAME = config["ENV_NAME"]
+EDM_DEPS = config["EDM_DEPS"]
 
 def bootstrap(ci_mode):
     """Create and populate dev env.

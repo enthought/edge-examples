@@ -1,9 +1,11 @@
 {
   "env_name": "edge-minimal-example",
-    "edm_deps": [
-        "click",
-        "pip",
-        "setuptools"
-    ],
-    "test": "Fred Test"
+  "edm_deps": [
+    "click",
+    "pip",
+    "setuptools"
+  ],
+  "cmd_deps": [
+    "docker"
+  ]
 }
