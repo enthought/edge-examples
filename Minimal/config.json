@@ -1,0 +1,9 @@
+{
+  "env_name": "edge-minimal-example",
+    "edm_deps": [
+        "click",
+        "pip",
+        "setuptools"
+    ],
+    "test": "Fred Test"
+}
