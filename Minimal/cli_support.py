@@ -7,6 +7,6 @@
 # Distribution is prohibited.
 """Things needed by the Edge CLI"""
 
-from bootstrap import ENV_NAME, EDM_DEPS
-
+ENV_NAME = "edge-minimal-example"
+EDM_DEPS = ["click", "pip", "setuptools"]
 TEST = "Fred Test"
