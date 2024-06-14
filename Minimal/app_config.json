@@ -7,5 +7,7 @@
   ],
   "cmd_deps": [
     "docker"
-  ]
+  ],
+  "app_id": null,
+  "framework": null
 }
