@@ -2,7 +2,7 @@
   "env_name": "edge-react-example",
   "edm_deps": [
     "click",
-    "gunicorn",,
+    "gunicorn",
     "pip",
     "setuptools"
   ],
