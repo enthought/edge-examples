@@ -1,13 +1,14 @@
 {
-  "env_name": "edge-minimal-example",
+  "env_name": "edge-react-example",
   "edm_deps": [
     "click",
+    "gunicorn",,
     "pip",
     "setuptools"
   ],
   "cmd_deps": [
     "docker"
   ],
-  "framework": "generic",
+  "framework": "react",
   "app_id": null
 }

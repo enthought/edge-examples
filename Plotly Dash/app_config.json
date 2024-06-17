@@ -1,5 +1,5 @@
 {
-  "env_name": "edge-minimal-example",
+  "env_name": "edge-plotly-dash-example",
   "edm_deps": [
     "click",
     "pip",
@@ -8,6 +8,6 @@
   "cmd_deps": [
     "docker"
   ],
-  "framework": "generic",
+  "framework": "plotly-dash",
   "app_id": null
 }

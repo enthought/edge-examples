@@ -15,10 +15,12 @@ import argparse
 import subprocess
 import json
 
-with open("config.json", "r") as f:
+
+with open("app_config.json", "r") as f:
     config = json.load(f)
-ENV_NAME = config["ENV_NAME"]
-EDM_DEPS = config["EDM_DEPS"]
+ENV_NAME = config["env_name"]
+EDM_DEPS = config["cmd_deps"]
+
 
 def bootstrap(ci_mode):
     """Create and populate dev env.

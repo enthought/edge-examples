@@ -13,9 +13,13 @@
 
 import argparse
 import subprocess
+import json
 
-ENV_NAME = "edge-plotly-dash-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
+
+with open("app_config.json", "r") as f:
+    config = json.load(f)
+ENV_NAME = config["env_name"]
+EDM_DEPS = config["cmd_deps"]
 
 
 def bootstrap(ci_mode):
@@ -35,7 +39,7 @@ def bootstrap(ci_mode):
         print("Bootstrap complete.")
 
     else:
-        print("Environment already exists; reusing.")
+        print(f"Environment '{ENV_NAME}' already exists; reusing.")
 
     if not ci_mode:
         print(f"Activating environment '{ENV_NAME}'")
