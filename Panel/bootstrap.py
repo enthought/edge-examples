@@ -13,13 +13,10 @@
 
 import argparse
 import subprocess
-import json
 
 
-with open("app_config.json", "r") as f:
-    config = json.load(f)
-ENV_NAME = config["env_name"]
-EDM_DEPS = config["cmd_deps"]
+ENV_NAME = "edge-panel-example"
+EDM_DEPS = ["click", "pip", "setuptools"]
 
 
 def bootstrap(ci_mode):
