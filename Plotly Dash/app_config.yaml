@@ -1,11 +1,14 @@
 env_name: edge-plotly-dash-example
 env_deps:
-- click
-- oauthlib
-- pip
-- pyyaml
-- questionary
-- setuptools
+  edm:
+  - click
+  - oauthlib
+  - pip
+  - pyyaml
+  - setuptools
+  pip:
+  - questionary
+  - src_edge/src
 app_deps:
 - enthought_edge>=2.16.0
 - appdirs
