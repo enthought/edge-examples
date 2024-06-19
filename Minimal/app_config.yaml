@@ -2,6 +2,7 @@ env_name: edge-minimal-example
 env_deps:
   edm:
   - click
+  - filetype
   - oauthlib
   - pip
   - python_dateutil
