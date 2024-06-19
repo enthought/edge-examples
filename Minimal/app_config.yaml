@@ -5,6 +5,7 @@ env_deps:
   - oauthlib
   - pip
   - pyyaml
+  - requests
   - setuptools
   pip:
   - questionary
