@@ -1,5 +1,5 @@
 env_name: edge-plotly-dash-example
-edm_deps:
+app_deps:
 - click
 - pip
 - setuptools

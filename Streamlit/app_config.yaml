@@ -1,5 +1,5 @@
 env_name: edge-streamlit-example
-edm_deps:
+app_deps:
 - click
 - pip
 - setuptools
