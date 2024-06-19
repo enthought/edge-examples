@@ -1,8 +1,21 @@
 env_name: edge-plotly-dash-example
-app_deps:
+env_deps:
 - click
 - pip
 - setuptools
+app_deps:
+- enthought_edge>=2.16.0
+- appdirs
+- packaging
+- pip
+- pyparsing
+- setuptools
+- six
+- requests
+- gunicorn
+- pandas
+- flask>2
+- dash
 cmd_deps:
 - docker
 framework: plotly-dash

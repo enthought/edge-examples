@@ -1,9 +1,21 @@
 env_name: edge-react-example
-app_deps:
+env_deps:
 - click
 - gunicorn
 - pip
 - setuptools
+app_deps:
+- enthought_edge>=2.16.0
+- appdirs
+- packaging
+- pip
+- pyparsing
+- setuptools
+- six
+- click
+- flask>2
+- gunicorn
+- opencv_python
 cmd_deps:
 - docker
 framework: react

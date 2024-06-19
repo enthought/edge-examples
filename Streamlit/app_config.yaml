@@ -1,8 +1,17 @@
 env_name: edge-streamlit-example
-app_deps:
+env_deps:
 - click
 - pip
 - setuptools
+app_deps:
+- enthought_edge>=2.16.0
+- appdirs
+- packaging
+- pip
+- pyparsing
+- setuptools
+- six
+- requests
 cmd_deps:
 - docker
 framework: streamlit

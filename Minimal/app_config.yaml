@@ -1,8 +1,13 @@
 env_name: edge-minimal-example
-app_deps:
+env_deps:
 - click
 - pip
 - setuptools
+app_deps:
+- flask
+- setuptools
+- gunicorn
+- enthought_edge
 cmd_deps:
 - docker
 framework: generic
