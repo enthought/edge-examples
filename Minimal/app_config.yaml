@@ -4,6 +4,7 @@ env_deps:
   - click
   - oauthlib
   - pip
+  - python_dateutil
   - pyyaml
   - requests
   - setuptools
