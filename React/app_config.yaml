@@ -2,7 +2,10 @@ env_name: edge-react-example
 env_deps:
 - click
 - gunicorn
+- oauthlib
 - pip
+- pyyaml
+- questionary
 - setuptools
 app_deps:
 - enthought_edge>=2.16.0

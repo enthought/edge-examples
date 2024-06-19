@@ -1,7 +1,10 @@
 env_name: edge-minimal-example
 env_deps:
 - click
+- oauthlib
 - pip
+- pyyaml
+- questionary
 - setuptools
 app_deps:
 - flask

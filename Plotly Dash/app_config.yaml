@@ -1,7 +1,10 @@
 env_name: edge-plotly-dash-example
 env_deps:
 - click
+- oauthlib
 - pip
+- pyyaml
+- questionary
 - setuptools
 app_deps:
 - enthought_edge>=2.16.0
