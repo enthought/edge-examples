@@ -2,9 +2,12 @@ env_name: edge-panel-example
 env_deps:
   edm:
   - click
+  - filetype
   - oauthlib
   - pip
+  - python_dateutil
   - pyyaml
+  - requests
   - setuptools
   pip:
   - questionary

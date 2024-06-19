@@ -2,10 +2,13 @@ env_name: edge-react-example
 env_deps:
   edm:
   - click
+  - filetype
   - gunicorn
   - oauthlib
   - pip
+  - python_dateutil
   - pyyaml
+  - requests
   - setuptools
   pip:
   - questionary
