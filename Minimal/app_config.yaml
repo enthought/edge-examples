@@ -2,6 +2,7 @@ env_name: edge-minimal-example
 framework: generic
 app_id: null
 app_version: 1.2.0
+repository: quay.io/enthought
 env_deps:
   edm:
   - click

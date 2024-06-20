@@ -9,7 +9,6 @@
 """
     This is the "ci" module for the minimal example.
 """
-
 import click
 import os.path as op
 import subprocess
@@ -17,34 +16,24 @@ import json
 import yaml
 
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
-REPOSITORY = "quay.io/enthought"
 
-# Docker image will be tagged "IMAGE:VERSION"
-# IMAGE = "quay.io/enthought/edge-example-minimal"
-# VERSION = "1.2.0"
-
-# These will go into the built Docker image.  You may wish to modify this
-# minimal example to pin the dependencies, or use a bundle file to define them.
-# APP_DEPENDENCIES = ["flask", "setuptools", "gunicorn", "enthought_edge"]
-
-# This will be used when running locally ("run" command).
-# We just use the last component of the full image URL.
-# CONTAINER_NAME = IMAGE.split("/")[-1]
 
 @click.group()
-def cli():
+@click.pass_context
+def cli(ctx):
     """Group for Click commands"""
-    pass
-
+    config = _load_config_settings()
+    ctx.obj = config
 
 @cli.command()
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
-def build(rebuild_zbundle):
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def build(config, rebuild_zbundle, verbose):
     """Build the Docker image"""
 
     # Configuration details
-    config = _load_config_settings()
-    bundle_image = "/".join([REPOSITORY, config["env_name"]])
+    bundle_image = "/".join([config["repository"], config["env_name"]])
     version = config["app_version"]
     app_deps = config["app_deps"]
 
@@ -66,24 +55,30 @@ def build(rebuild_zbundle):
             "-f",
             fname,
         ] + app_deps
+        if verbose:
+            click.echo(" ".join(cmd))
         subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
     # Finally, we run Docker.  The Dockerfile will copy the zbundle into
     # a temp folder and install it.
     cmd = ["docker", "build", "-t", f"{bundle_image}:{version}", "."]
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
-def run():
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def run(config, verbose):
     """Run the Docker image for testing"""
+    # Configuration details
+    container_name = config["env_name"]
+    bundle_image = "/".join([config["repository"], container_name])
+    version = config["app_version"]
 
     # Get values from the dev settings file (API tokens for testing, etc.)
     envs = _load_dev_settings()
-    config = _load_config_settings()
-    container_name = config["env_name"]
-    bundle_image = "/".join([REPOSITORY, container_name])
-    version = config["app_version"]
 
     cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", container_name]
     for key, value in envs.items():
@@ -91,13 +86,23 @@ def run():
     cmd += ["--env", "HOST_ADDRESS=0.0.0.0"]
     cmd += [f"{bundle_image}:{version}"]
 
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
-def publish():
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def publish(config, verbose):
     """Publish the Docker image for use with Edge"""
-    cmd = ["docker", "push", f"{IMAGE}:{VERSION}"]
+    # Configuration details
+    bundle_image = "/".join([config["repository"], config["env_name"]])
+    version = config["app_version"]
+
+    cmd = ["docker", "push", f"{bundle_image}:{version}"]
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True)
 
 
