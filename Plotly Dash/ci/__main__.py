@@ -9,52 +9,34 @@
 """
     This is the "ci" module for the Plotly Dash example.
 """
-
 import click
 import os.path as op
 import subprocess
-import sys
-import os
 import json
+import yaml
 
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
-# Docker image will be tagged "IMAGE:VERSION"
-IMAGE = "quay.io/enthought/edge-plotly-dash-example"
-VERSION = "1.3.0"
-
-# These will go into the built Docker image.  You may wish to modify this
-# minimal example to pin the dependencies, or use a bundle file to define them.
-APP_DEPENDENCIES = [
-    "enthought_edge>=2.16.0",
-    "appdirs",
-    "packaging",
-    "pip",
-    "pyparsing",
-    "setuptools",
-    "six",
-    "requests",
-    "gunicorn",
-    "pandas",
-    "flask>2",
-    "dash",
-]
-
-# This will be used when running locally ("run" command).
-# We just use the last component of the full image URL.
-CONTAINER_NAME = IMAGE.split("/")[-1]
-
 
 @click.group()
-def cli():
+@click.pass_context
+def cli(ctx):
     """Group for Click commands"""
-    pass
+    config = _load_config_settings()
+    ctx.obj = config
 
 
 @cli.command()
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
-def build(rebuild_zbundle):
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def build(config, rebuild_zbundle, verbose):
     """Build the Docker image"""
+
+    # Configuration details
+    bundle_image = "/".join([config["repository"], config["env_name"]])
+    version = config["app_version"]
+    app_deps = config["app_deps"]
 
     # First, we build a "zbundle" which contains all the eggs needed to
     # build the environment within the Docker image.
@@ -73,35 +55,57 @@ def build(rebuild_zbundle):
             "2.0",
             "-f",
             fname,
-        ] + APP_DEPENDENCIES
+        ] + app_deps
+        if verbose:
+            click.echo(" ".join(cmd))
         subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
     # Finally, we run Docker.  The Dockerfile will copy the zbundle into
     # a temp folder and install it.
-    cmd = ["docker", "build", "-t", f"{IMAGE}:{VERSION}", "."]
+    cmd = ["docker", "build", "-t", f"{bundle_image}:{version}", "."]
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
-def run():
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def run(config, verbose):
     """Run the Docker image for testing"""
+
+    # Configuration details
+    container_name = config["env_name"]
+    bundle_image = "/".join([config["repository"], container_name])
+    version = config["app_version"]
 
     # Get values from the dev settings file (API tokens for testing, etc.)
     envs = _load_dev_settings()
 
-    cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", CONTAINER_NAME]
+    cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", container_name]
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
     cmd += ["--env", "HOST_ADDRESS=0.0.0.0"]
-    cmd += [f"{IMAGE}:{VERSION}"]
+    cmd += [f"{bundle_image}:{version}"]
 
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
 @cli.command()
-def publish():
+@click.option("--verbose", default=False, is_flag=True)
+@click.pass_obj
+def publish(config, verbose):
     """Publish the Docker image for use with Edge"""
-    cmd = ["docker", "push", f"{IMAGE}:{VERSION}"]
+
+    # Configuration details
+    bundle_image = "/".join([config["repository"], config["env_name"]])
+    version = config["app_version"]
+
+    cmd = ["docker", "push", f"{bundle_image}:{version}"]
+    if verbose:
+        click.echo(" ".join(cmd))
     subprocess.run(cmd, check=True)
 
 
@@ -117,6 +121,25 @@ def _load_dev_settings():
     with open(fpath, "r") as f:
         data = json.load(f)
     return {k: v for k, v in data.items() if k.startswith("EDGE_")}
+
+
+def _load_config_settings():
+    """Load the application configuration settings.
+
+    Returns
+    -------
+    dict
+        The configuration settings.
+    """
+    data = {}
+    fpath = op.join(SRC_ROOT, "app_config.yaml")
+    if op.exists(fpath):
+        with open(fpath, "r") as f:
+            data = yaml.safe_load(f)
+
+    if not data:
+        raise ValueError("Could not load app_config.yaml")
+    return data
 
 
 if __name__ == "__main__":

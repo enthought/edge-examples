@@ -25,6 +25,7 @@ def cli(ctx):
     config = _load_config_settings()
     ctx.obj = config
 
+
 @cli.command()
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
 @click.option("--verbose", default=False, is_flag=True)
@@ -72,6 +73,7 @@ def build(config, rebuild_zbundle, verbose):
 @click.pass_obj
 def run(config, verbose):
     """Run the Docker image for testing"""
+
     # Configuration details
     container_name = config["env_name"]
     bundle_image = "/".join([config["repository"], container_name])
@@ -96,6 +98,7 @@ def run(config, verbose):
 @click.pass_obj
 def publish(config, verbose):
     """Publish the Docker image for use with Edge"""
+
     # Configuration details
     bundle_image = "/".join([config["repository"], config["env_name"]])
     version = config["app_version"]
