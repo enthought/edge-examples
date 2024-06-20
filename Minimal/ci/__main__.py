@@ -14,21 +14,22 @@ import click
 import os.path as op
 import subprocess
 import json
+import yaml
 
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
+REPOSITORY = "quay.io/enthought"
 
 # Docker image will be tagged "IMAGE:VERSION"
-IMAGE = "quay.io/enthought/edge-example-minimal"
-VERSION = "1.2.0"
+# IMAGE = "quay.io/enthought/edge-example-minimal"
+# VERSION = "1.2.0"
 
 # These will go into the built Docker image.  You may wish to modify this
 # minimal example to pin the dependencies, or use a bundle file to define them.
-APP_DEPENDENCIES = ["flask", "setuptools", "gunicorn", "enthought_edge"]
+# APP_DEPENDENCIES = ["flask", "setuptools", "gunicorn", "enthought_edge"]
 
 # This will be used when running locally ("run" command).
 # We just use the last component of the full image URL.
-CONTAINER_NAME = IMAGE.split("/")[-1]
-
+# CONTAINER_NAME = IMAGE.split("/")[-1]
 
 @click.group()
 def cli():
@@ -40,6 +41,12 @@ def cli():
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
 def build(rebuild_zbundle):
     """Build the Docker image"""
+
+    # Configuration details
+    config = _load_config_settings()
+    bundle_image = "/".join([REPOSITORY, config["env_name"]])
+    version = config["app_version"]
+    app_deps = config["app_deps"]
 
     # First, we build a "zbundle" which contains all the eggs needed to
     # build the environment within the Docker image.
@@ -58,12 +65,12 @@ def build(rebuild_zbundle):
             "2.0",
             "-f",
             fname,
-        ] + APP_DEPENDENCIES
+        ] + app_deps
         subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
     # Finally, we run Docker.  The Dockerfile will copy the zbundle into
     # a temp folder and install it.
-    cmd = ["docker", "build", "-t", f"{IMAGE}:{VERSION}", "."]
+    cmd = ["docker", "build", "-t", f"{bundle_image}:{version}", "."]
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
 
@@ -73,12 +80,16 @@ def run():
 
     # Get values from the dev settings file (API tokens for testing, etc.)
     envs = _load_dev_settings()
+    config = _load_config_settings()
+    container_name = config["env_name"]
+    bundle_image = "/".join([REPOSITORY, container_name])
+    version = config["app_version"]
 
-    cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", CONTAINER_NAME]
+    cmd = ["docker", "run", "--rm", "-p", "9000:9000", "--name", container_name]
     for key, value in envs.items():
         cmd += ["--env", f"{key}={value}"]
     cmd += ["--env", "HOST_ADDRESS=0.0.0.0"]
-    cmd += [f"{IMAGE}:{VERSION}"]
+    cmd += [f"{bundle_image}:{version}"]
 
     subprocess.run(cmd, check=True, cwd=SRC_ROOT)
 
@@ -102,6 +113,25 @@ def _load_dev_settings():
     with open(fpath, "r") as f:
         data = json.load(f)
     return {k: v for k, v in data.items() if k.startswith("EDGE_")}
+
+
+def _load_config_settings():
+    """Load the application configuration settings.
+
+    Returns
+    -------
+    dict
+        The configuration settings.
+    """
+    data = {}
+    fpath = op.join(SRC_ROOT, "app_config.yaml")
+    if op.exists(fpath):
+        with open(fpath, "r") as f:
+            data = yaml.safe_load(f)
+
+    if not data:
+        raise ValueError("Could not load app_config.yaml")
+    return data
 
 
 if __name__ == "__main__":

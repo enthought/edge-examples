@@ -1,6 +1,7 @@
 env_name: edge-minimal-example
 framework: generic
 app_id: null
+app_version: 1.2.0
 env_deps:
   edm:
   - click
