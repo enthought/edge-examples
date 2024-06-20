@@ -1,4 +1,6 @@
 env_name: edge-panel-example
+framework: panel
+app_id: null
 env_deps:
   edm:
   - click
@@ -26,5 +28,5 @@ app_deps:
 - matplotlib
 cmd_deps:
 - docker
-framework: panel
-app_id: null
+exclude:
+- bootstrap.py

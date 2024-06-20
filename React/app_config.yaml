@@ -1,4 +1,6 @@
 env_name: edge-react-example
+framework: react
+app_id: null
 env_deps:
   edm:
   - click
@@ -27,5 +29,5 @@ app_deps:
 - opencv_python
 cmd_deps:
 - docker
-framework: react
-app_id: null
+exclude:
+- bootstrap.py

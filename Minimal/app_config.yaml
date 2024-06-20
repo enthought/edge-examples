@@ -1,4 +1,6 @@
 env_name: edge-minimal-example
+framework: generic
+app_id: null
 env_deps:
   edm:
   - click
@@ -19,5 +21,5 @@ app_deps:
 - enthought_edge
 cmd_deps:
 - docker
-framework: generic
-app_id: null
+exclude:
+- bootstrap.py

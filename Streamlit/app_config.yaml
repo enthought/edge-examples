@@ -1,4 +1,6 @@
 env_name: edge-streamlit-example
+framework: streamlit
+app_id: null
 env_deps:
   edm:
   - click
@@ -23,5 +25,5 @@ app_deps:
 - requests
 cmd_deps:
 - docker
-framework: streamlit
-app_id: null
+exclude:
+- bootstrap.py

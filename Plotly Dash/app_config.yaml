@@ -1,4 +1,6 @@
 env_name: edge-plotly-dash-example
+framework: plotly-dash
+app_id: null
 env_deps:
   edm:
   - click
@@ -27,5 +29,5 @@ app_deps:
 - dash
 cmd_deps:
 - docker
-framework: plotly-dash
-app_id: null
+exclude:
+- bootstrap.py
