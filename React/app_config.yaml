@@ -1,4 +1,4 @@
-env_name: edge-react-example
+image_name: edge-react-example
 framework: react
 app_id: null
 app_version: 1.3.0

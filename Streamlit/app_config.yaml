@@ -1,4 +1,4 @@
-env_name: edge-streamlit-example
+image_name: edge-streamlit-example
 framework: streamlit
 app_id: null
 app_version: 1.3.0

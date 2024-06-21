@@ -35,7 +35,7 @@ def build(config, rebuild_zbundle, verbose):
     """Build the Docker image"""
 
     # Configuration details
-    bundle_image = "/".join([config["repository"], config["env_name"]])
+    bundle_image = "/".join([config["repository"], config["image_name"]])
     version = config["app_version"]
     app_deps = config["app_deps"]
 
@@ -76,7 +76,7 @@ def run(config, verbose):
     """Run the Docker image for testing"""
 
     # Configuration details
-    container_name = config["env_name"]
+    container_name = config["image_name"]
     bundle_image = "/".join([config["repository"], container_name])
     version = config["app_version"]
 
@@ -101,7 +101,7 @@ def publish(config, verbose):
     """Publish the Docker image for use with Edge"""
 
     # Configuration details
-    bundle_image = "/".join([config["repository"], config["env_name"]])
+    bundle_image = "/".join([config["repository"], config["image_name"]])
     version = config["app_version"]
 
     cmd = ["docker", "push", f"{bundle_image}:{version}"]
