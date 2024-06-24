@@ -18,6 +18,13 @@ import yaml
 SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 
+def _bundle_image(config: dict) -> str:
+    """Assemble a bundle image name from the configuration settings."""
+    return "/".join([config["repo_server"],
+                     config["repository"],
+                     config["image_name"]])
+
+
 @click.group()
 @click.pass_context
 def cli(ctx):
@@ -34,7 +41,7 @@ def build(config, rebuild_zbundle, verbose):
     """Build the Docker image"""
 
     # Configuration details
-    bundle_image = "/".join([config["repository"], config["image_name"]])
+    bundle_image = _bundle_image(config)
     version = config["app_version"]
     app_deps = config["app_deps"]
 
@@ -75,8 +82,8 @@ def run(config, verbose):
     """Run the Docker image for testing"""
 
     # Configuration details
+    bundle_image = _bundle_image(config)
     container_name = config["image_name"]
-    bundle_image = "/".join([config["repository"], container_name])
     version = config["app_version"]
 
     # Get values from the dev settings file (API tokens for testing, etc.)
@@ -100,7 +107,7 @@ def publish(config, verbose):
     """Publish the Docker image for use with Edge"""
 
     # Configuration details
-    bundle_image = "/".join([config["repository"], config["image_name"]])
+    bundle_image = _bundle_image(config)
     version = config["app_version"]
 
     cmd = ["docker", "push", f"{bundle_image}:{version}"]
