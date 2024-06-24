@@ -20,8 +20,8 @@ SRC_ROOT = op.abspath(op.join(op.dirname(__file__), ".."))
 
 def _bundle_image(config: dict) -> str:
     """Assemble a bundle image name from the configuration settings."""
-    return "/".join([config["repo_server"],
-                     config["repository"],
+    return "/".join([config["repository"],
+                     config["organisation"],
                      config["image_name"]])
 
 

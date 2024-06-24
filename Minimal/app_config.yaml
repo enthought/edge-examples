@@ -3,8 +3,8 @@ framework: generic
 app_id: null
 app_version: 1.2.0
 python_version: 3.8
-repo_server: quay.io
-repository: enthought
+repository: quay.io
+organisation: enthought
 env_deps:
   edm:
   - click
