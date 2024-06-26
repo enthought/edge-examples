@@ -1,9 +1,29 @@
-env_name: edge-minimal-example
-edm_deps:
-- click
-- pip
-- setuptools
-cmd_deps:
-- docker
+image_name: edge-minimal-example
 framework: generic
 app_id: null
+app_version: 1.2.0
+python_version: 3.8
+repository: quay.io
+organisation: enthought
+env_deps:
+  edm:
+  - click
+  - filetype
+  - oauthlib
+  - pip
+  - python_dateutil
+  - pyyaml
+  - requests
+  - setuptools
+  pip:
+  - questionary
+  - src_edge/src
+app_deps:
+- flask
+- setuptools
+- gunicorn
+- enthought_edge
+cmd_deps:
+- docker
+exclude:
+- bootstrap.py
