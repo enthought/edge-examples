@@ -8,6 +8,7 @@ organisation: enthought
 env_deps:
   edm:
   - click
+  - enthought_edge
   - filetype
   - gunicorn
   - oauthlib
@@ -18,7 +19,6 @@ env_deps:
   - setuptools
   pip:
   - questionary
-  - src_edge/src
 app_deps:
 - enthought_edge>=2.16.0
 - appdirs
