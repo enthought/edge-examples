@@ -8,6 +8,7 @@ organisation: enthought
 env_deps:
   edm:
   - click
+  - enthought_edge
   - filetype
   - oauthlib
   - pip
@@ -17,7 +18,6 @@ env_deps:
   - setuptools
   pip:
   - questionary
-  - src_edge/src
 app_deps:
 - flask
 - setuptools
