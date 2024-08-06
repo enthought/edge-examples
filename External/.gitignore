@@ -1,0 +1,7 @@
+.devspace
+
+.terraform
+.terraform.lock.hcl
+terraform.tfstate*
+
+app_environment.zbundle

@@ -1,0 +1,115 @@
+version: v2beta1
+name: edge-external-app-example
+
+vars:
+  DEVSPACE_AWS_PROFILE:
+    source: env
+    default: AdministratorAccess-594315687794
+  DEVSPACE_AWS_ECR_HOST:
+    source: env
+    default: 594315687794.dkr.ecr.us-east-1.amazonaws.com
+
+localRegistry:
+  enabled: false
+
+pipelines:
+  build:
+    run: |-
+      build_images --all
+  dev:
+    run: |-
+      build_images --all
+      create_deployments --all
+      start_dev --all
+  purge:
+    run: |-
+      stop_dev --all
+      purge_deployments --all
+
+hooks:
+- name: "pre-deploy-hook"
+  command: |-
+    $(
+      if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] || [ ]; then
+        echo 'aws sts get-caller-identity --profile ${DEVSPACE_AWS_PROFILE} >/dev/null 2>&1 || aws sso login'
+      else
+        echo ''
+      fi
+    )
+  events: ["before:deploy"]
+- name: "pre-image-build-hook"
+  command: |-
+    $(
+      if ! [ -f app_environment.zbundle ]; then
+        echo 'edm bundle generate -i --version 3.8 --platform rh7-x86_64 -m 2.0 -f app_environment.zbundle flask setuptools gunicorn'
+      else
+        echo ''
+      fi
+      if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ]; then
+        echo 'aws ecr get-login-password --profile ${DEVSPACE_AWS_PROFILE} | docker login --username AWS --password-stdin ${DEVSPACE_AWS_ECR_HOST}'
+      else
+        echo ''
+      fi
+    )
+  events: ["before:build"]
+
+
+images:
+  edge-external-app-example:
+    image: ${DEVSPACE_AWS_ECR_HOST}/edge-external-app-example
+    dockerfile: ./Dockerfile
+    context: .
+  edge-external-app-example-dev:
+    image: ${DEVSPACE_AWS_ECR_HOST}/edge-external-app-example-dev
+    dockerfile: ./Dockerfile.devspace
+    context: .
+    rebuildStrategy: "ignoreContextChanges"
+
+commands:
+  terraform-init: |-
+    cd deploy
+    terraform init
+
+functions:
+  create_deployments: |-
+    cd deploy
+    export TF_VAR_namespace=${DEVSPACE_NAMESPACE}
+    export TF_VAR_kube_context=${DEVSPACE_CONTEXT}
+    export TF_VAR_image_name=$(get_image --only=image edge-external-app-example)
+    export TF_VAR_image_tag=$(get_image --only=tag edge-external-app-example)
+    export TF_VAR_use_nodepool=$( [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && echo "true" || echo "false" )
+    terraform apply -auto-approve
+
+  purge_deployments: |-
+    cd deploy
+    export TF_VAR_namespace=${DEVSPACE_NAMESPACE}
+    export TF_VAR_kube_context=${DEVSPACE_CONTEXT}
+    terraform destroy -auto-approve
+
+dev:
+  edge-external-app-example:
+    labelSelector:
+      "app.kubernetes.io/name": "example"
+      "app.kubernetes.io/component": "backend"
+    devImage: ${runtime.images.edge-external-app-example-dev.image}:${runtime.images.edge-external-app-example-dev.tag}
+    command: [ "/bin/sh", "-c" ]
+    args: [ "/home/app/startup-script.sh --reload" ]
+    ports:
+      - port: 9000:9000
+    logs: { }
+    sync:
+      - path: src/startup-script.sh:/home/app/startup-script.sh
+        file: true
+        startContainer: true
+        disableDownload: true
+        printLogs: true
+        onUpload:
+          exec:
+            - command: |-
+                chmod +x /home/app/startup-script.sh
+          restartContainer: true
+      - path: src/main.py:/home/app/main.py
+        file: true
+        startContainer: true
+        disableDownload: true
+        printLogs: true
