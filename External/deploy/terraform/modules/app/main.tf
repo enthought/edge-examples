@@ -1,8 +1,3 @@
-provider "kubernetes" {
-  config_path    = "~/.kube/config"
-  config_context = var.kube_context
-}
-
 data "kubernetes_namespace_v1" "this" {
   metadata {
     name = var.namespace
