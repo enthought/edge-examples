@@ -42,8 +42,8 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Don't change the user, and in particular don't make the user "root".
 
 # Copy startup script and application.
-COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
+COPY --chown=app ./startup-script.sh /home/app/startup-script.sh
 RUN chmod +x /home/app/startup-script.sh
-COPY --chown=app ./src/main.py /home/app/main.py
+COPY --chown=app ./main.py /home/app/main.py
 
 CMD ["/home/app/startup-script.sh"]
