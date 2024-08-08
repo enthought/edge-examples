@@ -35,7 +35,7 @@ def root():
         </style>
     </head>
     <body>
-        <h1>Hello, {{ headers.get('X-Forwarded-Display-Name', 'Unknown') }}!</h1>
+        <h1>Hello again, {{ headers.get('X-Forwarded-Display-Name', 'Unknown') }}!</h1>
         <h2>Request Headers</h2>
         <table>
             <tr>
@@ -44,8 +44,8 @@ def root():
             </tr>
             {% for header, value in headers.items() %}
             <tr>
-                <td>{{ header }}</td>
-                <td>{{ value }}</td>
+                <td style="white-space: nowrap;">{{ header }}</td>
+                <td style="word-break: break-all; word-wrap: break-word;">{{ value }}</td>
             </tr>
             {% endfor %}
         </table>
