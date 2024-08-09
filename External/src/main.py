@@ -35,7 +35,7 @@ def root():
         </style>
     </head>
     <body>
-        <h1>Hello again, {{ headers.get('X-Forwarded-Display-Name', 'Unknown') }}!</h1>
+        <h1>Hello {{ headers.get('X-Forwarded-Display-Name', 'Unknown') }}!</h1>
         <h2>Request Headers</h2>
         <table>
             <tr>
