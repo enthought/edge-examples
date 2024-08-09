@@ -8,6 +8,7 @@ vars:
   DEVSPACE_AWS_ECR_HOST:
     source: env
     default: 594315687794.dkr.ecr.us-east-1.amazonaws.com
+  DEVSPACE_FLAGS: "-n ${DEVSPACE_NAME}"
   EDM_APP_DEPENDENCIES: "flask setuptools gunicorn"
 
 localRegistry:
@@ -118,3 +119,17 @@ dev:
         startContainer: true
         disableDownload: true
         printLogs: true
+  istio-ingressgateway: |-
+    $(
+      if [ ${DEVSPACE_CONTEXT} == "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} == "minikube" ]; then
+        echo "null"
+      else
+        output='
+    labelSelector:
+      istio: ingressgateway
+    namespace: istio-system
+    ports:
+      - port: "8080:8080"'
+        echo "$output"
+      fi
+    )
