@@ -34,14 +34,15 @@ def cli(ctx):
 
 
 @cli.command()
+@click.option("--bundle-image", default=None)
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
 @click.option("--verbose", default=False, is_flag=True)
 @click.pass_obj
-def build(config, rebuild_zbundle, verbose):
+def build(config, bundle_image, rebuild_zbundle, verbose):
     """Build the Docker image"""
 
     # Configuration details
-    bundle_image = _bundle_image(config)
+    bundle_image = bundle_image or _bundle_image(config)
     version = config["app_version"]
     app_deps = config["app_deps"]
 
@@ -81,13 +82,14 @@ def build(config, rebuild_zbundle, verbose):
 
 
 @cli.command()
+@click.option("--bundle-image", default=None)
 @click.option("--verbose", default=False, is_flag=True)
 @click.pass_obj
-def run(config, verbose):
+def run(config, bundle_image, verbose):
     """Run the Docker image for testing"""
 
     # Configuration details
-    bundle_image = _bundle_image(config)
+    bundle_image = bundle_image or _bundle_image(config)
     container_name = config["image_name"]
     version = config["app_version"]
 
@@ -106,13 +108,14 @@ def run(config, verbose):
 
 
 @cli.command()
+@click.option("--bundle-image", default=None)
 @click.option("--verbose", default=False, is_flag=True)
 @click.pass_obj
-def publish(config, verbose):
+def publish(config, bundle_image, verbose):
     """Publish the Docker image for use with Edge"""
 
     # Configuration details
-    bundle_image = _bundle_image(config)
+    bundle_image = bundle_image or _bundle_image(config)
     version = config["app_version"]
 
     cmd = ["docker", "push", f"{bundle_image}:{version}"]
