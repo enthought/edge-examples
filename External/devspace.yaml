@@ -121,7 +121,7 @@ dev:
         printLogs: true
   istio-ingressgateway: |-
     $(
-      if [ ${DEVSPACE_CONTEXT} == "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} == "minikube" ]; then
+      if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} != "minikube" ]; then
         echo "null"
       else
         output='
