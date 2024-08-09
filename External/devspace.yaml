@@ -4,10 +4,10 @@ name: edge-external-app-example
 vars:
   DEVSPACE_AWS_PROFILE:
     source: env
-    default: AdministratorAccess-594315687794
+    default: PlaceholderProfile-000000000000
   DEVSPACE_AWS_ECR_HOST:
     source: env
-    default: 594315687794.dkr.ecr.us-east-1.amazonaws.com
+    default: 000000000000.dkr.ecr.us-east-1.amazonaws.com
   DEVSPACE_FLAGS: "-n ${DEVSPACE_NAME}"
   EDM_APP_DEPENDENCIES: "flask setuptools gunicorn"
 
