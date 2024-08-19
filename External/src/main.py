@@ -7,7 +7,7 @@
 # Distribution is prohibited.
 
 """
-    Example Flask application (external).
+    Example Flask application.
 """
 
 import os
@@ -24,7 +24,7 @@ def root():
     html = """
     <html>
     <head>
-        <title>External Example Flask application</title>
+        <title>Example Flask application</title>
         <style>
             body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
             h1 { color: #333; }
