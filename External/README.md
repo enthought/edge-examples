@@ -1,15 +1,19 @@
-# Externally hosted app example
+# Kubernetes hosted app example
 
-This example shows how to develop and deploy an externally hosted application that integrates
-with Edge's upstream identity provider (Identity/Keycloak) for authentication and retrieval of user metadata.
+This example demonstrates how to develop and deploy a Kubernetes hosted application alongside Enthought Edge.
 
+It is designed to integrate with the authentication, monitoring, logging and scaling tooling available
+on Enthought-managed Kubernetes clusters, while retrieving user metadata from the upstream identity provider
+(Identity/Keycloak) shared with Edge.
 
 ## Before you begin
 
 Before starting, ensure you have the following installed:
 
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager
-* [Docker Desktop](https://docker.com)
+* A local Docker installation for building container images and hosting a Kubernetes cluster (for local deployment):
+  * [Docker Desktop](https://docs.docker.com/desktop/) or 
+  * [Minikube](https://minikube.sigs.k8s.io/docs/start/)
 * [DevSpace](https://www.devspace.sh/docs/getting-started/installation)
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
@@ -17,6 +21,29 @@ For this example, your ``edm.yaml`` file should have the public ``enthought/free
 repositories enabled.
 
 The example can be deployed and run locally or on a remote Kubernetes cluster.
+
+### Local deployment
+
+The local deployment option relies on a local Kubernetes cluster and has been tested with Docker Desktop's built-in Kubernetes feature and with Minikube.
+
+User metadata is passed to the application via HTTP headers. For the local deployment, we are mocking the headers
+by injecting test user metadata into incoming requests via Istio.
+
+#### Docker Desktop
+
+For Docker Desktop, you will need to perform the following steps:
+
+1. Make sure that Docker Desktop has been installed and is running.
+2. Enable the built-in Kubernetes feature via Settings -> Kubernetes -> Enable Kubernetes.
+3. Install Istio. [Istio's default profile](https://istio.io/latest/docs/setup/install/istioctl/#install-istio-using-the-default-profile) is sufficient for this example.
+
+#### Minikube
+
+1. Make sure that the Minikube CLI has been installed.
+2. Start a Minikube cluster (with Istio) by running `minikube start --addons="istio-provisioner,istio"`
+
+> [!NOTE]
+> Minikube will automatically try to detect the appropriate driver for your system. If you want to use a specific driver, you can specify it with the `--driver` flag. See the [Minikube documentation](https://minikube.sigs.k8s.io/docs/start/) for more information. We have successfully tested this example with the `docker` driver, `hyper-v` driver on Windows and `hyperkit` driver on MacOS.
 
 ### Remote deployment
 
@@ -26,16 +53,7 @@ and authentication middleware in an appropriate Kubernetes cluster for your use 
 The team will also guide you through the process of adjusting the configuration of this example to work with the
 remote deployment.
 
-### Local deployment
-
-The local deployment options relies on a local Kubernetes cluster, such as Docker Desktop's built-in option.
-You can enable the Kubernetes feature in Docker Desktop under Settings -> Kubernetes -> Enable Kubernetes.
-
-User metadata is passed to the application via HTTP headers. For the local deployment, we are mocking the headers
-by injecting test user metadata into incoming requests via Istio.
-
-After enabling Kubernetes in Docker Desktop, you will need to install Istio.
-[Installing Istio's default profile](https://istio.io/latest/docs/setup/install/istioctl/) is sufficient for this example. 
+Remote deployments will use the actual user metadata provided by Identity/Keycloak and therefore share a login session with Edge.
 
 ## Quick start
 
