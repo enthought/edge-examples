@@ -34,7 +34,7 @@ We recommend using Minikube for local development, since it simplifies the setup
 #### Minikube
 
 1. Make sure that the Minikube CLI has been installed.
-2. Start a Minikube cluster (with Istio) by running `minikube start --addons="istio-provisioner,istio"`
+2. Start a Minikube cluster (with Istio) by running `minikube start --memory 4096 --addons="istio-provisioner,istio"`
 
 > [!NOTE]
 > Minikube will automatically try to detect the appropriate driver for your system. If you want to use a specific driver, you can specify it with the `--driver` flag. See the [Minikube documentation](https://minikube.sigs.k8s.io/docs/start/) for more information. We have successfully tested this example with the `docker` driver, `hyper-v` driver on Windows and `hyperkit` driver on MacOS.
