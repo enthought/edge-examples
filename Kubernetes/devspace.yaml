@@ -2,12 +2,14 @@ version: v2beta1
 name: edge-kubernetes-app-example
 
 vars:
+  # the AWS profile is only relevant for remote deployments and can be ignored when
+  # using Minikube or Docker Desktop locally
   DEVSPACE_AWS_PROFILE:
     source: env
     default: PlaceholderProfile-000000000000
-  DEVSPACE_AWS_ECR_HOST:
+  DEVSPACE_IMAGE_PREFIX:
     source: env
-    default: 000000000000.dkr.ecr.us-east-1.amazonaws.com
+    default: ""
   DEVSPACE_FLAGS: "-n ${DEVSPACE_NAME}"
   EDM_APP_DEPENDENCIES: "flask setuptools gunicorn"
 
@@ -62,11 +64,11 @@ hooks:
 
 images:
   edge-kubernetes-app-example:
-    image: ${DEVSPACE_AWS_ECR_HOST}/edge-kubernetes-app-example
+    image: ${DEVSPACE_IMAGE_PREFIX}edge-kubernetes-app-example
     dockerfile: ./docker/Dockerfile
     context: ./src
   edge-kubernetes-app-example-dev:
-    image: ${DEVSPACE_AWS_ECR_HOST}/edge-kubernetes-app-example-dev
+    image: ${DEVSPACE_IMAGE_PREFIX}edge-kubernetes-app-example-dev
     dockerfile: ./docker/Dockerfile.devspace
     context: ./src
 
