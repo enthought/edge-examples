@@ -75,7 +75,7 @@ commands:
     cd deploy/terraform/deployments/devspace
     terraform init
   create-edm-devenv: |-
-    edm env create ${DEVSPACE_NAME} --version 3.8 --platform rh7-x86_64
+    edm env create ${DEVSPACE_NAME} --version 3.8
     edm install -e ${DEVSPACE_NAME} -y ${EDM_APP_DEPENDENCIES}
 
 functions:
