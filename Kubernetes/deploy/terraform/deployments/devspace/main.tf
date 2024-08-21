@@ -6,13 +6,13 @@ provider "kubernetes" {
 locals {
   app_name       = "example"
   component_name = "backend"
-  prefix         = "/external/default/example/"
+  prefix         = "/k8s/default/example/"
   service_port   = 9000
   container_port = 9000
 
   inject_headers = {
     "X-Forwarded-Email"              = "testuser@example.com"
-    "X-Forwarded-Groups"             = "role:edge-external-app-example:user"
+    "X-Forwarded-Groups"             = "role:edge-kubernetes-app-example:user"
     "X-Forwarded-Preferred-Username" = "testuser@example.com"
     "X-Forwarded-User"               = "abababab-abab-abab-abab-abababababab"
     "X-Forwarded-Display-Name"       = "Test User"

@@ -13,7 +13,7 @@ variable "image_tag" {
 
 variable "image_name" {
   type = string
-  default = "edge-external-app-example"
+  default = "edge-kubernetes-app-example"
 }
 
 variable "local" {

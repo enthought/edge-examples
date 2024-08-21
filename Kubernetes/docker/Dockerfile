@@ -1,9 +1,9 @@
-# This is the Dockerfile for the Enthought Edge "external" example.
+# This is the Dockerfile for the Enthought Edge Kubernetes app example.
 # 
-# We use "edm-rockylinux-8" as the base image.  This is a Rockylinux-8 based
+# We use "edm-rockylinux-8" as the base image. This is a Rockylinux-8 based
 # image which includes EDM.
 #
-# EDM dependencies for the app are brought in via a .zbundle file.  This avoids
+# EDM dependencies for the app are brought in via a .zbundle file. This avoids
 # the need to pass your EDM token and/or a custom edm.yaml into the Dockerfile.
 #
 # We perform a two-stage build, to avoid including the .zbundle in the layers
@@ -30,7 +30,7 @@ RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
 FROM $BASE_IMAGE AS stage_two
 
-LABEL source="https://github.com/enthought/edge-examples/blob/main/External/Dockerfile"
+LABEL source="https://github.com/enthought/edge-examples/blob/main/Kubernetes/Dockerfile"
 
 RUN adduser app
 USER app

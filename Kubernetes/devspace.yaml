@@ -1,5 +1,5 @@
 version: v2beta1
-name: edge-external-app-example
+name: edge-kubernetes-app-example
 
 vars:
   DEVSPACE_AWS_PROFILE:
@@ -61,12 +61,12 @@ hooks:
     events: ["before:build"]
 
 images:
-  edge-external-app-example:
-    image: ${DEVSPACE_AWS_ECR_HOST}/edge-external-app-example
+  edge-kubernetes-app-example:
+    image: ${DEVSPACE_AWS_ECR_HOST}/edge-kubernetes-app-example
     dockerfile: ./docker/Dockerfile
     context: ./src
-  edge-external-app-example-dev:
-    image: ${DEVSPACE_AWS_ECR_HOST}/edge-external-app-example-dev
+  edge-kubernetes-app-example-dev:
+    image: ${DEVSPACE_AWS_ECR_HOST}/edge-kubernetes-app-example-dev
     dockerfile: ./docker/Dockerfile.devspace
     context: ./src
 
@@ -83,8 +83,8 @@ functions:
     cd deploy/terraform/deployments/devspace
     export TF_VAR_namespace=${DEVSPACE_NAMESPACE}
     export TF_VAR_kube_context=${DEVSPACE_CONTEXT}
-    export TF_VAR_image_name=$(get_image --only=image edge-external-app-example)
-    export TF_VAR_image_tag=$(get_image --only=tag edge-external-app-example)
+    export TF_VAR_image_name=$(get_image --only=image edge-kubernetes-app-example)
+    export TF_VAR_image_tag=$(get_image --only=tag edge-kubernetes-app-example)
     export TF_VAR_local=$( [ ${DEVSPACE_CONTEXT} == "docker-desktop" ] || [ ${DEVSPACE_CONTEXT} == "minikube" ] && echo "true" || echo "false" )
     terraform apply -auto-approve
 
@@ -95,11 +95,11 @@ functions:
     terraform destroy -auto-approve
 
 dev:
-  edge-external-app-example:
+  edge-kubernetes-app-example:
     labelSelector:
       "app.kubernetes.io/name": "example"
       "app.kubernetes.io/component": "backend"
-    devImage: ${runtime.images.edge-external-app-example-dev.image}:${runtime.images.edge-external-app-example-dev.tag}
+    devImage: ${runtime.images.edge-kubernetes-app-example-dev.image}:${runtime.images.edge-kubernetes-app-example-dev.tag}
     command: ["/bin/sh", "-c"]
     args: ["/home/app/startup-script.sh --reload"]
     logs: {}

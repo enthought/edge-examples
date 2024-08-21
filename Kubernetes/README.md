@@ -63,10 +63,10 @@ The following steps will guide you through the process of deploying the example 
 
 2. Run ``devspace run terraform-init`` to initialize the Terraform workspace that will deploy the application resources into your local Kubernetes cluster.
 
-3. **Optionally**, run ``devspace run create-edm-devenv`` to create a development environment in EDM. This will create a new EDM environment called ``edge-externally-hosted-app`` and install the required dependencies. Note that is only meant to provide a development environment for your IDE and is not required for the application to run.
+3. **Optionally**, run ``devspace run create-edm-devenv`` to create a development environment in EDM. This will create a new EDM environment called ``edge-kubernetes-app-example`` and install the required dependencies. Note that is only meant to provide a development environment for your IDE and is not required for the application to run.
 
 4. Run ``devspace dev`` to start the application in development mode. This will build the Docker image, deploy the application and set up a port-forward to access it.  
-You should now be able to access the application at [http://localhost:8080/external/app/example](http://localhost:8080/external/app/example).
+You should now be able to access the application at [http://localhost:8080/k8s/default/example](http://localhost:8080/k8s/default/example).
 
 You can now start developing your application. The application is set up to sync changes to the source code and automatically reload. Application logs are streamed to the terminal.
 
