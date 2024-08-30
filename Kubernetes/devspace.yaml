@@ -1,0 +1,137 @@
+version: v2beta1
+name: edge-kubernetes-app-example
+
+vars:
+  # the AWS profile is only relevant for remote deployments and can be ignored when
+  # using Minikube or Docker Desktop locally
+  DEVSPACE_AWS_PROFILE:
+    source: env
+    default: PlaceholderProfile-000000000000
+  DEVSPACE_IMAGE_PREFIX:
+    source: env
+    default: ""
+  DEVSPACE_FLAGS: "-n ${DEVSPACE_NAME}"
+  EDM_APP_DEPENDENCIES: "flask setuptools gunicorn"
+
+localRegistry:
+  enabled: false
+
+pipelines:
+  build:
+    flags:
+    - name: rebuild-zbundle
+    run: |-
+      build_images --all
+  dev:
+    flags:
+    - name: rebuild-zbundle
+    run: |-
+      build_images --all
+      create_deployments --all
+      start_dev --all
+  purge:
+    run: |-
+      stop_dev --all
+      purge_deployments --all
+
+hooks:
+  - name: "pre-deploy-hook"
+    command: |-
+      $!(
+        if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} != "minikube" ]; then
+          echo 'aws sts get-caller-identity --profile ${DEVSPACE_AWS_PROFILE} >/dev/null 2>&1 || aws sso login'
+        else
+          echo ''
+        fi
+      )
+    events: ["before:deploy"]
+  - name: "pre-image-build-hook"
+    command: |-
+      $!(
+        if ! [ -f ./src/app_environment.zbundle ] || [ $(get_flag "rebuild-zbundle") == "true" ]; then
+          echo 'edm bundle generate -i --version 3.8 --platform rh7-x86_64 -m 2.0 -f ./src/app_environment.zbundle ${EDM_APP_DEPENDENCIES}'
+        else
+          echo ''
+        fi
+        if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} != "minikube" ]; then
+          echo 'aws sts get-caller-identity --profile ${DEVSPACE_AWS_PROFILE} >/dev/null 2>&1 || aws sso login'
+          echo 'aws ecr get-login-password --profile ${DEVSPACE_AWS_PROFILE} | docker login --username AWS --password-stdin ${DEVSPACE_AWS_ECR_HOST}'
+        else
+          echo ''
+        fi
+      )
+    events: ["before:build"]
+
+images:
+  edge-kubernetes-app-example:
+    image: ${DEVSPACE_IMAGE_PREFIX}edge-kubernetes-app-example
+    dockerfile: ./docker/Dockerfile
+    context: ./src
+  edge-kubernetes-app-example-dev:
+    image: ${DEVSPACE_IMAGE_PREFIX}edge-kubernetes-app-example-dev
+    dockerfile: ./docker/Dockerfile.devspace
+    context: ./src
+
+commands:
+  terraform-init: |-
+    cd deploy/terraform/deployments/devspace
+    terraform init
+  create-edm-devenv: |-
+    edm env create ${DEVSPACE_NAME} --version 3.8
+    edm install -e ${DEVSPACE_NAME} -y ${EDM_APP_DEPENDENCIES}
+
+functions:
+  create_deployments: |-
+    cd deploy/terraform/deployments/devspace
+    export TF_VAR_namespace=${DEVSPACE_NAMESPACE}
+    export TF_VAR_kube_context=${DEVSPACE_CONTEXT}
+    export TF_VAR_image_name=$(get_image --only=image edge-kubernetes-app-example)
+    export TF_VAR_image_tag=$(get_image --only=tag edge-kubernetes-app-example)
+    export TF_VAR_local=$( [ ${DEVSPACE_CONTEXT} == "docker-desktop" ] || [ ${DEVSPACE_CONTEXT} == "minikube" ] && echo "true" || echo "false" )
+    terraform apply -auto-approve
+
+  purge_deployments: |-
+    cd deploy/terraform/deployments/devspace
+    export TF_VAR_namespace=${DEVSPACE_NAMESPACE}
+    export TF_VAR_kube_context=${DEVSPACE_CONTEXT}
+    terraform destroy -auto-approve
+
+dev:
+  edge-kubernetes-app-example:
+    labelSelector:
+      "app.kubernetes.io/name": "example"
+      "app.kubernetes.io/component": "backend"
+    devImage: ${runtime.images.edge-kubernetes-app-example-dev.image}:${runtime.images.edge-kubernetes-app-example-dev.tag}
+    command: ["/bin/sh", "-c"]
+    args: ["/home/app/startup-script.sh --reload"]
+    logs: {}
+    sync:
+      - path: src/startup-script.sh:/home/app/startup-script.sh
+        file: true
+        startContainer: true
+        disableDownload: true
+        printLogs: true
+        onUpload:
+          exec:
+            - command: |-
+                chmod +x /home/app/startup-script.sh
+          restartContainer: true
+      - path: src/main.py:/home/app/main.py
+        file: true
+        startContainer: true
+        disableDownload: true
+        printLogs: true
+  istio-ingressgateway: |-
+    $(
+      if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} != "minikube" ]; then
+        echo "null"
+      else
+        output='
+    labelSelector:
+      istio: ingressgateway
+    namespace: istio-system
+    ports:
+      - port: "8080:8080"'
+        echo "$output"
+      fi
+    )
