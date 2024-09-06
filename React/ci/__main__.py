@@ -23,7 +23,7 @@ def _bundle_image(config: dict) -> str:
     """
     return "/".join([config["repository"],
                      config["organisation"],
-                     config["image_name"]])
+                     config["app_id"]])
 
 
 @click.group()
@@ -91,7 +91,7 @@ def run(config, bundle_image, verbose):
 
     # Configuration details
     bundle_image = bundle_image or _bundle_image(config)
-    container_name = config["image_name"]
+    container_name = config["app_id"]
     version = config["app_version"]
 
     # Get values from the dev settings file (API tokens for testing, etc.)
