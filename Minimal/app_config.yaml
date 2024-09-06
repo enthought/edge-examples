@@ -1,6 +1,5 @@
-image_name: edge-minimal-example
+app_id: edge-minimal-example
 framework: generic
-app_id: null
 app_version: 1.2.0
 python_version: 3.8
 repository: quay.io

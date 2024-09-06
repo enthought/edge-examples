@@ -1,6 +1,5 @@
-image_name: edge-panel-example
+app_id: edge-panel-example
 framework: panel
-app_id: null
 app_version: 1.3.0
 python_version: 3.8
 repository: quay.io
