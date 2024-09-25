@@ -20,7 +20,7 @@ jobs:
           {
             directory: "Minimal",
             environment: "edge-minimal-example",
-            image: "quay.io/enthought/edge-example-minimal:1.2.0"
+            image: "quay.io/enthought/edge-minimal-example:1.2.0"
           },
           {
             directory: "Panel",

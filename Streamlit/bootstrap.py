@@ -16,7 +16,7 @@ import subprocess
 
 
 ENV_NAME = "edge-streamlit-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
+EDM_DEPS = ["click", "pip", "pyyaml", "setuptools"]
 
 
 def bootstrap(ci_mode):
