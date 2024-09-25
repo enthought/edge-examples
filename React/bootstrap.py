@@ -16,7 +16,7 @@ import subprocess
 
 
 ENV_NAME = "edge-react-example"
-EDM_DEPS = ["click", "gunicorn", "pip", "setuptools"]
+EDM_DEPS = ["click", "gunicorn", "pip", "pyyaml", "setuptools"]
 
 
 def bootstrap(ci_mode):
