@@ -35,7 +35,7 @@ jobs:
           {
             directory: "React",
             environment: "edge-react-example",
-            image: "quay.io/enthought/edge-native-app-flask-demo:1.3.0"
+            image: "quay.io/enthought/edge-react-example:1.3.0"
           },
           {
             directory: "Streamlit",
