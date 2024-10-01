@@ -1,0 +1,28 @@
+app_id: edge-minimal-example
+framework: generic
+app_version: 1.2.0
+python_version: 3.8
+repository: quay.io
+organisation: enthought
+env_deps:
+  edm:
+  - click
+  - enthought_edge
+  - filetype
+  - oauthlib
+  - pip
+  - python_dateutil
+  - pyyaml
+  - requests
+  - setuptools
+  pip:
+  - questionary
+app_deps:
+- flask
+- setuptools
+- gunicorn
+- enthought_edge
+cmd_deps:
+- docker
+exclude:
+- bootstrap.py

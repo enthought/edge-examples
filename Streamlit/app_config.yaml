@@ -1,0 +1,32 @@
+app_id: edge-streamlit-example
+framework: streamlit
+app_version: 1.3.0
+python_version: 3.8
+repository: quay.io
+organisation: enthought
+env_deps:
+  edm:
+  - click
+  - enthought_edge
+  - filetype
+  - oauthlib
+  - pip
+  - python_dateutil
+  - pyyaml
+  - requests
+  - setuptools
+  pip:
+  - questionary
+app_deps:
+- enthought_edge>=2.16.0
+- appdirs
+- packaging
+- pip
+- pyparsing
+- setuptools
+- six
+- requests
+cmd_deps:
+- docker
+exclude:
+- bootstrap.py

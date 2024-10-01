@@ -166,7 +166,7 @@ version = AppVersion(
     description="This Is An Example Edge Application",
     icon=ICON,
     kind=AppKindEnum.Native,
-    proxy_kind=AppProxyKindEnum.PlotlyDash,
+    framework=AppProxyKindEnum.PlotlyDash,
     link="quay.io/<YOUR_ORGANIZATION>/YOUR_IMAGE_NAME_HERE:TAG",
     recommended_profile="edge.medium"
 )

@@ -14,8 +14,9 @@
 import argparse
 import subprocess
 
+
 ENV_NAME = "edge-streamlit-example"
-EDM_DEPS = ["click", "pip", "setuptools"]
+EDM_DEPS = ["click", "pip", "pyyaml", "setuptools"]
 
 
 def bootstrap(ci_mode):
@@ -25,7 +26,7 @@ def bootstrap(ci_mode):
     """
 
     if ENV_NAME not in _list_edm_envs():
-        print(f"Creating development environment {ENV_NAME}...")
+        print(f"Creating development environment '{ENV_NAME}'...")
         cmd = ["edm", "envs", "create", ENV_NAME, "--version", "3.8", "--force"]
         subprocess.run(cmd, check=True)
 
@@ -35,10 +36,10 @@ def bootstrap(ci_mode):
         print("Bootstrap complete.")
 
     else:
-        print("Environment already exists; reusing.")
+        print(f"Environment '{ENV_NAME}' already exists; reusing.")
 
     if not ci_mode:
-        print(f"Activating dev environment {ENV_NAME}")
+        print(f"Activating environment '{ENV_NAME}'")
         subprocess.run(["edm", "shell", "-e", ENV_NAME])
 
 
