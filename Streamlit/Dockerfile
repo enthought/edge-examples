@@ -20,7 +20,7 @@
 
 ARG BASE_IMAGE=quay.io/enthought/edm-rockylinux-8:latest
 
-FROM $BASE_IMAGE as stage_one
+FROM $BASE_IMAGE AS stage_one
 
 ARG EDGE_BUNDLE=app_environment.zbundle
 COPY $EDGE_BUNDLE /tmp/app_environment.zbundle
@@ -38,7 +38,7 @@ RUN edm run -- python -m pip install --no-cache-dir \
 
 # Second stage
 
-FROM $BASE_IMAGE as stage_two
+FROM $BASE_IMAGE AS stage_two
 
 LABEL source="https://github.com/enthought/edge-examples/blob/main/Streamlit/Dockerfile"
 
