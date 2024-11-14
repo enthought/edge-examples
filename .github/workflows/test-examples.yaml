@@ -61,7 +61,7 @@ jobs:
           export PATH="$HOME/edm/bin:$PATH"
           set -e
           cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
-          edm envs create edm --version 3.8 --force
+          edm envs create edm --version 3.11 --force
           npm install -g configurable-http-proxy
 
       - name: Build example 
