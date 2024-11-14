@@ -61,6 +61,7 @@ jobs:
           export PATH="$HOME/edm/bin:$PATH"
           set -e
           cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
+          edm available-runtimes
           edm envs create edm --version 3.11 --force
           npm install -g configurable-http-proxy
 
