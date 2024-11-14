@@ -7,7 +7,7 @@ jobs:
 
   test-examples:
     name: Test Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       SHELL: /bin/bash
@@ -62,6 +62,7 @@ jobs:
           set -e
           cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
           edm available-runtimes
+          edm list-platforms
           edm envs create edm --version 3.11 --force
           npm install -g configurable-http-proxy
 
