@@ -63,7 +63,7 @@ jobs:
           cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
           edm available-runtimes
           edm list-platforms
-          edm envs create edm --version 3.11 --force
+          edm envs create edm --version 3.11 --platform rh8-x86_64 --force
           npm install -g configurable-http-proxy
 
       - name: Build example 
