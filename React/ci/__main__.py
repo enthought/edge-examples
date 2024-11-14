@@ -46,6 +46,11 @@ def build(config, bundle_image, rebuild_zbundle, verbose):
     bundle_image = bundle_image or _bundle_image(config)
     version = config["app_version"]
     app_deps = config["app_deps"]
+    python_version = str(config["python_version"])
+    if python_version == "3.8":
+        platform = "rh7-x86_64"
+    else:
+        platform = "rh8-x86_64"
 
     # First, build the React application
     jsdir = op.join(SRC_ROOT, "src", "application", "frontend")
@@ -62,9 +67,9 @@ def build(config, bundle_image, rebuild_zbundle, verbose):
             "generate",
             "-i",
             "--version",
-            config["python_version"],
+            python_version,
             "--platform",
-            "rh8-x86_64",
+            platform,
             "-m",
             "2.0",
             "-f",
