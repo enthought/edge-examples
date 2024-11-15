@@ -310,7 +310,7 @@ Application Version record in Edge. Once the application is successfully
 published, it can be launched from the Edge Workbench like any other native
 application.
 
-## Step 4: Other commands
+## Other commands
 
 You can check the full set of published versions using:
 
