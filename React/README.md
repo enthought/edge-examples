@@ -337,14 +337,10 @@ Before publishing an application, ensure that:
 1. You have a **developer license** for the Edge platform.
 2. You have been assigned the **developer role** within your organization.
 
-:::note
-
-Without both a developer license and the appropriate role, you will
+**Note:** Without both a developer license and the appropriate role, you will
 not be able to publish applications. If you encounter permission errors during
 publishing, please contact your organization's administrator to verify your
 access level.
-
-:::
 
 Once your application is built (as described in **Step 2**), you can publish it
 by running the following command:
