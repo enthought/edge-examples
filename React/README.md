@@ -32,7 +32,17 @@ Tips for using React (and Flask) when building an Edge native app:
 
 ## Before you begin
 
-Before starting, ensure you have the following installed:
+- **Try the new Edge CLI tool:** If you prefer a streamlined, automated
+workflow, use the [Edge CLI](#develop-react-app-example-with-the-edge-cli). This tool simplifies the process of creating,
+managing, and publishing Edge applications.
+
+- **Manual setup:** For a more hands-on approach, follow the steps in this
+section. This involves configuring your development environment and Docker
+manually.
+
+### Required tools for the manual setup:
+
+Ensure you have the following installed:
 
 * [Docker](https://docker.com)
 * [Node JS](https://nodejs.org)
