@@ -1,7 +1,7 @@
 app_id: edge-react-example
 framework: react
 app_version: 1.3.0
-python_version: 3.8
+python_version: 3.11
 repository: quay.io
 organisation: enthought
 env_deps:
@@ -20,7 +20,6 @@ env_deps:
   - questionary
 app_deps:
 - enthought_edge>=2.16.0
-- appdirs
 - packaging
 - pip
 - pyparsing

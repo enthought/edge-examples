@@ -7,11 +7,11 @@ jobs:
 
   test-examples:
     name: Test Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     env:
       SHELL: /bin/bash
-      INSTALLED_EDM_VERSION: "3.4.0"
+      INSTALLED_EDM_VERSION: "3.7.0"
       EDM_API_TOKEN: ${{ secrets.HATCHER_TOKEN }}
 
     strategy:
@@ -61,7 +61,9 @@ jobs:
           export PATH="$HOME/edm/bin:$PATH"
           set -e
           cp "${{ github.workspace }}/.github/data/edm.yml" $HOME/.edm.yaml
-          edm envs create edm --version 3.8 --force
+          edm available-runtimes
+          edm list-platforms
+          edm envs create edm --version 3.11 --platform rh8-x86_64 --force
           npm install -g configurable-http-proxy
 
       - name: Build example 
