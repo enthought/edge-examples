@@ -15,7 +15,7 @@ managing, and publishing Edge applications.
 section. This involves configuring your development environment and Docker
 manually.
 
-### Required tools for the manual setup:
+## Required tools for the manual setup:
 
 Ensure you have the following installed:
 
