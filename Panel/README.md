@@ -7,7 +7,17 @@ https://panel.holoviz.org/.
 
 ## Before you begin
 
-Before starting, ensure you have the following installed:
+- **Try the new Edge CLI tool:** If you prefer a streamlined, automated
+workflow, use the [Edge CLI](#develop-panel-app-example-with-the-edge-cli). This tool simplifies the process of creating,
+managing, and publishing Edge applications.
+
+- **Manual setup:** For a more hands-on approach, follow the steps in this
+section. This involves configuring your development environment and Docker
+manually.
+
+## Required tools for the manual setup:
+
+Ensure you have the following installed:
 
 * [Docker](https://docker.com)
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager 
@@ -171,4 +181,158 @@ version = AppVersion(
     recommended_profile="edge.medium"
 )
 edge.applications.add_app_version(version)
+```
+
+# Develop Panel app example with the Edge CLI
+
+The Edge CLI is a command-line tool that allows you to interact with the Edge 
+platform. You can use the Edge CLI to create, manage, and deploy applications on
+Edge.
+
+## Installing the Edge CLI
+
+To install the Edge CLI, you need to have the Enthought Deployment Manager (EDM)
+and with that you can install the `enthought_edge` client and `edge_cli`:
+
+```
+$ edm shell
+$ edm install enthought_edge edge_cli
+```
+
+Then you can test the CLI with:
+
+```
+$ edge
+```
+
+## Step 1: Initialize a new application
+
+Before initializing an application, **ensure Docker is installed and running on your machine**. 
+The Edge CLI relies on Docker to manage the application's containerized
+environment.
+
+**Prerequisite: Docker installation**
+
+You can install Docker by following the official instructions for your operating
+system:
+
+- **For macOS and Windows:** Use [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+- **For Linux:** Use the appropriate package manager, or follow this [guide](https://docs.docker.com/desktop/install/linux/).
+
+Once Docker is installed, ensure it is running before proceeding with the Edge
+CLI commands.
+
+In a terminal, execute the edge command to initialize a new application:
+
+```
+$ edge app init
+```
+
+This will log you into Edge (if necessary) and prompt you for the following:
+
+```
+? Application ID: my-app
+? Create application in which organization? Default organization
+? Application framework? Holoviz Panel
+Do you want to create new application "my-app"? [Y/n]:
+```
+
+Answer `Y` to create the application. This will create a new directory with the
+name of the application ID in the current directory, download the example
+application for the chosen framework into that directory, create an EDM
+virtual environment, and create an application record in Edge.
+
+Further `edge app` commands are performed from within the application
+directory:
+
+```
+$ cd my-app
+```
+
+## Step 2: Build and test
+
+You can build the application with:
+
+```
+$ edge app build
+```
+
+This prompts you for the version to build as, with version `1.0.0` as the
+initial default:
+
+```
+? Build to version: 1.0.0
+```
+
+If you override this default, it will build to the new version number and that
+becomes the new default working version.
+
+Once built, you can do a basic "smoke test" with:
+
+```
+$ edge app check
+```
+
+This will launch the application, ensure it can be communicated with, then
+shut it down again.
+
+If you want to interact with the application manually use:
+
+```
+$ edge app run
+```
+
+This launches your application where it can be found in your web browser
+at `http://127.0.0.1:9000/`.  Once you are done, you can shut it down with
+`Ctrl-C`.
+
+## Step 3: Publish the application
+
+Before publishing an application, ensure that:
+
+1. You have a **developer license** for the Edge platform.
+2. You have been assigned the **developer role** within your organization.
+
+**Note:** Without both a developer license and the appropriate role, you will
+not be able to publish applications. If you encounter permission errors during
+publishing, please contact your organization's administrator to verify your
+access level.
+
+Once your application is built (as described in **Step 2**), you can publish it
+by running the following command:
+
+```
+$ edge app publish
+```
+
+This will push the application to the Enthought quay repository and create an
+Application Version record in Edge. Once the application is successfully
+published, it can be launched from the Edge Workbench like any other native
+application.
+
+## Other commands
+
+You can check the full set of published versions using:
+
+```
+$ edge app versions
+```
+
+To have the application's dependencies available for further operations,
+enter its virtual environment:
+
+```
+$ edge app shell
+```
+
+See the full list of application commands with:
+
+```
+$ edge app --help
+```
+
+Run any given command in verbose mode for debugging:
+
+```
+$ edge app --verbose <command>
 ```
