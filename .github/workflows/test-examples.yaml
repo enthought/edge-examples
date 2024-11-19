@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up EDM
-        uses: enthought/setup-edm-action@v2
+        uses: enthought/setup-edm-action@v4
         with:
           edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
 
