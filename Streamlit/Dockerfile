@@ -51,10 +51,9 @@ COPY --from=stage_one --chown=app /home/app/.edm /home/app/.edm
 # Make any global changes (yum install, e.g.) in the second stage.
 # Don't change the user, and in particular don't make the user "root".
 
-# Copy startup script and application.
-COPY --chown=app ./src/startup-script.sh /home/app/startup-script.sh
+# Copy source and make startup-script executable
+COPY --chown=app ./src/ /home/app
 RUN chmod +x /home/app/startup-script.sh
-COPY --chown=app ./src/app.py /home/app/app.py
 
 # Copy in the config file for Streamlit
 RUN mkdir /home/app/.streamlit
