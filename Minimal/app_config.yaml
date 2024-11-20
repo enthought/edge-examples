@@ -18,13 +18,10 @@ env_deps:
   pip:
   - questionary
 app_deps:
-  edm:
-  - flask
-  - pip
-  - setuptools
-  - gunicorn
-  - enthought_edge
-  pip: []
+- flask
+- setuptools
+- gunicorn
+- enthought_edge
 cmd_deps:
 - docker
 exclude:
