@@ -49,7 +49,7 @@ hooks:
     command: |-
       $!(
         if ! [ -f ./src/app_environment.zbundle ] || [ $(get_flag "rebuild-zbundle") == "true" ]; then
-          echo 'edm bundle generate -i --version 3.11 --platform rh8-x86_64 -m 2.0 -f ./src/app_environment.zbundle ${EDM_APP_DEPENDENCIES}'
+          echo 'edm bundle generate -i --version 3.8 --platform rh7-x86_64 -m 2.0 -f ./src/app_environment.zbundle ${EDM_APP_DEPENDENCIES}'
         else
           echo ''
         fi
@@ -77,7 +77,7 @@ commands:
     cd deploy/terraform/deployments/devspace
     terraform init
   create-edm-devenv: |-
-    edm env create ${DEVSPACE_NAME} --version 3.11 --platform rh8-x86_64
+    edm env create ${DEVSPACE_NAME} --version 3.8
     edm install -e ${DEVSPACE_NAME} -y ${EDM_APP_DEPENDENCIES}
 
 functions:
