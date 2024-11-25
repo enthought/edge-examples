@@ -21,6 +21,7 @@ app_deps:
   edm:
   - enthought_edge>=2.16.0
   - packaging
+  - panel
   - pip
   - pyparsing
   - setuptools
@@ -28,8 +29,7 @@ app_deps:
   - numpy
   - pandas
   - matplotlib
-  pip:
-  - panel
+  pip: []
 cmd_deps:
 - docker
 exclude:

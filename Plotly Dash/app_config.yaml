@@ -19,6 +19,7 @@ env_deps:
   - questionary
 app_deps:
   edm:
+  - dash
   - enthought_edge>=2.16.0
   - packaging
   - pip
@@ -30,7 +31,6 @@ app_deps:
   - pandas
   - flask>2
   pip:
-  - dash
   - Flask-Session
 cmd_deps:
 - docker
