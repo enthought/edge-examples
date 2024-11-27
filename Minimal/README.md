@@ -346,6 +346,12 @@ enter its virtual environment:
 $ edge app shell
 ```
 
+To rebuild the application's EDM environment:
+
+```
+$ edge env build
+```
+
 See the full list of application commands with:
 
 ```
@@ -357,3 +363,46 @@ Run any given command in verbose mode for debugging:
 ```
 $ edge app --verbose <command>
 ```
+
+## Handling Application Compatibility in Edge CLI
+
+When working with the new Edge CLI alongside an older installed application, you
+might encounter compatibility issues during the build process. These issues
+arise because the configuration file format has changed, and the new CLI is
+designed for the updated format. Follow the steps below to resolve the issue:
+
+### Instructions
+
+1. Trigger the Build
+
+Run the following command to build your app:
+
+```
+$ edge app build
+```
+
+If your app's configuration is incompatible with the new CLI, the command will
+fail with a message indicating the need to upgrade.
+
+2. Upgrade the App Configuration
+
+Upgrade the application's configuration to the new format using:
+
+```
+$ edge app upgrade
+```
+
+This command updates the application's configuration file to match the
+requirements of the new Edge CLI. If the configuration is already compatible,
+the command will exit cleanly, confirming that no further changes are necessary.
+
+3. Rebuild the App
+
+Attempt the build again:
+
+```
+$ edge app build
+```
+
+This time, the build should succeed, as the configuration has been updated to
+ensure compatibility with the new CLI.
