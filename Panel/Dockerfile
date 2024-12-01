@@ -32,6 +32,9 @@ WORKDIR /home/app
 # Create a default EDM environment using the enthought_edge bundle
 RUN edm env import -f /tmp/app_environment.zbundle edm && edm cache purge --yes
 
+# Add any 'pip' packages to the application environment
+COPY requirements.txt /tmp/requirements.txt
+RUN edm run -- python -m pip install -r /tmp/requirements.txt --no-cache-dir
 
 # Second stage
 

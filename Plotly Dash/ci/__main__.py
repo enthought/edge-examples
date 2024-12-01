@@ -45,12 +45,11 @@ def build(config, bundle_image, rebuild_zbundle, verbose):
     # Configuration details
     bundle_image = bundle_image or _bundle_image(config)
     version = config["app_version"]
-    app_deps = config["app_deps"]
+    app_deps = config["app_deps"]["edm"]
     python_version = str(config["python_version"])
     if python_version == "3.8":
-        platform = "rh7-x86_64"
-    else:
-        platform = "rh8-x86_64"
+        raise RuntimeError("Python 3.8 is not supported")
+    platform = "rh8-x86_64"
 
     # First, we build a "zbundle" which contains all the eggs needed to
     # build the environment within the Docker image.

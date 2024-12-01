@@ -19,16 +19,19 @@ env_deps:
   pip:
   - questionary
 app_deps:
-- enthought_edge>=2.16.0
-- packaging
-- pip
-- pyparsing
-- setuptools
-- six
-- click
-- flask>2
-- gunicorn
-- opencv_python
+  edm:
+  - enthought_edge>=2.16.0
+  - packaging
+  - pip
+  - pyparsing
+  - setuptools
+  - six
+  - click
+  - flask>2
+  - gunicorn
+  - opencv_python
+  pip:
+  - Flask-Session
 cmd_deps:
 - docker
 exclude:

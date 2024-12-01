@@ -18,13 +18,18 @@ env_deps:
   pip:
   - questionary
 app_deps:
-- enthought_edge>=2.16.0
-- packaging
-- pip
-- pyparsing
-- setuptools
-- six
-- requests
+  edm:
+  - enthought_edge>=2.16.0
+  - packaging
+  - pip
+  - pyparsing
+  - setuptools
+  - six
+  - requests
+  pip:
+  - streamlit
+  - streamlit-javascript
+  - streamlit-extras
 cmd_deps:
 - docker
 exclude:
