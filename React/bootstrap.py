@@ -27,7 +27,8 @@ def bootstrap(ci_mode):
 
     if ENV_NAME not in _list_edm_envs():
         print(f"Creating development environment '{ENV_NAME}'...")
-        cmd = ["edm", "envs", "create", ENV_NAME, "--version", "3.8", "--force"]
+        cmd = ["edm", "envs", "create", ENV_NAME, "--version", "3.11",
+               "--platform", "rh8-x86_64", "--force"]
         subprocess.run(cmd, check=True)
 
         cmd = ["edm", "install", "-e", ENV_NAME, "-y"] + EDM_DEPS

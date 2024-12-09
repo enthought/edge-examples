@@ -11,7 +11,7 @@ jobs:
 
     env:
       SHELL: /bin/bash
-      INSTALLED_EDM_VERSION: "3.7.0"
+      INSTALLED_EDM_VERSION: "4.0.0"
       EDM_API_TOKEN: ${{ secrets.HATCHER_TOKEN }}
 
     strategy:
@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up EDM
-        uses: enthought/setup-edm-action@v2
+        uses: enthought/setup-edm-action@v4
         with:
           edm-version:  ${{ env.INSTALLED_EDM_VERSION }}
 
