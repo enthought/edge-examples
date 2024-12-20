@@ -37,7 +37,7 @@ def cli(ctx):
 @cli.command()
 @click.option("--bundle-image", default=None)
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
-@click.option("--verbose", default=False, is_flag=True)
+@click.option("--verbose/--no-verbose", default=True, is_flag=True)
 @click.pass_obj
 def build(config, bundle_image, rebuild_zbundle, verbose):
     """Build the Docker image"""
