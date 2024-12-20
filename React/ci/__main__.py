@@ -37,7 +37,7 @@ def cli(ctx):
 @cli.command()
 @click.option("--bundle-image", default=None)
 @click.option("--rebuild-zbundle", default=False, is_flag=True)
-@click.option("--verbose", default=False, is_flag=True)
+@click.option("--verbose/--no-verbose", default=True, is_flag=True)
 @click.pass_obj
 def build(config, bundle_image, rebuild_zbundle, verbose):
     """Build the Docker image"""
@@ -48,8 +48,9 @@ def build(config, bundle_image, rebuild_zbundle, verbose):
     app_deps = config["app_deps"]["edm"]
     python_version = str(config["python_version"])
     if python_version == "3.8":
-        raise RuntimeError("Python 3.8 is not supported")
-    platform = "rh8-x86_64"
+        platform = "rh7-x86_64"
+    else:
+        platform = "rh8-x86_64"
 
     # First, build the React application
     jsdir = op.join(SRC_ROOT, "src", "application", "frontend")
