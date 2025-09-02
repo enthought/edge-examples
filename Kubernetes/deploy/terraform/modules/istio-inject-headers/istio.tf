@@ -1,29 +1,11 @@
-resource "kubernetes_manifest" "gateway_localhost" {
-  manifest = {
-    apiVersion = "networking.istio.io/v1beta1"
-    kind       = "Gateway"
-    metadata = {
-      name      = "localhost"
-      namespace = "istio-system"
-    }
-
-    spec = {
-      selector = {
-        istio = "ingressgateway"
-      }
-      servers = [
-        {
-          hosts = [
-            "*"
-          ]
-          port = {
-            name     = "http"
-            number   = 80
-            protocol = "HTTP"
-          }
-        },
-      ]
-    }
+# This data source is only here to provoke an _obvious_ error if the
+# chosen istio gateway does not exist.
+data "kubernetes_resource" "gateway" {
+  api_version = "networking.istio.io/v1"
+  kind        = "Gateway"
+  metadata {
+    name      = var.istio_gateway_name
+    namespace = var.istio_ingress_namespace
   }
 }
 
@@ -86,7 +68,7 @@ resource "kubernetes_manifest" "authorization_policy_backend" {
             {
               source = {
                 principals = [
-                  "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"
+                  var.istio_ingress_sa_principal
                 ]
               }
             }
@@ -104,6 +86,9 @@ resource "kubernetes_manifest" "authorization_policy_backend" {
       ]
     }
   }
+  field_manager {
+    force_conflicts = true
+  }
 }
 
 
@@ -117,10 +102,10 @@ resource "kubernetes_manifest" "virtualservice" {
     }
     spec = {
       gateways = [
-        "${kubernetes_manifest.gateway_localhost.manifest.metadata.namespace}/${kubernetes_manifest.gateway_localhost.manifest.metadata.name}"
+        "${var.istio_ingress_namespace}/${var.istio_gateway_name}",
       ]
       hosts = [
-        "*"
+        "${var.app_name}.local.enthought.com",
       ]
       http = [
         {
@@ -136,6 +121,9 @@ resource "kubernetes_manifest" "virtualservice" {
               set = merge(
                 {
                   "X-Forwarded-For" = "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
+                },
+                {
+                  
                 },
                 { for k, v in var.inject_headers : k => v }
               )

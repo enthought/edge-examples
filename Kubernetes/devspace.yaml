@@ -121,17 +121,3 @@ dev:
         startContainer: true
         disableDownload: true
         printLogs: true
-  istio-ingressgateway: |-
-    $(
-      if [ ${DEVSPACE_CONTEXT} != "docker-desktop" ] && [ ${DEVSPACE_CONTEXT} != "minikube" ]; then
-        echo "null"
-      else
-        output='
-    labelSelector:
-      istio: ingressgateway
-    namespace: istio-system
-    ports:
-      - port: "8080:8080"'
-        echo "$output"
-      fi
-    )
