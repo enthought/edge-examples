@@ -36,3 +36,9 @@ variable "istio_gateway_name" {
   type        = string
   default     = "local-enthought-com"
 }
+
+variable "istio_ingress_sa_principal" {
+  type = string
+  default = "cluster.local/ns/istio-ingress/sa/istio-ingress"
+  description = "Principal used to allow traffic from in the istio.tf configuration."
+}

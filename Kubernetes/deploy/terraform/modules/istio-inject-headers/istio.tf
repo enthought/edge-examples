@@ -68,9 +68,7 @@ resource "kubernetes_manifest" "authorization_policy_backend" {
             {
               source = {
                 principals = [
-                  "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account",
-                  "cluster.local/ns/istio-ingress/sa/istio-ingress-internet-facing",
-                  "*"
+                  var.istio_ingress_sa_principal
                 ]
               }
             }
@@ -87,6 +85,9 @@ resource "kubernetes_manifest" "authorization_policy_backend" {
         }
       ]
     }
+  }
+  field_manager {
+    force_conflicts = true
   }
 }
 
