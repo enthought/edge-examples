@@ -11,9 +11,7 @@ on Enthought-managed Kubernetes clusters, while retrieving user metadata from th
 Before starting, ensure you have the following installed:
 
 * [EDM](https://www.enthought.com/edm/), the Enthought Deployment Manager
-* A local Docker installation for building container images and hosting a Kubernetes cluster (for local deployment):
-  * [Minikube](https://minikube.sigs.k8s.io/docs/start/) or
-  * [Docker Desktop](https://docs.docker.com/desktop/)  
+* [Docker Desktop](https://docs.docker.com/desktop/) for building container images and hosting a Kubernetes cluster (for local deployment) 
 * [DevSpace](https://www.devspace.sh/docs/getting-started/installation)
 * [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
@@ -24,28 +22,24 @@ The example can be deployed and run locally or on a remote Kubernetes cluster.
 
 ### Local deployment
 
-The local deployment option relies on a local Kubernetes cluster and has been tested with Minikube and with Docker Desktop's built-in Kubernetes feature.
+The local deployment option relies on a local Kubernetes cluster and has been tested with Docker Desktop's built-in Kubernetes feature,
+using the `kind` (Kubernetes in Docker) cluster option.
 
 User metadata is passed to the application via HTTP headers. For the local deployment, we are mocking the headers
 by injecting test user metadata into incoming requests via Istio.
 
-We recommend using Minikube for local development, since it simplifies the setup of Istio and lacks the licensing restrictions of Docker Desktop.
-
-#### Minikube
-
-1. Make sure that the Minikube CLI has been installed.
-2. Start a Minikube cluster (with Istio) by running `minikube start --memory 4096 --addons="istio-provisioner,istio"`
-
-> [!NOTE]
-> Minikube will automatically try to detect the appropriate driver for your system. If you want to use a specific driver, you can specify it with the `--driver` flag. See the [Minikube documentation](https://minikube.sigs.k8s.io/docs/start/) for more information. We have successfully tested this example with the `docker` driver, `hyper-v` driver on Windows and `hyperkit` driver on MacOS.
+We recommend using Docker Desktop with `kind` for local development, since it simplifies the setup of Istio and lacks the licensing restrictions of Docker Desktop.
 
 #### Docker Desktop
 
 For Docker Desktop, you will need to perform the following steps:
 
 1. Make sure that Docker Desktop has been installed and is running.
-2. Enable the built-in Kubernetes feature via Settings -> Kubernetes -> Enable Kubernetes.
+2. Enable the built-in Kubernetes feature via Settings -> Kubernetes -> Enable Kubernetes. Make sure the Cluster settings are set to use the `kind` cluster provisioning method
 3. Install Istio. [Istio's default profile](https://istio.io/latest/docs/setup/install/istioctl/#install-istio-using-the-default-profile) is sufficient for this example.
+4. Download or clone the [`terraform-kubernetes-local-bootstrap`](https://github.com/enthought/terraform-kubernetes-local-bootstrap) repository
+and follow the [`README.md`](https://github.com/enthought/terraform-kubernetes-local-bootstrap/blob/main/README.md) instructions. This will install CoreDNS and make your
+application be available locally at `https://example.local.enthought.com`.
 
 ### Remote deployment
 
@@ -61,7 +55,7 @@ Remote deployments will use the actual user metadata provided by Identity/Keyclo
 
 The following steps will guide you through the process of deploying the example app locally.
 
-1. Make sure that your Kubenetes context is pointing to the local cluster by running `devspace use context minikube` (or `devspace use context docker-desktop` if you are using Docker Desktop).
+1. Make sure that your Kubenetes context is pointing to the local cluster by running `devspace use context docker-desktop`.
 
 2. Run `devspace run terraform-init` to initialize the Terraform workspace that will deploy the application resources into your local Kubernetes cluster.
 

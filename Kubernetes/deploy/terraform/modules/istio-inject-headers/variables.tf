@@ -26,3 +26,13 @@ variable "inject_headers" {
   type = map(string)
   default = {}
 }
+
+variable "istio_ingress_namespace" {
+  type        = string
+  default     = "istio-ingress"
+}
+
+variable "istio_gateway_name" {
+  type        = string
+  default     = "local-enthought-com"
+}

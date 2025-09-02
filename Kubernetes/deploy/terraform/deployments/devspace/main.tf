@@ -6,7 +6,7 @@ provider "kubernetes" {
 locals {
   app_name       = "example"
   component_name = "backend"
-  prefix         = "/k8s/default/example/"
+  prefix         = "/"
   service_port   = 9000
   container_port = 9000
 
