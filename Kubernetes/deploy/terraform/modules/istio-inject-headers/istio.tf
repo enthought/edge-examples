@@ -121,6 +121,9 @@ resource "kubernetes_manifest" "virtualservice" {
                 {
                   "X-Forwarded-For" = "%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%"
                 },
+                {
+                  
+                },
                 { for k, v in var.inject_headers : k => v }
               )
             }
